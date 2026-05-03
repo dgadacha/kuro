@@ -1,124 +1,92 @@
 <p align="center">
-<a href="https://seanime.app/">
-<img src="docs/images/seanime-logo.png" alt="preview" width="70px"/>
-</a>
+  <img src="seanime-web/public/kuro-logo.svg" alt="Kuro" width="96"/>
 </p>
 
-<h1 align="center"><b>Seanime</b></h1>
+<h1 align="center">Kuro</h1>
 
 <p align="center">
-<img src="https://seanime.app/bucket/gh-showcase.webp" alt="preview" width="100%"/>
+  A Netflix-style anime streaming app — French-first, no clutter, no local library required.
+  <br/>
+  <em>Fork of <a href="https://github.com/5rahim/seanime">Seanime</a>.</em>
 </p>
 
-<p align="center">
-  <a href="https://seanime.app/docs">Documentation</a> |
-  <a href="https://github.com/5rahim/seanime/releases">Latest release</a> |
-  <a href="https://www.youtube.com/playlist?list=PLgQO-Ih6JClhFFdEVuNQJejyX_8iH82gl">Tutorials</a> |
-  <a href="https://discord.gg/Sbr7Phzt6m">Discord</a> |
-  <a href="https://seanime.app/docs/policies">Copyright</a>
-</p>
+---
 
-<div align="center">
-  <a href="https://github.com/5rahim/seanime/releases">
-    <img src="https://img.shields.io/github/v/release/5rahim/seanime?style=flat-square&color=blue" alt="" />
-  </a>
-  <a href="https://github.com/5rahim/seanime/releases">
-    <img src="https://img.shields.io/github/downloads/5rahim/seanime/total?style=flat-square&color=blue" alt="" />
-  </a>
-	<a href="https://discord.gg/Aruz7wdAaf">
-	  <img src="https://img.shields.io/discord/1224767201551192224?style=flat-square&logo=Discord&color=blue&label=Discord" alt="discord">
-	</a>
-  <a href="https://github.com/sponsors/5rahim">
-    <img src="https://img.shields.io/static/v1?label=Sponsor&style=flat-square&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" alt="" />
-  </a>
-</div>
+## What it is
 
+Self-hosted web app to discover, track and watch anime, with the visual language of Netflix. Stream from online sources or via torrent, sync your progress to AniList, watch offline.
 
-<h5 align="center">
-Leave a star if you like the project! ⭐️
-</h5>
+## What's different from Seanime
 
-## About
+This fork strips everything that doesn't fit a "watch anime quickly" use case:
 
-Seanime is a **media server** with a **web interface** and **desktop app** for managing your local library, streaming anime and reading manga.
+- **Removed** — manga (entirely), the local-file scanner and library, the full torrent client (qBittorrent / Transmission), the auto-downloader, MyAnimeList sync, the schedule view, the Electron desktop client, all the related settings.
+- **Reworked** — Netflix-style top bar (transparent over hero, opaque on scroll), Netflix-style home with hero + horizontal rows including "Continue watching", grid-based My Lists & Search, a flat brand-red theme on pure black.
+- **Added** — bilingual French / English toggle, FR-first defaults, a one-command Makefile.
 
-> [!IMPORTANT]
->Seanime does not provide, host, or distribute any media content. Users are responsible for obtaining media through legal means and complying with their local laws. Extensions listed on the app are unaffiliated with Seanime and may be removed if they violated copyright laws. </strong>
+## Stack
 
+- **Backend**: Go 1.23+ — Echo, GORM/SQLite, Goja (JS extensions), torrent client for streaming.
+- **Frontend**: React + Tanstack Router + Tailwind, bundled with Rsbuild.
+- **API ↔ UI**: REST with codegen-typed hooks, WebSocket for events.
 
-## Features
+## Install
 
-- **Cross-platform**: Web interface and desktop app for Windows, Linux, and macOS
-- **Seanime Denshi**: Desktop client with built-in video player (support for SSA/ASS subtitles, Anime4K sharpening, auto translation, and more)
-- **AniList Integration**: Browse and manage your lists, discover anime and manga
-- **Custom Sources**: Support for adding non-AniList anime and manga series 
-- **Library Management**: Fast and smart scanning of local files without strict naming conventions or folder structures
-- **Torrent Integration**: Built-in torrent search engine via extensions and downloading support with Qbittorrent, Transmission, Torbox, and Real-Debrid
-- **Torrent Streaming**: Stream torrents directly to the media player without waiting for downloads (supports Bittorrent, Torbox and Real-Debrid)
-- **Online Streaming**: Watch anime from online sources directly within the app via extensions
-- **Auto Downloader**: Automatically track and download new episodes with customizable filters and advanced features (prioritization, scoring, delay, etc.)
-- **Extension Marketplace**: In-app repository to install and manage extensions for online streaming, manga sources, and torrent providers
-- **Manga Reader**: Read chapters from your local library or via extensions with a unified interface
-- **Transcoding & Direct Play**: Stream your library to any device web browser with on-the-fly transcoding or direct play
-- **External Player Support**: Seamless integration with MPV, VLC, and MPC-HC on desktop
-- **Mobile Player Integration**: Open files and streams in mobile players (Outplayer, VLC, etc.) via intents or deep links
-- **Playlists**: Create and manage playlists for a seamless binge watching experience
-- **Customizable UI**: Personalize the interface with color themes, background images, and layout options
-- **Discord Rich Presence**: Display your watching activity automatically
-- **Offline Mode**: Access your anime and manga library without an internet connection
-- **Schedule**: Track upcoming releases and missed episodes
+### Prerequisites
+- Go 1.23+
+- Node.js 18+ + npm
+- ffmpeg (for transcoding)
 
-## Get started
+### Dev
 
-Read the installation guide to set up Seanime on your device.
+```sh
+make dev
+```
 
-<p align="center">
-<a href="https://seanime.app/docs" style="font-size:18px;" align="center">
-How to install Seanime
-</a>
-</p>
+First run installs npm deps, writes `~/.seanime-data/config.toml`, starts the Go backend (port `43211`) and the rsbuild dev server (port `43210`) in parallel. `Ctrl+C` stops both.
 
-<br>
+Open <http://127.0.0.1:43210>.
 
-## Goal
+### Production build
 
-This is a one-person project and may not meet every use case. If it doesn’t fully fit your needs, other tools might be a better match.
+```sh
+make build   # produces ./seanime binary with embedded web UI
+make run     # build then launch
+```
 
-### Not planned
+### Other targets
 
-- Built-in support for other trackers such as MyAnimeList, Trakt, SIMKL, etc.
-- Built-in support for other media players
-- Built-in localization (translations)
+```sh
+make help    # list everything
+make clean   # remove build artifacts (keeps your data dir)
+```
 
+Override defaults inline: `make dev DATADIR=/tmp/kuro PORT=43211`.
 
-Consider sponsoring or sharing the project if you want to see more features implemented.
+## First-time setup
 
-## Sponsors
+1. Authenticate with AniList from the profile dropdown (top-right avatar). Required for "Continue watching" and progress sync.
+2. **Extensions → Marketplace** — install at least one streaming source. For French content: search `anime-sama` (online streaming), `nyaa` (torrent search, filter by `VOSTFR` / `VF`).
+3. **Settings → Online streaming** — enable.
+4. Pick an anime → it lands on the **Online streaming** tab by default → choose your provider once and it sticks per-anime.
 
-The maintenance of this project is made possible by the sponsors.
+## Project layout
 
-<p align="center">
-<!-- real-sponsors --><a href="https://github.com/TorBox-App"><img src="https:&#x2F;&#x2F;github.com&#x2F;TorBox-App.png" width="60px" alt="User avatar: TorBox-App" /></a><!-- real-sponsors -->
-<!-- real-sponsors --><a href="https://github.com/Ikyion"><img src="https:&#x2F;&#x2F;github.com&#x2F;Ikyion.png" width="60px" alt="User avatar: Ikyion" /></a><!-- real-sponsors -->
-<!-- real-sponsors --><a href="https://github.com/osayed0001"><img src="https:&#x2F;&#x2F;github.com&#x2F;osayed0001.png" width="60px" alt="User avatar: osayed0001" /></a><!-- real-sponsors -->
-</p>
+```
+.
+├── main.go                 # thin Go entrypoint
+├── internal/               # backend modules (handlers, plugin runtime, torrent, …)
+├── seanime-web/            # frontend (React + Rsbuild)
+│   └── src/app/(main)/_features/netflix/   # the Kuro-specific UI
+├── codegen/                # generates TS types/hooks from Go handlers
+├── Makefile                # dev / build / run / clean
+└── web/                    # built frontend, embedded into the Go binary at build
+```
 
-## Tech stack
+The Netflix-themed UI lives almost entirely in `seanime-web/src/app/(main)/_features/netflix/`. Translations are in `seanime-web/src/lib/i18n/locales/{en,fr}.json`.
 
-* Server: [Go](https://go.dev/)
-* Frontend: [React](https://reactjs.org/), [Rsbuild/Rspack](https://rsbuild.rs/), [Tanstack Router](https://tanstack.com/router)
-* Seanime Denshi: [Electron](https://www.electronjs.org/)
+## Credits & license
 
-## Development and Build
+Kuro is a fork of [5rahim/seanime](https://github.com/5rahim/seanime) — all the heavy lifting (the Go server, the plugin runtime, the AniList client, the torrent streamer) is theirs.
 
-Building from source is straightforward, you'll need [Node.js](https://nodejs.org/en/download) and [Go](https://go.dev/doc/install) installed on your system.
-Development and testing might require additional configuration.
-
-[Read more here](https://github.com/5rahim/seanime/blob/main/DEVELOPMENT_AND_BUILD.md)
-
-<br>
-
-<br>
-
-> [!NOTE]
-> For copyright-related requests, please contact the maintainer using the contact information provided on [the website](https://seanime.app/docs/policies).
+Released under the same license as the upstream project — see [LICENSE](LICENSE).
