@@ -102,25 +102,25 @@ export default function Page() {
                         data-discover-page-anime-container
                     >
                         <div className="space-y-2 z-[5] relative" data-discover-page-anime-trending-container>
-                            <h2>Trending Right Now</h2>
+                            <h2>{t("discover.trending_now")}</h2>
                             <DiscoverTrending />
                         </div>
                         <RecentReleases />
                         <div className="space-y-2 z-[5] relative" data-discover-page-anime-highest-rated-container>
-                            <h2>Top of the Season</h2>
+                            <h2>{t("discover.top_of_season")}</h2>
                             <DiscoverThisSeason />
                         </div>
                         <div className="space-y-2 z-[5] relative" data-discover-page-anime-highest-rated-container>
-                            <h2>Best of Last Season</h2>
+                            <h2>{t("discover.best_of_last_season")}</h2>
                             <DiscoverPastSeason />
                         </div>
                         <DiscoverMissedSequelsSection />
                         <div className="space-y-2 z-[5] relative" data-discover-page-anime-upcoming-container>
-                            <h2>Coming Soon</h2>
+                            <h2>{t("discover.coming_soon")}</h2>
                             <DiscoverUpcoming />
                         </div>
                         <div className="space-y-2 z-[5] relative" data-discover-page-anime-trending-movies-container>
-                            <h2>Trending Movies</h2>
+                            <h2>{t("discover.trending_movies")}</h2>
                             <DiscoverTrendingMovies />
                         </div>
                         {/*<div className="space-y-2 z-[5] relative">*/}

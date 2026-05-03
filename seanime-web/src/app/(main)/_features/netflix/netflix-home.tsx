@@ -16,9 +16,9 @@ export function NetflixHome() {
         <div data-netflix-home className="contents">
             <NetflixHero />
 
-            {/* Slight overlap under the hero's bottom gradient — kept gentle so the
-                row title doesn't crash into the hero CTAs at common viewport sizes. */}
-            <div className="relative z-[2] -mt-12 space-y-10 pb-20">
+            {/* Modest pull-up keeps the Netflix overlap feel without crashing
+                the first row title into the hero CTAs. */}
+            <div className="relative z-[2] mt-4 space-y-10 pb-20">
                 <TrendingRow />
                 <PopularRow />
                 <CurrentSeasonRow />

@@ -17,6 +17,7 @@ import { Carousel, CarouselContent, CarouselDotButtons, CarouselItem } from "@/c
 import { ContextMenuItem } from "@/components/ui/context-menu"
 import { useThemeSettings } from "@/lib/theme/theme-hooks"
 import React from "react"
+import { useTranslation } from "react-i18next"
 import { IoLibrarySharp } from "react-icons/io5"
 import { LuTvMinimalPlay } from "react-icons/lu"
 
@@ -29,6 +30,7 @@ type EpisodeSectionProps = {
 }
 
 export function EpisodeSection({ entry, details, bottomSection, hideCarousel, maxCol = 4 }: EpisodeSectionProps) {
+    const { t } = useTranslation()
     const ts = useThemeSettings()
     const serverStatus = useServerStatus()
     const { currentView } = useAnimeEntryPageView()
@@ -229,7 +231,7 @@ export function EpisodeSection({ entry, details, bottomSection, hideCarousel, ma
                     />}
 
                     {specialEpisodes.length > 0 && <>
-                        <h2>Specials</h2>
+                        <h2>{t("entry.specials")}</h2>
                         <EpisodeListGrid data-episode-list-specials maxCol={maxCol}>
                             {specialEpisodes.map(episode => (
                                 <EpisodeItem
@@ -250,7 +252,7 @@ export function EpisodeSection({ entry, details, bottomSection, hideCarousel, ma
                     </>}
 
                     {ncEpisodes.length > 0 && <>
-                        <h2>Others</h2>
+                        <h2>{t("entry.others")}</h2>
                         <EpisodeListGrid data-episode-list-others maxCol={maxCol}>
                             {ncEpisodes.map(episode => (
                                 <EpisodeItem

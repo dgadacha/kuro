@@ -5,8 +5,10 @@ import { AppLayoutStack } from "@/components/ui/app-layout"
 import { Carousel, CarouselContent, CarouselDotButtons } from "@/components/ui/carousel"
 import { addSeconds, formatDistanceToNow, subDays } from "date-fns"
 import React from "react"
+import { useTranslation } from "react-i18next"
 
 export function RecentReleases() {
+    const { t } = useTranslation()
 
     const { data, isLoading } = useAnilistListRecentAiringAnime({
         page: 1,
@@ -25,7 +27,7 @@ export function RecentReleases() {
 
     return (
         <AppLayoutStack className="pb-6">
-            <h2>Aired Recently</h2>
+            <h2>{t("discover.aired_recently")}</h2>
             <Carousel
                 className="w-full max-w-full"
                 gap="md"

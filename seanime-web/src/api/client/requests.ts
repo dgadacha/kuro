@@ -1,5 +1,6 @@
 import { getServerBaseUrl } from "@/api/client/server-url"
 import { SERVER_AUTH_TOKEN_STORAGE_KEY, serverAuthTokenAtom } from "@/app/(main)/_atoms/server-status.atoms"
+import i18n from "@/lib/i18n"
 import { getClientId, getClientIdProof, setClientIdentity } from "@/lib/server/client-id"
 import { __clientPlatform__ } from "@/types/constants"
 import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from "@tanstack/react-query"
@@ -283,7 +284,7 @@ function _handleSeaError(data: any): string {
 
     const err = data?.error as string
 
-    if (!err) return "Unknown error"
+    if (!err) return i18n.t("errors.unknown", { defaultValue: "Unknown error" })
 
     if (err.includes("Too many requests"))
         return "AniList: Too many requests, please wait a moment and try again."

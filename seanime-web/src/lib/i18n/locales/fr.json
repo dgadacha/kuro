@@ -51,7 +51,31 @@
   },
   "discover": {
     "tab_anime": "Anime",
-    "tab_schedule": "Planning"
+    "tab_schedule": "Planning",
+    "trending_now": "Tendances actuelles",
+    "top_of_season": "Top de la saison",
+    "best_of_last_season": "Meilleurs de la saison passée",
+    "coming_soon": "Prochainement",
+    "trending_movies": "Films tendance",
+    "aired_recently": "Diffusés récemment",
+    "airing_schedule": "Planning de diffusion",
+    "missed_sequels": "Suites que tu pourrais avoir manquées"
+  },
+  "entry": {
+    "specials": "Spéciaux",
+    "others": "Autres",
+    "online_streaming": "Streaming en ligne",
+    "torrent_streaming": "Torrent streaming",
+    "debrid_streaming": "Streaming Debrid",
+    "no_provider_available": "Aucun provider disponible. Installe d'abord une extension provider.",
+    "trailer": "Bande-annonce"
+  },
+  "errors": {
+    "unknown": "Erreur inconnue",
+    "network": "Erreur réseau. Vérifie ta connexion.",
+    "kuro_unexpected": "Kuro a rencontré une erreur inattendue. Réessaye.",
+    "retry": "Réessayer",
+    "reload": "Recharger"
   },
   "settings": {
     "tabs": {

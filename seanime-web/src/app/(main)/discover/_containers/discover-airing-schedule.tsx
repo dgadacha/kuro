@@ -11,10 +11,12 @@ import { format, isSameMonth, isToday, subDays } from "date-fns"
 import { addDays } from "date-fns/addDays"
 import { isSameDay } from "date-fns/isSameDay"
 import React from "react"
+import { useTranslation } from "react-i18next"
 import { LuDock, LuEye } from "react-icons/lu"
 
 
 export function DiscoverAiringSchedule() {
+    const { t } = useTranslation()
     const { data, isLoading } = useAnilistListRecentAiringAnime({
         page: 1,
         perPage: 50,
@@ -91,7 +93,7 @@ export function DiscoverAiringSchedule() {
 
     return (
         <div className="space-y-4 z-[5] relative" data-discover-airing-schedule-container>
-            <h2 className="text-center">Airing Schedule</h2>
+            <h2 className="text-center">{t("discover.airing_schedule")}</h2>
             <div className="space-y-6">
                 {days.map((day, index) => {
                     if (day.events.length === 0) return null
