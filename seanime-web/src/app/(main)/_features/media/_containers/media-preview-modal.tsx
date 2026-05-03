@@ -1,7 +1,6 @@
 import { AL_AnimeDetailsById_Media, AL_BaseAnime, AL_MangaDetailsById_Media, Anime_Entry, Manga_Entry, Nullish } from "@/api/generated/types"
 import { useGetAnilistAnimeDetails } from "@/api/hooks/anilist.hooks"
 import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
-import { useGetMangaEntry, useGetMangaEntryDetails } from "@/api/hooks/manga.hooks"
 import { TrailerModal } from "@/app/(main)/_features/anime/_components/trailer-modal"
 import { AnimeEntryStudio } from "@/app/(main)/_features/media/_components/anime-entry-studio"
 import {
@@ -20,7 +19,6 @@ import {
     __torrentSearch_selectionEpisodeAtom,
     TorrentSearchDrawer,
 } from "@/app/(main)/entry/_containers/torrent-search/torrent-search-drawer"
-import { MangaRecommendations } from "@/app/(main)/manga/_components/manga-recommendations"
 import { SeaImage } from "@/components/shared/sea-image"
 import { SeaLink } from "@/components/shared/sea-link"
 import { Button, IconButton } from "@/components/ui/button"
@@ -102,7 +100,6 @@ export function MediaPreviewModal(props: AnimePreviewModalProps) {
                 </div>}
 
                 {info?.type === "anime" && <Anime mediaId={info.mediaId} />}
-                {info?.type === "manga" && <Manga mediaId={info.mediaId} />}
 
 
             </Modal>
@@ -115,13 +112,6 @@ function Anime({ mediaId }: { mediaId: number }) {
     const { data: details, isLoading: detailsLoading } = useGetAnilistAnimeDetails(mediaId)
 
     return <Content entry={entry} details={details} entryLoading={entryLoading} detailsLoading={detailsLoading} type="anime" />
-}
-
-function Manga({ mediaId }: { mediaId: number }) {
-    const { data: entry, isLoading: entryLoading } = useGetMangaEntry(mediaId)
-    const { data: details, isLoading: detailsLoading } = useGetMangaEntryDetails(mediaId)
-
-    return <Content entry={entry} details={details} entryLoading={entryLoading} detailsLoading={detailsLoading} type="manga" />
 }
 
 function Content({ entry, entryLoading, detailsLoading, details, type }: {
@@ -301,7 +291,6 @@ function Content({ entry, entryLoading, detailsLoading, details, type }: {
                             maxCol={2}
                         />}
                         {type === "anime" && <RelationsRecommendationsSection entry={entry as Anime_Entry} details={details} maxCol={5} />}
-                        {type === "manga" && <MangaRecommendations entry={entry as Manga_Entry} details={details} maxCol={5} />}
                     </div>}
                 </div>
 

@@ -1,6 +1,5 @@
 import { useSetOfflineMode } from "@/api/hooks/local.hooks"
 import { SidebarNavbar } from "@/app/(main)/_features/layout/top-navbar"
-import { useServerStatus } from "@/app/(main)/_hooks/use-server-status"
 import { ConfirmationDialog, useConfirmationDialog } from "@/components/shared/confirmation-dialog"
 import { AppSidebar, useAppSidebarContext } from "@/components/ui/app-layout"
 import { Avatar } from "@/components/ui/avatar"
@@ -10,12 +9,11 @@ import { usePathname } from "@/lib/navigation"
 import { useThemeSettings } from "@/lib/theme/theme-hooks"
 import React from "react"
 import { IoCloudyOutline, IoLibraryOutline } from "react-icons/io5"
-import { LuBookOpen, LuSettings } from "react-icons/lu"
+import { LuSettings } from "react-icons/lu"
 import { PluginSidebarTray } from "../plugin/tray/plugin-sidebar-tray"
 
 
 export function OfflineSidebar() {
-    const serverStatus = useServerStatus()
     const ctx = useAppSidebarContext()
     const ts = useThemeSettings()
 
@@ -86,13 +84,7 @@ export function OfflineSidebar() {
                                 href: "/offline",
                                 isCurrent: pathname === "/offline",
                             },
-                            ...[serverStatus?.settings?.library?.enableManga && {
-                                iconType: LuBookOpen,
-                                name: "Manga",
-                                href: "/offline/manga",
-                                isCurrent: pathname.startsWith("/offline/manga"),
-                            }].filter(Boolean) as any,
-                        ].filter(Boolean)}
+                        ]}
                         onLinkItemClick={() => ctx.setOpen(false)}
                     />
 

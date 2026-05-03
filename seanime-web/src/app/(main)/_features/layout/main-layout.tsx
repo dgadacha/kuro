@@ -2,8 +2,6 @@ import { ScanProgressBar } from "@/app/(main)/_features/anime-library/_container
 import { ScannerModal } from "@/app/(main)/_features/anime-library/_containers/scanner-modal"
 import { ErrorExplainer } from "@/app/(main)/_features/error-explainer/error-explainer"
 import { IssueReport } from "@/app/(main)/_features/issue-report/issue-report"
-import { LibraryExplorerDrawer } from "@/app/(main)/_features/library-explorer/library-explorer-drawer"
-import { LibraryWatcher } from "@/app/(main)/_features/library-watcher/library-watcher"
 import { MediaPreviewModal } from "@/app/(main)/_features/media/_containers/media-preview-modal"
 import { MainSidebar } from "@/app/(main)/_features/navigation/main-sidebar"
 import { GlobalPlaylistManager } from "@/app/(main)/_features/playlists/_containers/global-playlist-manager"
@@ -17,20 +15,15 @@ import { useChangelogTourListener } from "@/app/(main)/_features/tour/changelog-
 
 import { useAnimeCollectionLoader } from "@/app/(main)/_hooks/anilist-collection-loader"
 import { useAnimeLibraryCollectionLoader } from "@/app/(main)/_hooks/anime-library-collection-loader"
-import { useMangaCollectionLoader } from "@/app/(main)/_hooks/manga-collection-loader"
 import { useMissingEpisodesLoader } from "@/app/(main)/_hooks/missing-episodes-loader"
 import { useAnimeCollectionListener } from "@/app/(main)/_listeners/anilist-collection.listeners"
 import { useAuthEventListeners } from "@/app/(main)/_listeners/auth.listeners.ts"
-import { useAutoDownloaderItemListener } from "@/app/(main)/_listeners/autodownloader.listeners"
 import { useExtensionListener } from "@/app/(main)/_listeners/extensions.listeners"
 import { useExternalPlayerLinkListener } from "@/app/(main)/_listeners/external-player-link.listeners"
-import { useMangaListener } from "@/app/(main)/_listeners/manga.listeners"
 import { useMiscEventListeners } from "@/app/(main)/_listeners/misc-events.listeners"
-import { useSyncListener } from "@/app/(main)/_listeners/sync.listeners"
 import { DebridStreamOverlay } from "@/app/(main)/entry/_containers/debrid-stream/debrid-stream-overlay"
 import { useTorrentStreamListener } from "@/app/(main)/entry/_containers/torrent-stream/_lib/handle-torrent-stream"
 import { TorrentStreamOverlay } from "@/app/(main)/entry/_containers/torrent-stream/torrent-stream-overlay"
-import { ChapterDownloadsDrawer } from "@/app/(main)/manga/_containers/chapter-downloads/chapter-downloads-drawer"
 import { LoadingOverlayWithLogo } from "@/components/shared/loading-overlay-with-logo"
 import { AppLayout, AppLayoutContent, AppLayoutSidebar, AppSidebarProvider } from "@/components/ui/app-layout"
 import { usePathname, useRouter } from "@/lib/navigation"
@@ -51,11 +44,9 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
         <>
             <Loader />
             <ScanProgressBar />
-            <LibraryWatcher />
             <ScannerModal />
             <PlaylistListModal />
             <GlobalPlaylistManager />
-            <ChapterDownloadsDrawer />
             <TorrentStreamOverlay />
             <DebridStreamOverlay />
             <MediaPreviewModal />
@@ -76,7 +67,6 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
             <NakamaWatchPartyChat />
             <TopIndefiniteLoader />
             <Announcements />
-            <LibraryExplorerDrawer />
             <PluginWebviewSlot slot="fixed" />
 
             <AppSidebarProvider>
@@ -96,24 +86,14 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
 }
 
 function Loader() {
-    /**
-     * Data loaders
-     */
     useAnimeLibraryCollectionLoader()
     useAnimeCollectionLoader()
-    useMangaCollectionLoader()
     useMissingEpisodesLoader()
 
-    /**
-     * Websocket listeners
-     */
-    useAutoDownloaderItemListener()
     useAnimeCollectionListener()
     useMiscEventListeners()
     useExtensionListener()
-    useMangaListener()
     useExternalPlayerLinkListener()
-    useSyncListener()
     useInvalidateQueriesListener()
     useTorrentStreamListener()
     useChangelogTourListener()
@@ -123,9 +103,7 @@ function Loader() {
     const router = useRouter()
     const pathname = usePathname()
 
-    const [hasNavigated, setHasNavigated] = React.useState(false)
-
-    // dumb fix for duplicated player
+    const [, setHasNavigated] = React.useState(false)
     const prevPathname = React.useRef(pathname)
     React.useEffect(() => {
         if (prevPathname.current !== pathname && pathname !== "/") {

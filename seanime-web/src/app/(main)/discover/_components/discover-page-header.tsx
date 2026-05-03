@@ -10,11 +10,6 @@ import {
     __discover_randomTrendingAtom,
     __discover_setAnimeRandomNumberAtom,
 } from "@/app/(main)/discover/_containers/discover-trending"
-import {
-    __discover_mangaRandomNumberAtom,
-    __discover_mangaTotalItemsAtom,
-    __discover_setMangaRandomNumberAtom,
-} from "@/app/(main)/discover/_containers/discover-trending-country"
 import { __discord_pageTypeAtom } from "@/app/(main)/discover/_lib/discover.atoms"
 import { imageShimmer } from "@/components/shared/image-helpers"
 import { SeaImage } from "@/components/shared/sea-image"
@@ -70,13 +65,9 @@ function HeaderCarouselDots({ className }: HeaderCarouselDotsProps) {
     const animeTotalItems = useAtomValue(__discover_animeTotalItemsAtom)
     const setAnimeRandomNumber = useSetAtom(__discover_setAnimeRandomNumberAtom)
 
-    const mangaRandomNumber = useAtomValue(__discover_mangaRandomNumberAtom)
-    const mangaTotalItems = useAtomValue(__discover_mangaTotalItemsAtom)
-    const setMangaRandomNumber = useSetAtom(__discover_setMangaRandomNumberAtom)
-
-    const currentIndex = pageType === "anime" ? animeRandomNumber : mangaRandomNumber
-    const totalItems = pageType === "anime" ? animeTotalItems : mangaTotalItems
-    const setCurrentIndex = pageType === "anime" ? setAnimeRandomNumber : setMangaRandomNumber
+    const currentIndex = animeRandomNumber
+    const totalItems = animeTotalItems
+    const setCurrentIndex = setAnimeRandomNumber
 
     const maxDots = Math.min(totalItems, 12)
     // Don't render if there are no items or only one item

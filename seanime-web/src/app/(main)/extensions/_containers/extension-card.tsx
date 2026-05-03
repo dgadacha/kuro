@@ -8,7 +8,7 @@ import {
 import { ExtensionDetails } from "@/app/(main)/extensions/_components/extension-details"
 import { ExtensionCodeModal } from "@/app/(main)/extensions/_containers/extension-code"
 import { ExtensionUserConfigModal } from "@/app/(main)/extensions/_containers/extension-user-config"
-import { LANGUAGES_LIST } from "@/app/(main)/manga/_lib/language-map"
+import { LANGUAGES_LIST } from "@/app/(main)/extensions/_lib/language-map"
 import { ConfirmationDialog, useConfirmationDialog } from "@/components/shared/confirmation-dialog"
 import { SeaImage } from "@/components/shared/sea-image"
 import { AppLayoutStack } from "@/components/ui/app-layout"

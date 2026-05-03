@@ -5,7 +5,6 @@ import { DiscoverAiringSchedule } from "@/app/(main)/discover/_containers/discov
 import { DiscoverMissedSequelsSection } from "@/app/(main)/discover/_containers/discover-missed-sequels"
 import { DiscoverPastSeason, DiscoverThisSeason } from "@/app/(main)/discover/_containers/discover-popular"
 import { DiscoverTrending } from "@/app/(main)/discover/_containers/discover-trending"
-import { DiscoverTrendingCountry } from "@/app/(main)/discover/_containers/discover-trending-country"
 import { DiscoverTrendingMovies } from "@/app/(main)/discover/_containers/discover-trending-movies"
 import { DiscoverUpcoming } from "@/app/(main)/discover/_containers/discover-upcoming"
 import { __discord_pageTypeAtom } from "@/app/(main)/discover/_lib/discover.atoms"
@@ -55,11 +54,6 @@ export default function Page() {
                             items={[
                                 { name: "Anime", isCurrent: pageType === "anime", onClick: () => setPageType("anime") },
                                 { name: "Schedule", isCurrent: pageType === "schedule", onClick: () => setPageType("schedule") },
-                                ...(serverStatus?.settings?.library?.enableManga ? [{
-                                    name: "Manga",
-                                    isCurrent: pageType === "manga",
-                                    onClick: () => setPageType("manga"),
-                                }] : []),
                             ]}
                         />
                     </div>
@@ -146,39 +140,6 @@ export default function Page() {
                         }}
                     >
                         <DiscoverAiringSchedule />
-                    </PageWrapper>}
-                    {pageType === "manga" && <PageWrapper
-                        key="manga"
-                        className="relative 2xl:order-first pb-10 pt-4"
-                        data-discover-page-manga-container
-                        {...{
-                            initial: { opacity: 0, y: 60 },
-                            animate: { opacity: 1, y: 0 },
-                            exit: { opacity: 0, scale: 0.99 },
-                            transition: {
-                                duration: 0.35,
-                            },
-                        }}
-                    >
-                        {/*<div className="space-y-2 z-[5] relative">*/}
-                        {/*    <h2>Trending right now</h2>*/}
-                        {/*    <DiscoverTrendingMangaAll />*/}
-                        {/*</div>*/}
-                        <div className="space-y-2 z-[5] relative" data-discover-page-manga-trending-container>
-                            <h2>Trending Manga</h2>
-                            <DiscoverTrendingCountry country="JP" forDiscoverHeader />
-                        </div>
-                        <div className="space-y-2 z-[5] relative" data-discover-page-manga-trending-manhwa-container>
-                            <h2>Trending Manhwa</h2>
-                            <DiscoverTrendingCountry country="KR" />
-                        </div>
-                        <div className="space-y-2 z-[5] relative" data-discover-page-manga-trending-manhua-container>
-                            <h2>Trending Manhua</h2>
-                            <DiscoverTrendingCountry country="CN" />
-                        </div>
-                        {/*<div className="space-y-2 z-[5] relative">*/}
-                        {/*    <DiscoverMangaSearchBar />*/}
-                        {/*</div>*/}
                     </PageWrapper>}
                 </AnimatePresence>
 

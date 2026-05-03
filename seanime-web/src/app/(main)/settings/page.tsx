@@ -17,7 +17,6 @@ import { AnimeLibrarySettings } from "@/app/(main)/settings/_containers/anime-li
 import { DebridSettings } from "@/app/(main)/settings/_containers/debrid-settings"
 import { FilecacheSettings } from "@/app/(main)/settings/_containers/filecache-settings"
 import { LogsSettings } from "@/app/(main)/settings/_containers/logs-settings"
-import { MangaSettings } from "@/app/(main)/settings/_containers/manga-settings"
 import { MediastreamSettings } from "@/app/(main)/settings/_containers/mediastream-settings"
 import { ServerSettings } from "@/app/(main)/settings/_containers/server-settings"
 import { TorrentstreamSettings } from "@/app/(main)/settings/_containers/torrentstream-settings"
@@ -257,10 +256,6 @@ export default function Page() {
                                         className="group"
                                     ><CgMediaPodcast className="text-xl mr-3 transition-transform duration-200" /> Online Streaming</TabsTrigger>
 
-                                    <TabsTrigger
-                                        value="manga"
-                                        className="group"
-                                    ><LuBookOpen className="text-xl mr-3 transition-transform duration-200" /> Manga</TabsTrigger>
                                     <TabsTrigger
                                         value="nakama"
                                         className="group relative"
@@ -616,12 +611,6 @@ export default function Page() {
                                     <TabsContent value="local" className={tabContentClass}>
 
                                         <LocalSettings isPending={isPending} />
-
-                                    </TabsContent>
-
-                                    <TabsContent value="manga" className={tabContentClass}>
-
-                                        <MangaSettings isPending={isPending} />
 
                                     </TabsContent>
 

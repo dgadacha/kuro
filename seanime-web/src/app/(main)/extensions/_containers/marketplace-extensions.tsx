@@ -7,7 +7,7 @@ import {
 } from "@/api/hooks/extensions.hooks"
 import { EXTENSION_TYPE } from "@/app/(main)/extensions/_containers/extension-list"
 import { DEFAULT_MARKETPLACE_URL, marketplaceUrlAtom } from "@/app/(main)/extensions/_lib/marketplace.atoms"
-import { LANGUAGES_LIST } from "@/app/(main)/manga/_lib/language-map"
+import { LANGUAGES_LIST } from "@/app/(main)/extensions/_lib/language-map"
 import { LuffyError } from "@/components/shared/luffy-error"
 import { SeaImage } from "@/components/shared/sea-image"
 import { AppLayoutStack } from "@/components/ui/app-layout"

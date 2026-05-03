@@ -1,6 +1,5 @@
 import { AL_AnimeCollection_MediaListCollection_Lists } from "@/api/generated/types"
 import { useGetRawAnimeCollection, useGetRawAnimeCollectionTags } from "@/api/hooks/anilist.hooks"
-import { useGetRawAnilistMangaCollection, useGetRawAnilistMangaCollectionTags } from "@/api/hooks/manga.hooks"
 import { useServerStatus } from "@/app/(main)/_hooks/use-server-status"
 import { CollectionParams, CollectionType, DEFAULT_COLLECTION_PARAMS, filterEntriesByTitle, filterListEntries } from "@/lib/helpers/filtering"
 import { atomWithImmer } from "jotai-immer"
@@ -8,51 +7,32 @@ import { useAtom } from "jotai/react"
 import React from "react"
 import { useDebounce } from "use-debounce"
 
-export const MYLISTS_DEFAULT_PARAMS: CollectionParams<"anime"> | CollectionParams<"manga"> = {
+export const MYLISTS_DEFAULT_PARAMS: CollectionParams<"anime"> = {
     ...DEFAULT_COLLECTION_PARAMS,
     sorting: "SCORE_DESC",
     unreadOnly: false,
     continueWatchingOnly: false,
 }
 
-export const __myListsSearch_paramsAtom = atomWithImmer<CollectionParams<"anime"> | CollectionParams<"manga">>(MYLISTS_DEFAULT_PARAMS)
+export const __myListsSearch_paramsAtom = atomWithImmer<CollectionParams<"anime">>(MYLISTS_DEFAULT_PARAMS)
 
-export const __myListsSearch_paramsInputAtom = atomWithImmer<CollectionParams<"anime"> | CollectionParams<"manga">>(MYLISTS_DEFAULT_PARAMS)
+export const __myListsSearch_paramsInputAtom = atomWithImmer<CollectionParams<"anime">>(MYLISTS_DEFAULT_PARAMS)
 
-export const __myLists_selectedTypeAtom = atomWithImmer<"anime" | "manga" | "stats">("anime")
+export const __myLists_selectedTypeAtom = atomWithImmer<"anime" | "stats">("anime")
 
-export function useHandleUserAnilistLists(debouncedSearchInput: string, type?: "anime" | "manga") {
+export function useHandleUserAnilistLists(debouncedSearchInput: string, _type?: "anime") {
 
     const serverStatus = useServerStatus()
-    const [selectedType, setSelectedType] = useAtom(__myLists_selectedTypeAtom)
+    const [selectedType] = useAtom(__myLists_selectedTypeAtom)
     const { data: animeData } = useGetRawAnimeCollection()
-    const { data: mangaData } = useGetRawAnilistMangaCollection()
     const { data: animeTagMap } = useGetRawAnimeCollectionTags()
-    const { data: mangaTagMap } = useGetRawAnilistMangaCollectionTags()
 
-    const data = React.useMemo(() => {
-        if (type) {
-            return type === "anime" ? animeData : mangaData
-        }
-        return selectedType === "anime" ? animeData : mangaData
-    }, [selectedType, animeData, mangaData, type])
-
+    const data = animeData
     const lists = React.useMemo(() => data?.MediaListCollection?.lists, [data])
-    const mediaTagMap = React.useMemo(() => {
-        if (type) {
-            return type === "anime" ? animeTagMap : mangaTagMap
-        }
-        return selectedType === "anime" ? animeTagMap : mangaTagMap
-    }, [animeTagMap, mangaTagMap, selectedType, type])
+    const mediaTagMap = animeTagMap
 
     const [params, _setParams] = useAtom(__myListsSearch_paramsAtom)
     const [debouncedParams] = useDebounce(params, 500)
-
-    React.useLayoutEffect(() => {
-        if (selectedType === "manga" && !serverStatus?.settings?.library?.enableManga) {
-            setSelectedType("anime")
-        }
-    }, [serverStatus?.settings?.library?.enableManga])
 
     React.useLayoutEffect(() => {
         _setParams(MYLISTS_DEFAULT_PARAMS)

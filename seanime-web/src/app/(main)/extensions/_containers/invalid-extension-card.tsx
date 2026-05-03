@@ -3,7 +3,7 @@ import { useGrantPluginPermissions, useReloadExternalExtension } from "@/api/hoo
 import { useWebsocketMessageListener } from "@/app/(main)/_hooks/handle-websockets"
 import { ExtensionSettings } from "@/app/(main)/extensions/_containers/extension-card"
 import { ExtensionCodeModal } from "@/app/(main)/extensions/_containers/extension-code"
-import { LANGUAGES_LIST } from "@/app/(main)/manga/_lib/language-map"
+import { LANGUAGES_LIST } from "@/app/(main)/extensions/_lib/language-map"
 import { SeaImage } from "@/components/shared/sea-image"
 import { Alert } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"

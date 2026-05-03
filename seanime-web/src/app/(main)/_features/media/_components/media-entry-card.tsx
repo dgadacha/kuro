@@ -13,7 +13,6 @@ import { usePlayNext } from "@/app/(main)/_atoms/playback.atoms"
 import { ToggleLockFilesButton } from "@/app/(main)/_features/anime-library/_containers/toggle-lock-files-button"
 import { AnimeEntryCardUnwatchedBadge } from "@/app/(main)/_features/anime/_containers/anime-entry-card-unwatched-badge"
 import { SeaContextMenu } from "@/app/(main)/_features/context-menu/sea-context-menu"
-import { useLibraryExplorer } from "@/app/(main)/_features/library-explorer/library-explorer.atoms"
 import {
     __mediaEntryCard_hoveredPopupId,
     AnimeEntryCardNextAiring,
@@ -36,7 +35,6 @@ import { usePlaylistEditorManager } from "@/app/(main)/_features/playlists/lib/p
 import { useAnilistUserAnimeListData } from "@/app/(main)/_hooks/anilist-collection-loader"
 import { useHasMissingEpisodes } from "@/app/(main)/_hooks/missing-episodes-loader"
 import { useHasTorrentOrDebridInclusion, useServerStatus } from "@/app/(main)/_hooks/use-server-status"
-import { MangaEntryCardUnreadBadge } from "@/app/(main)/manga/_containers/manga-entry-card-unread-badge"
 import { SeaLink } from "@/components/shared/sea-link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -182,7 +180,6 @@ export function MediaEntryCard<T extends "anime" | "manga">(props: MediaEntryCar
     }, [setActionPopupHover])
 
     const { setPreviewModalMediaId } = useMediaPreviewModal()
-    const { openDirInLibraryExplorer } = useLibraryExplorer()
 
     const [isHoveringCard, setIsHoveringCard] = useState(false)
     const [shouldRenderPopup, setShouldRenderPopup] = useState(false)
@@ -208,12 +205,6 @@ export function MediaEntryCard<T extends "anime" | "manga">(props: MediaEntryCar
     const handleAddToPlaylistClick = React.useCallback(() => {
         selectMediaAndOpenEditor(mediaId)
     }, [mediaId, selectMediaAndOpenEditor])
-
-    const handleOpenInExplorerClick = React.useCallback(() => {
-        if (libraryData?.sharedPath) {
-            openDirInLibraryExplorer(libraryData.sharedPath)
-        }
-    }, [libraryData?.sharedPath, openDirInLibraryExplorer])
 
     const stringifiedListData = React.useMemo(() => JSON.stringify(listData), [listData])
 
@@ -248,12 +239,6 @@ export function MediaEntryCard<T extends "anime" | "manga">(props: MediaEntryCar
                     >
                         <BiAddToQueue /> Add to Playlist
                     </ContextMenuItem>}
-                    {(!!libraryData) && <ContextMenuItem
-                        onClick={handleOpenInExplorerClick}
-                    >
-                        <LuFolderTree /> Open in Library Explorer
-                    </ContextMenuItem>}
-
                     <PluginMediaCardContextMenuItems for={type} media={media} />
                 </ContextMenuGroup>}
             >
@@ -408,8 +393,6 @@ export function MediaEntryCard<T extends "anime" | "manga">(props: MediaEntryCar
                                     nakamaLibraryData={nakamaLibraryData}
                                 />
                             )}
-                            {type === "manga" &&
-                                <MangaEntryCardUnreadBadge mediaId={media.id} progress={listData?.progress} progressTotal={progressTotal} />}
                         </> : null}
                     />
                 </div>

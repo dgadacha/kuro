@@ -2,14 +2,11 @@ import { useRefreshAnimeCollection } from "@/api/hooks/anilist.hooks"
 import { useLogout } from "@/api/hooks/auth.hooks"
 import { useGetExtensionUpdateData as useGetExtensionUpdateData, usePluginWithIssuesCount } from "@/api/hooks/extensions.hooks"
 import { isLoginModalOpenAtom } from "@/app/(main)/_atoms/server-status.atoms"
-import { useSyncIsActive } from "@/app/(main)/_atoms/sync.atoms"
 import { ElectronUpdateModal } from "@/app/(main)/_electron/electron-update-modal"
 import { SidebarNavbar } from "@/app/(main)/_features/layout/top-navbar"
 import { usePluginSidebarItems } from "@/app/(main)/_features/plugin/webview/plugin-sidebar"
 import { useSeaCommand } from "@/app/(main)/_features/sea-command/sea-command"
 import { UpdateModal } from "@/app/(main)/_features/update/update-modal"
-import { useAutoDownloaderQueueCount } from "@/app/(main)/_hooks/autodownloader-queue-count"
-import { useWebsocketMessageListener } from "@/app/(main)/_hooks/handle-websockets"
 import { useMissingEpisodeCount } from "@/app/(main)/_hooks/missing-episodes-loader"
 import { useCurrentUser, useServerStatus } from "@/app/(main)/_hooks/use-server-status"
 import { ConfirmationDialog, useConfirmationDialog } from "@/components/shared/confirmation-dialog"
@@ -27,8 +24,6 @@ import { VerticalMenu, VerticalMenuItem } from "@/components/ui/vertical-menu"
 import { openTab } from "@/lib/helpers/browser"
 import { usePathname, useRouter } from "@/lib/navigation"
 import { ANILIST_OAUTH_URL, ANILIST_PIN_URL } from "@/lib/server/config"
-import { TORRENT_CLIENT, TORRENT_PROVIDER } from "@/lib/server/settings"
-import { WSEvents } from "@/lib/server/ws-events"
 import { useThemeSettings } from "@/lib/theme/theme-hooks"
 import { __isDesktop__, __isElectronDesktop__ } from "@/types/constants"
 import { useAtom } from "jotai"
@@ -37,12 +32,10 @@ import { BiChevronRight, BiExtension, BiLogIn, BiLogOut } from "react-icons/bi"
 import { FiLogIn, FiSearch } from "react-icons/fi"
 import { HiOutlineServerStack } from "react-icons/hi2"
 import { IoCloudOfflineOutline, IoHomeOutline } from "react-icons/io5"
-import { LuBookOpen, LuCalendar, LuCompass, LuRefreshCw, LuRss, LuSettings } from "react-icons/lu"
+import { LuCalendar, LuCompass, LuRefreshCw, LuSettings } from "react-icons/lu"
 import { MdOutlineConnectWithoutContact } from "react-icons/md"
 import { PiArrowCircleLeftDuotone, PiArrowCircleRightDuotone } from "react-icons/pi"
 import { RiListCheck3 } from "react-icons/ri"
-import { SiQbittorrent, SiTransmission } from "react-icons/si"
-import { TbReportSearch } from "react-icons/tb"
 import { nakamaModalOpenAtom, useNakamaStatus } from "../nakama/nakama-manager"
 import { PluginSidebarTray } from "../plugin/tray/plugin-sidebar-tray"
 
@@ -122,16 +115,6 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
 
     // Data
     const missingEpisodeCount = useMissingEpisodeCount()
-    const autoDownloaderQueueCount = useAutoDownloaderQueueCount()
-
-    // Torrents
-    const [activeTorrentCount, setActiveTorrentCount] = React.useState({ downloading: 0, paused: 0, seeding: 0 })
-    useWebsocketMessageListener<{ downloading: number, paused: number, seeding: number }>({
-        type: WSEvents.ACTIVE_TORRENT_COUNT_UPDATED,
-        onMessage: data => {
-            setActiveTorrentCount(data)
-        },
-    })
 
     // Refresh AniList
     const { mutate: refreshAC, isPending: isRefreshingAC } = useRefreshAnimeCollection()
@@ -163,13 +146,6 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
                 intent="alert-solid"
             >{missingEpisodeCount}</Badge> : undefined,
         },
-        ...serverStatus?.settings?.library?.enableManga ? [{
-            id: "manga",
-            iconType: LuBookOpen,
-            name: "Manga",
-            href: "/manga",
-            isCurrent: pathname.startsWith("/manga"),
-        }] : [],
         {
             id: "lists",
             iconType: RiListCheck3,
@@ -190,29 +166,7 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
             name: "Search",
             href: "/search",
             isCurrent: pathname === "/search",
-            // onClick: () => {
-            //     ctx.setOpen(false)
-            //     setGlobalSearchIsOpen(true)
-            // },
         },
-        ...(
-            serverStatus?.settings?.library?.torrentProvider !== TORRENT_PROVIDER.NONE
-            && serverStatus?.settings?.torrent?.defaultTorrentClient !== TORRENT_CLIENT.NONE)
-            ? [{
-                id: "torrent-list",
-                iconType: serverStatus?.settings?.torrent?.defaultTorrentClient === TORRENT_CLIENT.QBITTORRENT ? SiQbittorrent : SiTransmission,
-                name: (activeTorrentCount.seeding === 0 || !serverStatus?.settings?.torrent?.showActiveTorrentCount)
-                    ? "Torrent list"
-                    : `Torrent list (${activeTorrentCount.seeding} seeding)`,
-                href: "/torrent-list",
-                isCurrent: pathname === "/torrent-list",
-                addon: ((activeTorrentCount.downloading + activeTorrentCount.paused) > 0 && serverStatus?.settings?.torrent?.showActiveTorrentCount)
-                    ? <Badge
-                        className="absolute right-0 top-0 bg-green-500" size="sm"
-                        intent="alert-solid"
-                    >{activeTorrentCount.downloading + activeTorrentCount.paused}</Badge>
-                    : undefined,
-            }] : [],
         ...(serverStatus?.debridSettings?.enabled && !!serverStatus?.debridSettings?.provider) ? [{
             id: "debrid",
             iconType: HiOutlineServerStack,
@@ -220,38 +174,11 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
             href: "/debrid",
             isCurrent: pathname === "/debrid",
         }] : [],
-        ...(!!serverStatus?.settings?.library?.libraryPath) ? [{
-            id: "scan-summaries",
-            iconType: TbReportSearch,
-            name: "Scan summaries",
-            href: "/scan-summaries",
-            isCurrent: pathname === "/scan-summaries",
-        }] : [],
-        ...(serverStatus?.settings?.library?.torrentProvider !== TORRENT_PROVIDER.NONE && !!serverStatus?.settings?.library?.libraryPath) ? [{
-            id: "auto-downloader",
-            iconType: LuRss,
-            name: "Auto Downloader",
-            href: "/auto-downloader",
-            isCurrent: pathname === "/auto-downloader",
-            addon: autoDownloaderQueueCount > 0 ? <Badge
-                className="absolute right-0 top-0" size="sm"
-                intent="alert-solid"
-            >{autoDownloaderQueueCount}</Badge> : undefined,
-        }] : [],
     ], [
         pathname,
         missingEpisodeCount,
-        serverStatus?.settings?.library?.enableManga,
-        serverStatus?.settings?.library?.torrentProvider,
-        serverStatus?.settings?.torrent?.defaultTorrentClient,
-        serverStatus?.settings?.torrent?.showActiveTorrentCount,
         serverStatus?.debridSettings?.enabled,
         serverStatus?.debridSettings?.provider,
-        serverStatus?.settings?.library?.libraryPath,
-        activeTorrentCount.seeding,
-        activeTorrentCount.downloading,
-        activeTorrentCount.paused,
-        autoDownloaderQueueCount,
     ])
 
     // Plugins
@@ -442,9 +369,6 @@ function SidebarFooter({ isCollapsed, onLogout }: { isCollapsed: boolean, onLogo
     const { data: updateData } = useGetExtensionUpdateData()
     const pluginWithIssuesCount = usePluginWithIssuesCount()
 
-    // Sync
-    const { syncIsActive } = useSyncIsActive()
-
     // Nakama
     const [nakamaModalOpen, setNakamaModalOpen] = useAtom(nakamaModalOpenAtom)
     const nakamaStatus = useNakamaStatus()
@@ -515,16 +439,8 @@ function SidebarFooter({ isCollapsed, onLogout }: { isCollapsed: boolean, onLogo
                     {
                         iconType: IoCloudOfflineOutline,
                         name: "Offline",
-                        href: "/sync",
-                        isCurrent: pathname.includes("/sync"),
-                        addon: (syncIsActive)
-                            ? <Badge
-                                className="absolute right-0 top-0 bg-blue-500" size="sm"
-                                intent="alert-solid"
-                            >
-                                1
-                            </Badge>
-                            : undefined,
+                        href: "/offline",
+                        isCurrent: pathname.includes("/offline"),
                     },
                     {
                         iconType: LuSettings,

@@ -1,5 +1,5 @@
 import { Extension_Extension } from "@/api/generated/types"
-import { LANGUAGES_LIST } from "@/app/(main)/manga/_lib/language-map"
+import { LANGUAGES_LIST } from "@/app/(main)/extensions/_lib/language-map"
 import { SeaImage } from "@/components/shared/sea-image"
 import { SeaLink } from "@/components/shared/sea-link"
 import { Badge } from "@/components/ui/badge"
