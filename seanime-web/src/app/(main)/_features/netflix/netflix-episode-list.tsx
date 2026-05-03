@@ -7,6 +7,7 @@ import { cn } from "@/components/ui/core/styling"
 import { Select } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
+import { useTranslatedTexts } from "@/lib/translate/use-translated-text"
 import { useAtom } from "jotai/react"
 import React from "react"
 import { useTranslation } from "react-i18next"
@@ -37,6 +38,13 @@ export function NetflixEpisodeList({ animeEntry }: Props) {
         () => (data?.episodes ?? []).slice().sort((a, b) => a.number - b.number),
         [data?.episodes],
     )
+
+    // Translate every description in a single batched DeepL call.
+    const rawDescriptions = React.useMemo(
+        () => episodes.map(e => e.description ?? ""),
+        [episodes],
+    )
+    const { texts: translatedDescriptions } = useTranslatedTexts(rawDescriptions)
 
     const noProvider = !providerExtensionOptions?.length
 
@@ -86,10 +94,11 @@ export function NetflixEpisodeList({ animeEntry }: Props) {
 
             {!noProvider && !isLoading && episodes.length > 0 && (
                 <ul className="space-y-2">
-                    {episodes.map((ep) => (
+                    {episodes.map((ep, i) => (
                         <EpisodeRow
                             key={ep.number}
                             ep={ep}
+                            description={translatedDescriptions[i] || ep.description || ""}
                             mediaId={mediaId}
                             provider={provider || ""}
                             dubbed={supportsDub && dubbed}
@@ -104,12 +113,14 @@ export function NetflixEpisodeList({ animeEntry }: Props) {
 
 function EpisodeRow({
     ep,
+    description,
     mediaId,
     provider,
     dubbed,
     t,
 }: {
     ep: Onlinestream_Episode
+    description: string
     mediaId: number
     provider: string
     dubbed: boolean
@@ -147,9 +158,9 @@ function EpisodeRow({
                         <h3 className="text-white font-semibold text-base lg:text-lg line-clamp-1">
                             {ep.title || `${t("entry.episode_short")} ${ep.number}`}
                         </h3>
-                        {ep.description && (
+                        {description && (
                             <p className="text-[--muted] text-xs lg:text-sm mt-1 line-clamp-2 leading-relaxed">
-                                {ep.description}
+                                {description}
                             </p>
                         )}
                     </div>

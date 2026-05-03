@@ -81,3 +81,48 @@ export function useTranslatedText(text: string | undefined | null, opts?: { enab
         error,
     }
 }
+
+/**
+ * Batched variant — translates a list of strings in a single request.
+ * Use this when you have N descriptions to translate at once (episodes,
+ * etc.) instead of firing N parallel requests.
+ *
+ * Returns the same-length array, with empty inputs preserved as empty
+ * strings, and untranslated content (no key / target=EN) returned verbatim.
+ */
+export function useTranslatedTexts(texts: ReadonlyArray<string | undefined | null>): {
+    texts: string[]
+    isTranslating: boolean
+    error: unknown
+} {
+    const lang = (i18n.resolvedLanguage ?? i18n.language ?? "en").toLowerCase()
+    const target = lang === "fr" ? "FR" : "EN"
+    const key = getDeeplKey()
+
+    // Normalize input + keep order. Empty entries skip translation.
+    const originals = texts.map(t => (t ?? "").trim())
+    const shouldTranslate = target !== "EN" && !!key && originals.some(t => t.length > 0)
+
+    // queryKey is the joined originals so identical batches dedupe.
+    const { data, isFetching, error } = useQuery({
+        queryKey: ["translate-batch", target, originals],
+        enabled: shouldTranslate,
+        staleTime: 5 * 60 * 1000,
+        gcTime: Infinity,
+        retry: 1,
+        queryFn: async () => {
+            const res = await axios.post<{ data: { translated: string[] } }>(
+                `${getServerBaseUrl()}/api/v1/translate`,
+                { texts: originals, target, key },
+                { headers: { "Content-Type": "application/json" } },
+            )
+            return res.data?.data?.translated ?? originals
+        },
+    })
+
+    return {
+        texts: shouldTranslate ? (data ?? originals) : originals,
+        isTranslating: shouldTranslate && isFetching,
+        error,
+    }
+}

@@ -36,92 +36,125 @@ func translateCacheKey(text, target string) string {
 
 // HandleTranslateText
 //
-//	@summary proxies a single translation request to DeepL Free / Pro.
-//	@desc The API key is sent per-request (stored in the browser's
-//	      localStorage by the frontend, never in the server config).
-//	      Translations are cached in-memory by sha256(text|target) for
-//	      30 days, so re-opening the same anime is free.
+//	@summary proxies translation requests to DeepL Free / Pro.
+//	@desc Accepts either {text, target, key} for a single string or
+//	      {texts, target, key} for a batch (DeepL allows up to 50 per
+//	      request, much friendlier on the monthly quota when an anime
+//	      has 25+ episodes). Cache is per-string and 30 days, so the
+//	      second visit is free.
 //	@route /api/v1/translate [POST]
-//	@returns {translated string}
+//	@returns {translated string} or {translated []string} depending on input
 func (h *Handler) HandleTranslateText(c echo.Context) error {
 	type body struct {
-		Text   string `json:"text"`
-		Target string `json:"target"`
-		Key    string `json:"key"`
+		Text   string   `json:"text"`
+		Texts  []string `json:"texts"`
+		Target string   `json:"target"`
+		Key    string   `json:"key"`
 	}
 
 	var b body
 	if err := c.Bind(&b); err != nil {
 		return h.RespondWithError(c, fmt.Errorf("invalid body: %w", err))
 	}
-	b.Text = strings.TrimSpace(b.Text)
 	b.Target = strings.ToUpper(strings.TrimSpace(b.Target))
 	b.Key = strings.TrimSpace(b.Key)
-
-	if b.Text == "" || b.Target == "" {
-		return h.RespondWithData(c, map[string]string{"translated": ""})
+	if b.Target == "" {
+		return h.RespondWithError(c, fmt.Errorf("missing target language"))
 	}
 	if b.Key == "" {
 		return h.RespondWithError(c, fmt.Errorf("missing DeepL API key"))
 	}
 
-	// Cache
-	cacheKey := translateCacheKey(b.Text, b.Target)
-	translateCacheMu.RLock()
-	if e, ok := translateCache[cacheKey]; ok && time.Now().Before(e.expires) {
+	batched := len(b.Texts) > 0
+	inputs := b.Texts
+	if !batched {
+		inputs = []string{b.Text}
+	}
+
+	// Trim, separate cached vs uncached.
+	out := make([]string, len(inputs))
+	missingIdx := make([]int, 0, len(inputs))
+	missingTexts := make([]string, 0, len(inputs))
+	for i, raw := range inputs {
+		s := strings.TrimSpace(raw)
+		if s == "" {
+			out[i] = ""
+			continue
+		}
+		key := translateCacheKey(s, b.Target)
+		translateCacheMu.RLock()
+		entry, ok := translateCache[key]
 		translateCacheMu.RUnlock()
-		return h.RespondWithData(c, map[string]string{"translated": e.value})
-	}
-	translateCacheMu.RUnlock()
-
-	// Free-tier keys end in ":fx" → api-free.deepl.com, otherwise api.deepl.com.
-	host := "api.deepl.com"
-	if strings.HasSuffix(b.Key, ":fx") {
-		host = "api-free.deepl.com"
+		if ok && time.Now().Before(entry.expires) {
+			out[i] = entry.value
+			continue
+		}
+		missingIdx = append(missingIdx, i)
+		missingTexts = append(missingTexts, s)
 	}
 
-	form := url.Values{}
-	form.Set("text", b.Text)
-	form.Set("target_lang", b.Target)
-	form.Set("preserve_formatting", "1")
+	// Hit DeepL only if anything is missing.
+	if len(missingTexts) > 0 {
+		host := "api.deepl.com"
+		if strings.HasSuffix(b.Key, ":fx") {
+			host = "api-free.deepl.com"
+		}
 
-	req, err := http.NewRequestWithContext(c.Request().Context(), http.MethodPost,
-		"https://"+host+"/v2/translate", strings.NewReader(form.Encode()))
-	if err != nil {
-		return h.RespondWithError(c, err)
+		form := url.Values{}
+		for _, t := range missingTexts {
+			form.Add("text", t)
+		}
+		form.Set("target_lang", b.Target)
+		form.Set("preserve_formatting", "1")
+
+		req, err := http.NewRequestWithContext(c.Request().Context(), http.MethodPost,
+			"https://"+host+"/v2/translate", strings.NewReader(form.Encode()))
+		if err != nil {
+			return h.RespondWithError(c, err)
+		}
+		req.Header.Set("Authorization", "DeepL-Auth-Key "+b.Key)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("User-Agent", "kuro/1.0")
+
+		resp, err := translateClient.Do(req)
+		if err != nil {
+			return h.RespondWithError(c, err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			return h.RespondWithError(c, fmt.Errorf("deepl returned %d: %s", resp.StatusCode, string(body)))
+		}
+
+		var parsed struct {
+			Translations []struct {
+				Text string `json:"text"`
+			} `json:"translations"`
+		}
+		if err := json.NewDecoder(resp.Body).Decode(&parsed); err != nil {
+			return h.RespondWithError(c, err)
+		}
+
+		if len(parsed.Translations) != len(missingTexts) {
+			return h.RespondWithError(c, fmt.Errorf("deepl returned %d translations for %d inputs",
+				len(parsed.Translations), len(missingTexts)))
+		}
+
+		translateCacheMu.Lock()
+		for j, tr := range parsed.Translations {
+			pos := missingIdx[j]
+			out[pos] = tr.Text
+			translateCache[translateCacheKey(missingTexts[j], b.Target)] = translateCacheEntry{
+				value:   tr.Text,
+				expires: time.Now().Add(translateCacheTTL),
+			}
+		}
+		translateCacheMu.Unlock()
 	}
-	req.Header.Set("Authorization", "DeepL-Auth-Key "+b.Key)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("User-Agent", "kuro/1.0")
 
-	resp, err := translateClient.Do(req)
-	if err != nil {
-		return h.RespondWithError(c, err)
+	if batched {
+		return h.RespondWithData(c, map[string][]string{"translated": out})
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return h.RespondWithError(c, fmt.Errorf("deepl returned %d: %s", resp.StatusCode, string(body)))
-	}
-
-	var parsed struct {
-		Translations []struct {
-			Text string `json:"text"`
-		} `json:"translations"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&parsed); err != nil {
-		return h.RespondWithError(c, err)
-	}
-
-	out := ""
-	if len(parsed.Translations) > 0 {
-		out = parsed.Translations[0].Text
-	}
-
-	translateCacheMu.Lock()
-	translateCache[cacheKey] = translateCacheEntry{value: out, expires: time.Now().Add(translateCacheTTL)}
-	translateCacheMu.Unlock()
-
-	return h.RespondWithData(c, map[string]string{"translated": out})
+	return h.RespondWithData(c, map[string]string{"translated": out[0]})
 }
