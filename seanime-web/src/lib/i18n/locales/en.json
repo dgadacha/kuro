@@ -50,6 +50,10 @@
       "slideshow_aria": "Featured selection"
     }
   },
+  "watch": {
+    "start": "Start playback",
+    "click_hint": "Browsers block autoplay in new tabs — one click and you're set."
+  },
   "lists": {
     "title": "My lists",
     "search_placeholder": "Search in my lists…",

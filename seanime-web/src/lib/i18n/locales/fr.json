@@ -50,6 +50,10 @@
       "slideshow_aria": "Sélection à la une"
     }
   },
+  "watch": {
+    "start": "Lancer la lecture",
+    "click_hint": "Les navigateurs bloquent l'autoplay dans un nouvel onglet — un clic et c'est parti."
+  },
   "lists": {
     "title": "Mes listes",
     "search_placeholder": "Rechercher dans mes listes…",
