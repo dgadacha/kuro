@@ -40,6 +40,7 @@ import { useAtom } from "jotai/react"
 import capitalize from "lodash/capitalize"
 import React from "react"
 import { UseFormReturn } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { BiDonateHeart } from "react-icons/bi"
 import { CgMediaPodcast } from "react-icons/cg"
 import { FaDiscord } from "react-icons/fa"
@@ -76,6 +77,7 @@ const tabContentClass = cn(
 
 
 export default function Page() {
+    const { t } = useTranslation()
     const status = useServerStatus()
     const { isFeatureDisabled, showFeatureWarning } = useServerDisabledFeatures()
     const setServerStatus = useSetServerStatus()
@@ -186,7 +188,7 @@ export default function Page() {
                                     <TabsTrigger
                                         value="seanime"
                                         className="group"
-                                    ><LuWandSparkles className="text-xl mr-3 transition-transform duration-200" /> App</TabsTrigger>
+                                    ><LuWandSparkles className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.app")}</TabsTrigger>
                                     {/* <TabsTrigger
                                      value="local"
                                      className="group"
@@ -194,11 +196,11 @@ export default function Page() {
                                     <TabsTrigger
                                         value="library"
                                         className="group"
-                                    ><LuLibrary className="text-xl mr-3 transition-transform duration-200" /> Local Anime Library</TabsTrigger>
+                                    ><LuLibrary className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.library")}</TabsTrigger>
                                     <TabsTrigger
                                         value="playback"
                                         className="group"
-                                    ><LuCirclePlay className="text-xl mr-3 transition-transform duration-200" /> Video Playback</TabsTrigger>
+                                    ><LuCirclePlay className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.playback")}</TabsTrigger>
                                 </Card>
 
                                 {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
@@ -210,17 +212,15 @@ export default function Page() {
                                     <TabsTrigger
                                         value="media-player"
                                         className="group"
-                                    ><LuMonitorPlay className="text-xl mr-3 transition-transform duration-200" /> Desktop Media Player</TabsTrigger>
+                                    ><LuMonitorPlay className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.media_player")}</TabsTrigger>
                                     <TabsTrigger
                                         value="external-player-link"
                                         className="group"
-                                    ><LuCircleArrowOutUpRight className="text-xl mr-3 transition-transform duration-200" /> External Player
-                                                                                                                            Link</TabsTrigger>
+                                    ><LuCircleArrowOutUpRight className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.external_player_link")}</TabsTrigger>
                                     <TabsTrigger
                                         value="mediastream"
                                         className="relative group"
-                                    ><LuTabletSmartphone className="text-xl mr-3 transition-transform duration-200" /> Transcoding / Direct
-                                                                                                                       Play</TabsTrigger>
+                                    ><LuTabletSmartphone className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.transcoding")}</TabsTrigger>
                                 </Card>
 
                                 {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
@@ -231,19 +231,19 @@ export default function Page() {
                                     <TabsTrigger
                                         value="torrent"
                                         className="group"
-                                    ><LuFileSearch className="text-xl mr-3 transition-transform duration-200" /> Torrent Provider</TabsTrigger>
+                                    ><LuFileSearch className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.torrent_provider")}</TabsTrigger>
                                     <TabsTrigger
                                         value="torrent-client"
                                         className="group"
-                                    ><MdOutlineDownloading className="text-xl mr-3 transition-transform duration-200" /> Torrent Client</TabsTrigger>
+                                    ><MdOutlineDownloading className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.torrent_client")}</TabsTrigger>
                                     <TabsTrigger
                                         value="torrentstream"
                                         className="relative group"
-                                    ><SiBittorrent className="text-xl mr-3 transition-transform duration-200" /> Torrent Streaming</TabsTrigger>
+                                    ><SiBittorrent className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.torrent_streaming")}</TabsTrigger>
                                     <TabsTrigger
                                         value="debrid"
                                         className="group"
-                                    ><HiOutlineServerStack className="text-xl mr-3 transition-transform duration-200" /> Debrid Service</TabsTrigger>
+                                    ><HiOutlineServerStack className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.debrid")}</TabsTrigger>
                                 </Card>
 
                                 {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
@@ -254,16 +254,16 @@ export default function Page() {
                                     <TabsTrigger
                                         value="onlinestream"
                                         className="group"
-                                    ><CgMediaPodcast className="text-xl mr-3 transition-transform duration-200" /> Online Streaming</TabsTrigger>
+                                    ><CgMediaPodcast className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.online_streaming")}</TabsTrigger>
 
                                     <TabsTrigger
                                         value="nakama"
                                         className="group relative"
-                                    ><MdOutlineConnectWithoutContact className="text-xl mr-3 transition-transform duration-200" /> Nakama</TabsTrigger>
+                                    ><MdOutlineConnectWithoutContact className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.nakama")}</TabsTrigger>
                                     <TabsTrigger
                                         value="discord"
                                         className="group"
-                                    ><FaDiscord className="text-xl mr-3 transition-transform duration-200" /> Discord</TabsTrigger>
+                                    ><FaDiscord className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.discord")}</TabsTrigger>
                                 </Card>
 
                                 {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
@@ -275,12 +275,12 @@ export default function Page() {
                                         <TabsTrigger
                                             value="denshi"
                                             className="group"
-                                        ><LuMonitor className="text-xl mr-3 transition-transform duration-200" /> Denshi</TabsTrigger>
+                                        ><LuMonitor className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.denshi")}</TabsTrigger>
                                     )}
                                     <TabsTrigger
                                         value="ui"
                                         className="group"
-                                    ><MdOutlinePalette className="text-xl mr-3 transition-transform duration-200" /> User Interface</TabsTrigger>
+                                    ><MdOutlinePalette className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.ui")}</TabsTrigger>
                                     {/* <TabsTrigger
                                      value="cache"
                                      className="group"
@@ -288,7 +288,7 @@ export default function Page() {
                                     <TabsTrigger
                                         value="logs"
                                         className="group"
-                                    ><LuBookKey className="text-xl mr-3 transition-transform duration-200" /> Logs & Cache</TabsTrigger>
+                                    ><LuBookKey className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.logs")}</TabsTrigger>
                                 </Card>
                             </div>
                         </SettingsNavCard>
@@ -304,7 +304,7 @@ export default function Page() {
                                     size="md"
                                     leftIcon={<BiDonateHeart className="text-lg" />}
                                 >
-                                    Donate
+                                    {t("donate")}
                                 </Button>
                             </SeaLink>
                         </div>

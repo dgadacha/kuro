@@ -84,6 +84,7 @@
       "playback": "Lecture vidéo",
       "media_player": "Lecteur externe",
       "external_player_link": "Lien lecteur externe",
+      "transcoding": "Transcodage / Direct Play",
       "direct_play": "Direct Play",
       "torrent_provider": "Fournisseur de torrents",
       "torrent_client": "Client torrent",
@@ -94,10 +95,12 @@
       "discord": "Discord",
       "data": "Données",
       "ui": "Interface",
-      "logs": "Journaux",
+      "logs": "Journaux & Cache",
+      "denshi": "Denshi",
       "anilist": "AniList"
     }
   },
+  "donate": "Faire un don",
   "onboarding": {
     "step_n_of": "Étape {{n}} / {{total}}",
     "settings_modifiable": "Tous ces réglages sont modifiables plus tard dans les Paramètres.",

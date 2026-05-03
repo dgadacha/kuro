@@ -84,6 +84,7 @@
       "playback": "Video Playback",
       "media_player": "Desktop Media Player",
       "external_player_link": "External Player Link",
+      "transcoding": "Transcoding / Direct Play",
       "direct_play": "Direct Play",
       "torrent_provider": "Torrent Provider",
       "torrent_client": "Torrent Client",
@@ -93,11 +94,13 @@
       "nakama": "Nakama",
       "discord": "Discord",
       "data": "Data",
-      "ui": "UI",
-      "logs": "Logs",
+      "ui": "User Interface",
+      "logs": "Logs & Cache",
+      "denshi": "Denshi",
       "anilist": "AniList"
     }
   },
+  "donate": "Donate",
   "onboarding": {
     "step_n_of": "Step {{n}} / {{total}}",
     "settings_modifiable": "All these settings can be changed later in Settings.",
