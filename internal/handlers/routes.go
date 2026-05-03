@@ -245,21 +245,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	// Torrent / Torrent Client
 	//
 
-	v1.POST("/torrent/search", h.HandleSearchTorrent)
-
-	//
-	// Auto Select
-	//
-
-	v1.GET("/auto-select/profile", h.HandleGetAutoSelectProfile)
-	v1.POST("/auto-select/profile", h.HandleSaveAutoSelectProfile)
-	v1.DELETE("/auto-select/profile", h.HandleDeleteAutoSelectProfile)
-
-	//
-	// Download
-	//
-
-	v1.POST("/download-torrent-file", h.HandleDownloadTorrentFile)
 
 	//
 	// Updates
@@ -379,18 +364,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1.GET("/videocore/insight/character/:malId", h.HandleVideoCoreInSightGetCharacterDetails)
 
 	//
-	// Torrent stream
-	//
-	v1.GET("/torrentstream/settings", h.HandleGetTorrentstreamSettings)
-	v1.PATCH("/torrentstream/settings", h.HandleSaveTorrentstreamSettings)
-	v1.POST("/torrentstream/start", h.HandleTorrentstreamStartStream)
-	v1.POST("/torrentstream/stop", h.HandleTorrentstreamStopStream)
-	v1.POST("/torrentstream/drop", h.HandleTorrentstreamDropTorrent)
-	v1.POST("/torrentstream/torrent-file-previews", h.HandleGetTorrentstreamTorrentFilePreviews)
-	v1.POST("/torrentstream/batch-history", h.HandleGetTorrentstreamBatchHistory)
-	v1.GET("/torrentstream/stream/*", h.HandleTorrentstreamServeStream)
-
-	//
 	// Extensions
 	//
 
@@ -410,7 +383,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1Extensions.GET("/list/development", h.HandleListDevelopmentModeExtensions)
 	v1Extensions.GET("/list/manga-provider", h.HandleListMangaProviderExtensions)
 	v1Extensions.GET("/list/onlinestream-provider", h.HandleListOnlinestreamProviderExtensions)
-	v1Extensions.GET("/list/anime-torrent-provider", h.HandleListAnimeTorrentProviderExtensions)
 	v1Extensions.GET("/list/custom-source", h.HandleListCustomSourceExtensions)
 	v1Extensions.GET("/user-config/:id", h.HandleGetExtensionUserConfig)
 	v1Extensions.POST("/user-config", h.HandleSaveExtensionUserConfig)
@@ -446,22 +418,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1Local.POST("/offline", h.HandleSetOfflineMode)
 
 	//
-	// Debrid
-	//
-
-	v1.GET("/debrid/settings", h.HandleGetDebridSettings)
-	v1.PATCH("/debrid/settings", h.HandleSaveDebridSettings)
-	v1.POST("/debrid/torrents", h.HandleDebridAddTorrents)
-	v1.POST("/debrid/torrents/download", h.HandleDebridDownloadTorrent)
-	v1.POST("/debrid/torrents/cancel", h.HandleDebridCancelDownload)
-	v1.DELETE("/debrid/torrent", h.HandleDebridDeleteTorrent)
-	v1.GET("/debrid/torrents", h.HandleDebridGetTorrents)
-	v1.POST("/debrid/torrents/info", h.HandleDebridGetTorrentInfo)
-	v1.POST("/debrid/torrents/file-previews", h.HandleDebridGetTorrentFilePreviews)
-	v1.POST("/debrid/stream/start", h.HandleDebridStartStream)
-	v1.POST("/debrid/stream/cancel", h.HandleDebridCancelStream)
-
-	//
 	// Report
 	//
 
@@ -486,13 +442,8 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1Nakama.GET("/host/anime/library/files/:id", h.HandleGetNakamaAnimeLibraryFiles)
 	v1Nakama.GET("/host/anime/library/files", h.HandleGetNakamaAnimeAllLibraryFiles)
 	v1Nakama.POST("/play", h.HandleNakamaPlayVideo)
-	v1Nakama.GET("/host/torrentstream/stream", h.HandleNakamaHostTorrentstreamServeStream)
-	v1Nakama.HEAD("/host/torrentstream/stream", h.HandleNakamaHostTorrentstreamServeStream)
 	v1Nakama.GET("/host/anime/library/stream", h.HandleNakamaHostAnimeLibraryServeStream)
 	v1Nakama.HEAD("/host/anime/library/stream", h.HandleNakamaHostAnimeLibraryServeStream)
-	v1Nakama.GET("/host/debridstream/stream", h.HandleNakamaHostDebridstreamServeStream)
-	v1Nakama.HEAD("/host/debridstream/stream", h.HandleNakamaHostDebridstreamServeStream)
-	v1Nakama.GET("/host/debridstream/url", h.HandleNakamaHostGetDebridstreamURL)
 	v1Nakama.GET("/stream", h.HandleNakamaProxyStream)
 	v1Nakama.HEAD("/stream", h.HandleNakamaProxyStream)
 	v1Nakama.POST("/watch-party/create", h.HandleNakamaCreateWatchParty)
