@@ -121,7 +121,7 @@ export function useDownloadMemoryProfile() {
             try {
                 const headers: Record<string, string> = {}
                 if (password) {
-                    headers["X-Kuro-Token"] = password
+                    headers["X-Seanime-Token"] = password
                 }
 
                 const response = await fetch(downloadUrl, {
@@ -180,7 +180,7 @@ export function useDownloadGoRoutineProfile() {
             try {
                 const headers: Record<string, string> = {}
                 if (password) {
-                    headers["X-Kuro-Token"] = password
+                    headers["X-Seanime-Token"] = password
                 }
 
                 const response = await fetch(downloadUrl, {
@@ -233,7 +233,7 @@ export function useDownloadCPUProfile() {
             try {
                 const headers: Record<string, string> = {}
                 if (password) {
-                    headers["X-Kuro-Token"] = password
+                    headers["X-Seanime-Token"] = password
                 }
 
                 const response = await fetch(downloadUrl, {

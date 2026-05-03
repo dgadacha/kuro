@@ -30,7 +30,7 @@ export function ElectronRestartServerPrompt() {
         try {
             const headers: Record<string, string> = {}
             if (serverAuthToken) {
-                headers["X-Kuro-Token"] = serverAuthToken
+                headers["X-Seanime-Token"] = serverAuthToken
             }
 
             const res = await fetch(`${getServerBaseUrl()}/api/v1/status`, {

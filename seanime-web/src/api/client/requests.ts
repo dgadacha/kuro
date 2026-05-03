@@ -103,7 +103,7 @@ export async function buildSeaQuery<T, D extends any = any>(
     const headers: Record<string, string> = {}
 
     if (password) {
-        headers["X-Kuro-Token"] = password
+        headers["X-Seanime-Token"] = password
     }
 
     const clientId = getClientId()
@@ -113,7 +113,7 @@ export async function buildSeaQuery<T, D extends any = any>(
         headers["X-Seanime-Client-Id-Proof"] = clientIdProof
     }
     if (__clientPlatform__) {
-        headers["X-Kuro-Client-Platform"] = __clientPlatform__
+        headers["X-Seanime-Client-Platform"] = __clientPlatform__
     }
 
     let res
