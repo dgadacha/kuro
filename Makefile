@@ -8,7 +8,8 @@
 # Override defaults inline, e.g. `make dev DATADIR=/tmp/kuro PORT=43000`.
 
 DATADIR ?= $(HOME)/.seanime-data
-PORT    ?= 43000
+# 43211 is the seanime default — extensions hardcode it for the proxy URL
+PORT    ?= 43211
 GO      ?= go
 NPM     ?= npm
 
@@ -47,6 +48,9 @@ init-config:
 	@if [ ! -f "$(DATADIR)/config.toml" ]; then \
 	  printf '[server]\nhost = "0.0.0.0"\nport = %s\n' "$(PORT)" > "$(DATADIR)/config.toml"; \
 	  echo "→ wrote $(DATADIR)/config.toml"; \
+	elif ! grep -q "port = $(PORT)" "$(DATADIR)/config.toml"; then \
+	  echo "→ updating port to $(PORT) in $(DATADIR)/config.toml"; \
+	  sed -i '' -E "s/^port = [0-9]+/port = $(PORT)/" "$(DATADIR)/config.toml"; \
 	fi
 
 build: ## Build the standalone binary (web embedded)
