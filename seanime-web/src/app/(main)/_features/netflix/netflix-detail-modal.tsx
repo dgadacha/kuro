@@ -62,12 +62,15 @@ function Body({ mediaId }: { mediaId: number }) {
     const { data: entry, isLoading: entryLoading } = useGetAnimeEntry(mediaId)
     const { data: details } = useGetAnilistAnimeDetails(mediaId)
 
+    // Hooks MUST be called unconditionally (before any early return) to keep
+    // their order stable across renders.
+    const rawDescription = entry?.media?.description?.replace(/(<([^>]+)>)/gi, "") ?? ""
+    const { text: description, isTranslating } = useTranslatedText(rawDescription)
+
     if (entryLoading || !entry) return <BodySkeleton />
 
     const banner = entry.media?.bannerImage || entry.media?.coverImage?.extraLarge
     const title = entry.media?.title?.userPreferred ?? ""
-    const rawDescription = entry.media?.description?.replace(/(<([^>]+)>)/gi, "") ?? ""
-    const { text: description, isTranslating } = useTranslatedText(rawDescription)
     const year = entry.media?.startDate?.year
     const episodes = entry.media?.episodes
     const score = entry.media?.meanScore
