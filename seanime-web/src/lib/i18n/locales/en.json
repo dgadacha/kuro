@@ -52,6 +52,7 @@
   },
   "watch": {
     "start": "Start playback",
+    "resume_at": "Resume at",
     "click_hint": "Browsers block autoplay in new tabs — one click and you're set."
   },
   "modal": {

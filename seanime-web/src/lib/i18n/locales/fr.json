@@ -52,6 +52,7 @@
   },
   "watch": {
     "start": "Lancer la lecture",
+    "resume_at": "Reprendre à",
     "click_hint": "Les navigateurs bloquent l'autoplay dans un nouvel onglet — un clic et c'est parti."
   },
   "modal": {

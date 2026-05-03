@@ -1,4 +1,4 @@
-import { useGetAnimeCollection } from "@/api/hooks/anilist.hooks"
+import { NetflixContinueWatching } from "@/app/(main)/_features/netflix/netflix-continue-watching"
 import { NetflixHero } from "@/app/(main)/_features/netflix/netflix-hero"
 import { NetflixRow } from "@/app/(main)/_features/netflix/netflix-row"
 import {
@@ -22,7 +22,7 @@ export function NetflixHome() {
             </div>
 
             <div className="relative z-[2] mt-4 space-y-10 pb-20">
-                <ContinueWatchingRow />
+                <NetflixContinueWatching />
                 <TrendingRow />
                 <PopularRow />
                 <CurrentSeasonRow />
@@ -39,33 +39,6 @@ export function NetflixHome() {
  * co-located with the element it observes, instead of plumbing 6 refs through
  * the parent. The first row uses priority image loading (above the fold).
  */
-
-function ContinueWatchingRow() {
-    const { t } = useTranslation()
-    const { data, isLoading } = useGetAnimeCollection()
-
-    const media = React.useMemo(() => {
-        const lists = data?.MediaListCollection?.lists ?? []
-        const current = lists.find(l => l?.status === "CURRENT")
-        const repeating = lists.find(l => l?.status === "REPEATING")
-        // AniList returns CURRENT in updated-desc order — preserve it.
-        return [...(current?.entries ?? []), ...(repeating?.entries ?? [])]
-            .filter(Boolean)
-            .map(e => e!.media)
-            .filter(Boolean)
-    }, [data])
-
-    if (!isLoading && media.length === 0) return null
-
-    return (
-        <NetflixRow
-            title={t("home.rows.continue_watching")}
-            media={media}
-            isLoading={isLoading}
-            priorityImages
-        />
-    )
-}
 
 function TrendingRow() {
     const { t } = useTranslation()

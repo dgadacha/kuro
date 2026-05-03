@@ -11,3 +11,7 @@ export const __onlinestream_selectedEpisodeNumberAtom = atom<number | null>(null
 export const __onlinestream_selectedServerAtom = atomWithStorage<string | undefined>("sea-onlinestream-server", undefined)
 
 export const __onlinestream_qualityAtom = atomWithStorage<string | undefined>("sea-onlinestream-quality", undefined)
+
+// Set by /watch when opening a "Continue watching" link. Consumed once by
+// the OnlinestreamPage on first onLoadedMetadata to seek the player.
+export const __onlinestream_resumeAtSecondsAtom = atom<number | null>(null)

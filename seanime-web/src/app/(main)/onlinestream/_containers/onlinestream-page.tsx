@@ -22,6 +22,7 @@ import { useNakamaOnlineStreamWatchParty } from "@/app/(main)/onlinestream/_lib/
 import { useHandleOnlinestreamProviderExtensions } from "@/app/(main)/onlinestream/_lib/handle-onlinestream-providers"
 import {
     __onlinestream_qualityAtom,
+    __onlinestream_resumeAtSecondsAtom,
     __onlinestream_selectedDubbedAtom,
     __onlinestream_selectedEpisodeNumberAtom,
     __onlinestream_selectedProviderAtom,
@@ -379,9 +380,22 @@ export function OnlinestreamPage({ animeEntry, animeEntryLoading, hideBackButton
     }, [episodes, media, animeEntry?.listData, urlEpNumber, currentPlaylist, isWatchPartyPeer])
 
 
+    const [resumeAtSeconds, setResumeAtSeconds] = useAtom(__onlinestream_resumeAtSecondsAtom)
+    const resumeRef = React.useRef(resumeAtSeconds)
+    React.useEffect(() => { resumeRef.current = resumeAtSeconds }, [resumeAtSeconds])
+
     function onCanPlay() {
         if (urlEpNumber) {
             router.replace(pathname + `?id=${mediaId}`)
+        }
+        // Apply a one-shot resume offset (set by /watch when opening
+        // a "Continue watching" link).
+        const resume = resumeRef.current
+        if (resume != null && resume > 0 && playerRef.current && Number.isFinite(playerRef.current.duration)) {
+            try {
+                playerRef.current.currentTime = Math.min(resume, playerRef.current.duration - 5)
+            } catch { /* seek may fail before metadata is fully ready — fine */ }
+            setResumeAtSeconds(null)
         }
     }
 

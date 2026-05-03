@@ -1,6 +1,7 @@
 import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
 import { OnlinestreamPage } from "@/app/(main)/onlinestream/_containers/onlinestream-page"
 import {
+    __onlinestream_resumeAtSecondsAtom,
     __onlinestream_selectedDubbedAtom,
     __onlinestream_selectedEpisodeNumberAtom,
     __onlinestream_selectedProviderAtom,
@@ -14,6 +15,15 @@ import React from "react"
 import { useTranslation } from "react-i18next"
 import { BiPlay } from "react-icons/bi"
 
+function formatHMS(total: number): string {
+    if (!Number.isFinite(total) || total < 0) return "00:00"
+    const h = Math.floor(total / 3600)
+    const m = Math.floor((total % 3600) / 60)
+    const s = Math.floor(total % 60)
+    const pad = (n: number) => String(n).padStart(2, "0")
+    return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`
+}
+
 export default function WatchPage() {
     const { t } = useTranslation()
     const searchParams = useSearchParams()
@@ -22,13 +32,16 @@ export default function WatchPage() {
     const epParam = searchParams.get("episode") ?? searchParams.get("ep")
     const providerParam = searchParams.get("provider")
     const dubParam = searchParams.get("dub")
+    const tParam = searchParams.get("t")
 
     const mediaId = idParam ? parseInt(idParam, 10) : NaN
     const epNumber = epParam ? parseInt(epParam, 10) : NaN
+    const resumeSeconds = tParam ? parseInt(tParam, 10) : NaN
 
     const setEpisode = useSetAtom(__onlinestream_selectedEpisodeNumberAtom)
     const setProvider = useSetAtom(__onlinestream_selectedProviderAtom)
     const setDubbed = useSetAtom(__onlinestream_selectedDubbedAtom)
+    const setResumeAt = useSetAtom(__onlinestream_resumeAtSecondsAtom)
 
     // The player only mounts after the user clicks. The click counts as a
     // browser user-gesture, which lets the player call .play() with sound.
@@ -39,8 +52,10 @@ export default function WatchPage() {
         if (!Number.isNaN(epNumber)) setEpisode(epNumber)
         if (providerParam) setProvider(providerParam)
         if (dubParam === "1") setDubbed(true)
+        // Player will consume + clear this on first onLoadedMetadata.
+        if (!Number.isNaN(resumeSeconds) && resumeSeconds > 0) setResumeAt(resumeSeconds)
         setStarted(true)
-    }, [epNumber, providerParam, dubParam, setEpisode, setProvider, setDubbed])
+    }, [epNumber, providerParam, dubParam, resumeSeconds, setEpisode, setProvider, setDubbed, setResumeAt])
 
     const { data: animeEntry, isLoading } = useGetAnimeEntry(mediaId)
 
@@ -98,7 +113,9 @@ export default function WatchPage() {
                     className="bg-white !text-black hover:!bg-white/90 font-bold px-10 rounded-md mt-4"
                     autoFocus
                 >
-                    {t("watch.start")}
+                    {!Number.isNaN(resumeSeconds) && resumeSeconds > 0
+                        ? `${t("watch.resume_at")} ${formatHMS(resumeSeconds)}`
+                        : t("watch.start")}
                 </Button>
 
                 <p className="text-xs text-[--muted] max-w-md mt-2">
