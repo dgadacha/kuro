@@ -35,6 +35,7 @@
   },
   "home": {
     "rows": {
+      "continue_watching": "Continuer à regarder",
       "trending": "Tendances actuelles",
       "popular": "Populaires",
       "current_season": "Cette saison",
@@ -48,6 +49,26 @@
       "slide_label": "Slide {{n}} : {{title}}",
       "slideshow_aria": "Sélection à la une"
     }
+  },
+  "lists": {
+    "title": "Mes listes",
+    "search_placeholder": "Rechercher dans mes listes…",
+    "empty": "Rien pour le moment.",
+    "no_match": "Aucun anime ne correspond à ta recherche.",
+    "tabs": {
+      "all": "Tout",
+      "current": "En cours",
+      "planning": "À regarder",
+      "completed": "Terminés",
+      "paused": "En pause",
+      "dropped": "Abandonnés"
+    }
+  },
+  "search": {
+    "title": "Recherche",
+    "placeholder": "Cherche un anime, un genre, une année…",
+    "no_results": "Aucun résultat.",
+    "start_typing": "Tape pour chercher dans tout le catalogue AniList."
   },
   "discover": {
     "tab_anime": "Anime",

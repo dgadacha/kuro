@@ -35,6 +35,7 @@
   },
   "home": {
     "rows": {
+      "continue_watching": "Continue watching",
       "trending": "Trending now",
       "popular": "Popular",
       "current_season": "This season",
@@ -48,6 +49,26 @@
       "slide_label": "Slide {{n}}: {{title}}",
       "slideshow_aria": "Featured selection"
     }
+  },
+  "lists": {
+    "title": "My lists",
+    "search_placeholder": "Search in my lists…",
+    "empty": "Nothing here yet.",
+    "no_match": "No anime matches your search.",
+    "tabs": {
+      "all": "All",
+      "current": "Currently watching",
+      "planning": "Plan to watch",
+      "completed": "Completed",
+      "paused": "Paused",
+      "dropped": "Dropped"
+    }
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search anime, genre, year…",
+    "no_results": "No results found.",
+    "start_typing": "Type to search across the AniList catalog."
   },
   "discover": {
     "tab_anime": "Anime",
