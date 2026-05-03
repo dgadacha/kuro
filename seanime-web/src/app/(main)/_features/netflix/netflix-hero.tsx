@@ -37,7 +37,7 @@ export function NetflixHero() {
         <section
             data-netflix-hero
             className={cn(
-                "relative w-full -mt-[--titlebar-h] overflow-hidden",
+                "relative w-full overflow-hidden",
                 HERO.heightClass,
             )}
             onMouseEnter={() => setHovering(true)}

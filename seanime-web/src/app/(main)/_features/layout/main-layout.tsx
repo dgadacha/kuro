@@ -3,7 +3,7 @@ import { ScannerModal } from "@/app/(main)/_features/anime-library/_containers/s
 import { ErrorExplainer } from "@/app/(main)/_features/error-explainer/error-explainer"
 import { IssueReport } from "@/app/(main)/_features/issue-report/issue-report"
 import { MediaPreviewModal } from "@/app/(main)/_features/media/_containers/media-preview-modal"
-import { MainSidebar } from "@/app/(main)/_features/navigation/main-sidebar"
+import { NetflixTopBar } from "@/app/(main)/_features/netflix/netflix-top-bar"
 import { GlobalPlaylistManager } from "@/app/(main)/_features/playlists/_containers/global-playlist-manager"
 import { PlaylistListModal } from "@/app/(main)/_features/playlists/playlist-list-modal"
 import { PluginManager } from "@/app/(main)/_features/plugin/plugin-manager"
@@ -25,7 +25,7 @@ import { DebridStreamOverlay } from "@/app/(main)/entry/_containers/debrid-strea
 import { useTorrentStreamListener } from "@/app/(main)/entry/_containers/torrent-stream/_lib/handle-torrent-stream"
 import { TorrentStreamOverlay } from "@/app/(main)/entry/_containers/torrent-stream/torrent-stream-overlay"
 import { LoadingOverlayWithLogo } from "@/components/shared/loading-overlay-with-logo"
-import { AppLayout, AppLayoutContent, AppLayoutSidebar, AppSidebarProvider } from "@/components/ui/app-layout"
+import { AppLayout, AppLayoutContent, AppSidebarProvider } from "@/components/ui/app-layout"
 import { usePathname, useRouter } from "@/lib/navigation"
 import { __isElectronDesktop__ } from "@/types/constants"
 import React from "react"
@@ -70,15 +70,11 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
             <PluginWebviewSlot slot="fixed" />
 
             <AppSidebarProvider>
-                <AppLayout withSidebar sidebarSize="slim">
-                    <AppLayoutSidebar>
-                        <MainSidebar />
-                    </AppLayoutSidebar>
-                    <AppLayout>
-                        <AppLayoutContent>
-                            {children}
-                        </AppLayoutContent>
-                    </AppLayout>
+                <NetflixTopBar />
+                <AppLayout>
+                    <AppLayoutContent>
+                        {children}
+                    </AppLayoutContent>
                 </AppLayout>
             </AppSidebarProvider>
         </>
