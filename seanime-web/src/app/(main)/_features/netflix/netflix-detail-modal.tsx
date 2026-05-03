@@ -4,14 +4,14 @@ import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
 import { NetflixEpisodeList } from "@/app/(main)/_features/netflix/netflix-episode-list"
 import { NetflixMoreLikeThis } from "@/app/(main)/_features/netflix/netflix-more-like-this"
 import { SeaImage } from "@/components/shared/sea-image"
-import { Button, IconButton } from "@/components/ui/button"
+import { IconButton } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
 import { Modal } from "@/components/ui/modal"
 import { Skeleton } from "@/components/ui/skeleton"
 import { atom, useAtom, useSetAtom } from "jotai"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { BiInfoCircle, BiPlay, BiX } from "react-icons/bi"
+import { BiX } from "react-icons/bi"
 
 const __netflixDetailModalAtom = atom<number | null>(null)
 
@@ -79,36 +79,10 @@ function Body({ mediaId }: { mediaId: number }) {
                     <SeaImage src={banner} alt="" fill priority className="object-cover object-center" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-10 space-y-5">
+                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-10">
                     <h1 className="text-3xl lg:text-5xl font-extrabold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] max-w-2xl">
                         {title}
                     </h1>
-
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <a
-                            href={`/watch?id=${mediaId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <Button
-                                size="lg"
-                                className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-8"
-                                leftIcon={<BiPlay className="text-2xl" />}
-                            >
-                                {t("home.hero.play")}
-                            </Button>
-                        </a>
-                        <a href={`/entry?id=${mediaId}`}>
-                            <Button
-                                size="lg"
-                                intent="gray-subtle"
-                                className="bg-white/20 hover:bg-white/30 !text-white font-semibold rounded-md px-6 backdrop-blur-sm"
-                                leftIcon={<BiInfoCircle className="text-xl" />}
-                            >
-                                {t("modal.full_page")}
-                            </Button>
-                        </a>
-                    </div>
                 </div>
             </div>
 

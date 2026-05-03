@@ -7,6 +7,7 @@ import {
     Anime_NakamaEntryLibraryData,
     Manga_EntryListData,
 } from "@/api/generated/types"
+import { useNetflixDetailModal } from "@/app/(main)/_features/netflix/netflix-detail-modal"
 import { getAnimeLibraryEntryAtom } from "@/app/(main)/_atoms/anime-library-collection.atoms"
 import { getMangaCollectionEntryAtom } from "@/app/(main)/_atoms/manga-collection.atoms"
 import { usePlayNext } from "@/app/(main)/_atoms/playback.atoms"
@@ -94,14 +95,18 @@ export function MediaEntryCard<T extends "anime" | "manga">(props: MediaEntryCar
         withAudienceScore = true,
         hideUnseenCountBadge = false,
         hideAnilistEntryEditButton = false,
-        onClick,
+        onClick: providedOnClick,
         hideReleasingBadge = false,
     } = props
+    // For anime cards we default to opening the Netflix-style detail modal.
+    // Callers can still pass a custom onClick to override (e.g. unmatched-files flow).
+    const onClick = providedOnClick ?? (type === "anime" ? () => openDetail(media.id) : undefined)
 
     const router = useRouter()
     const serverStatus = useServerStatus()
     const { hasStreamingEnabled } = useHasTorrentOrDebridInclusion()
     const setActionPopupHover = useSetAtom(__mediaEntryCard_hoveredPopupId)
+    const { openDetail } = useNetflixDetailModal()
 
     const { selectMediaAndOpenEditor } = usePlaylistEditorManager()
 

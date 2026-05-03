@@ -1,9 +1,9 @@
 import { AL_BaseAnime } from "@/api/generated/types"
+import { useNetflixDetailModal } from "@/app/(main)/_features/netflix/netflix-detail-modal"
 import { HERO } from "@/app/(main)/_features/netflix/netflix.constants"
 import { useSlideshow } from "@/app/(main)/_features/netflix/use-slideshow"
 import { useDiscoverTrendingAnime } from "@/app/(main)/discover/_lib/handle-discover-queries"
 import { SeaImage } from "@/components/shared/sea-image"
-import { SeaLink } from "@/components/shared/sea-link"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -13,6 +13,7 @@ import { BiInfoCircle, BiPlay } from "react-icons/bi"
 
 export function NetflixHero() {
     const { t } = useTranslation()
+    const { openDetail } = useNetflixDetailModal()
     const { data, isLoading } = useDiscoverTrendingAnime()
 
     const pool = React.useMemo<AL_BaseAnime[]>(
@@ -70,26 +71,24 @@ export function NetflixHero() {
                     )}
 
                     <div className="flex items-center gap-3 pt-2">
-                        <SeaLink href={`/entry?id=${featured.id}`}>
-                            <Button
-                                size="lg"
-                                className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-8"
-                                leftIcon={<BiPlay className="text-2xl" />}
-                            >
-                                {t("home.hero.play")}
-                            </Button>
-                        </SeaLink>
+                        <Button
+                            size="lg"
+                            className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-8"
+                            leftIcon={<BiPlay className="text-2xl" />}
+                            onClick={() => openDetail(featured.id)}
+                        >
+                            {t("home.hero.play")}
+                        </Button>
 
-                        <SeaLink href={`/entry?id=${featured.id}`}>
-                            <Button
-                                size="lg"
-                                intent="gray-subtle"
-                                className="bg-white/20 hover:bg-white/30 !text-white font-semibold rounded-md px-8 backdrop-blur-sm"
-                                leftIcon={<BiInfoCircle className="text-2xl" />}
-                            >
-                                {t("home.hero.more_info")}
-                            </Button>
-                        </SeaLink>
+                        <Button
+                            size="lg"
+                            intent="gray-subtle"
+                            className="bg-white/20 hover:bg-white/30 !text-white font-semibold rounded-md px-8 backdrop-blur-sm"
+                            leftIcon={<BiInfoCircle className="text-2xl" />}
+                            onClick={() => openDetail(featured.id)}
+                        >
+                            {t("home.hero.more_info")}
+                        </Button>
                     </div>
                 </div>
             </div>
