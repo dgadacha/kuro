@@ -38,7 +38,9 @@ function Layout() {
         <ServerDataWrapper host={host}>
             <MainLayout>
                 <div data-main-layout-container className="h-auto">
-                    <div data-main-layout-content>
+                    {/* push content under the fixed Netflix top bar.
+                        Hero pages opt out via -mt-16 lg:-mt-[68px]. */}
+                    <div data-main-layout-content className="pt-16 lg:pt-[68px]">
                         <ErrorBoundary FallbackComponent={AppErrorBoundary}>
                             <Outlet />
                         </ErrorBoundary>

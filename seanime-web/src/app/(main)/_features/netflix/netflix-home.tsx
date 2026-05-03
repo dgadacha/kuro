@@ -14,10 +14,12 @@ import { useTranslation } from "react-i18next"
 export function NetflixHome() {
     return (
         <div data-netflix-home className="contents">
-            <NetflixHero />
+            {/* Hero opts out of the route's top padding so it can sit flush
+                under the transparent navbar — Netflix-style. */}
+            <div className="-mt-16 lg:-mt-[68px]">
+                <NetflixHero />
+            </div>
 
-            {/* Modest pull-up keeps the Netflix overlap feel without crashing
-                the first row title into the hero CTAs. */}
             <div className="relative z-[2] mt-4 space-y-10 pb-20">
                 <TrendingRow />
                 <PopularRow />
