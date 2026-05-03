@@ -99,7 +99,7 @@ export function AnimeEntryPage() {
         if (!animeEntry) return
         try {
             if (animeEntry?.media?.title?.userPreferred) {
-                document.title = `${animeEntry?.media?.title?.userPreferred} | Seanime`
+                document.title = `${animeEntry?.media?.title?.userPreferred} | Kuro`
             }
             // switchedView.current = false
         }

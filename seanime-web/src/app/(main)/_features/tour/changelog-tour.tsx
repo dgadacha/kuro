@@ -99,7 +99,7 @@ function useSetupTour(): Record<string, () => TourStep[]> {
                 id: "transcode-new-player",
                 target: "[data-tab-trigger='mediastream']",
                 title: "Transcode Player",
-                content: "Transcoding/Direct Play now uses the custom Seanime player used by Seanime Denshi and Online Streaming.",
+                content: "Transcoding/Direct Play now uses the custom Kuro player used by Kuro Denshi and Online Streaming.",
                 route: "/settings",
                 prepare: async () => {
                     setSettingsTab("mediastream")
@@ -188,7 +188,7 @@ function useSetupTour(): Record<string, () => TourStep[]> {
             {
                 id: "changelog-2",
                 title: "Bug Fixes",
-                content: "Several bugs have been fixed in this release, including some related to Seanime Denshi and plugins. Read the full changelog for more details.",
+                content: "Several bugs have been fixed in this release, including some related to Kuro Denshi and plugins. Read the full changelog for more details.",
                 route: "/",
                 ignoreOutsideClick: true,
             },

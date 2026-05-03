@@ -202,7 +202,7 @@ export function UISettings() {
 
     function handleSave(data: z.infer<typeof themeSchema>) {
         if (colord(data.backgroundColor).isLight()) {
-            toast.error("Seanime does not support light themes")
+            toast.error("Kuro does not support light themes")
             return
         }
 
@@ -772,7 +772,7 @@ export function UISettings() {
                         {/*            side="right"*/}
                         {/*            label="Fix border rendering artifacts (client-specific)"*/}
                         {/*            name="enableMediaCardStyleFix"*/}
-                        {/*            help="Seanime will try to fix border rendering artifacts. This setting only affects this client/browser."*/}
+                        {/*            help="Kuro will try to fix border rendering artifacts. This setting only affects this client/browser."*/}
                         {/*            value={fixBorderRenderingArtifacts}*/}
                         {/*            onValueChange={(v) => {*/}
                         {/*                setFixBorerRenderingArtifacts(v)*/}

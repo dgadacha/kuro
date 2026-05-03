@@ -41,7 +41,7 @@ export function ServerSettings(props: ServerSettingsProps) {
 
     const confirmDialog = useConfirmationDialog({
         title: "Upload to AniList",
-        description: "This will upload your local Seanime collection to your AniList account. Are you sure you want to proceed?",
+        description: "This will upload your local Kuro collection to your AniList account. Are you sure you want to proceed?",
         actionText: "Upload",
         actionIntent: "primary",
         onConfirm: async () => {
@@ -81,7 +81,7 @@ export function ServerSettings(props: ServerSettingsProps) {
                     side="right"
                     name="enableWatchContinuity"
                     label="Enable watch history"
-                    help="If enabled, Seanime will remember your watch progress and resume from where you left off."
+                    help="If enabled, Kuro will remember your watch progress and resume from where you left off."
                     moreHelp="Only applies to desktop and integrated players."
                 />
 
@@ -162,7 +162,7 @@ export function ServerSettings(props: ServerSettingsProps) {
                     side="right"
                     name="autoSaveCurrentMediaOffline"
                     label="Save all currently watched/read media for offline use"
-                    help="If enabled, Seanime will automatically save all media you're currently watching/reading for offline use."
+                    help="If enabled, Kuro will automatically save all media you're currently watching/reading for offline use."
                 />
 
             </SettingsCard>
@@ -266,14 +266,14 @@ export function ServerSettings(props: ServerSettingsProps) {
                     side="right"
                     name="disableNotifications"
                     label="Disable system notifications"
-                    moreHelp="Notifications shown by the OS when Seanime runs the auto-downloader or auto-scanner."
+                    moreHelp="Notifications shown by the OS when Kuro runs the auto-downloader or auto-scanner."
                 />
                 <Field.Switch
                     side="right"
                     name="disableCacheLayer"
                     label="Disable AniList caching"
-                    help="If enabled, Seanime will stop caching AniList requests to disk."
-                    moreHelp="By default, all requests made to AniList are cached. This allows Seanime to keep being usable when AniList goes down. The cache directory is modifiable in the config file."
+                    help="If enabled, Kuro will stop caching AniList requests to disk."
+                    moreHelp="By default, all requests made to AniList are cached. This allows Kuro to keep being usable when AniList goes down. The cache directory is modifiable in the config file."
                 />
                 {!f.watch("disableCacheLayer") && (
                     <div>
@@ -282,7 +282,7 @@ export function ServerSettings(props: ServerSettingsProps) {
                             onValueChange={v => toggleCacheLayer()}
                             disabled={isTogglingCacheLayer}
                             label="Use cache-only mode"
-                            moreHelp="Seanime will use cached data instead of making API requests."
+                            moreHelp="Kuro will use cached data instead of making API requests."
                         />
                     </div>
                 )}
@@ -290,7 +290,7 @@ export function ServerSettings(props: ServerSettingsProps) {
                     side="right"
                     name="useFallbackMetadataProvider"
                     label="Use fallback metadata provider"
-                    help="If enabled, Seanime will use an alternative source to fetch episode metadata."
+                    help="If enabled, Kuro will use an alternative source to fetch episode metadata."
                 />
                 {/*<Separator />*/}
                 {/*<Field.Switch*/}
@@ -311,27 +311,27 @@ export function ServerSettings(props: ServerSettingsProps) {
                     label={__isElectronDesktop__ ? "Do not fetch update notes" : "Do not check for updates"}
                     help={__isElectronDesktop__ ? (<span className="flex gap-2 items-center">
                         <LuCircleAlert className="size-4 text-[--blue]" />
-                        <span>If enabled, new releases won't be displayed. Seanime Denshi may still auto-update in the background.</span>
-                    </span>) : "If enabled, Seanime will not check for new releases."}
-                    moreHelp={__isElectronDesktop__ ? "You cannot disable auto-updates for Seanime Denshi." : undefined}
+                        <span>If enabled, new releases won't be displayed. Kuro Denshi may still auto-update in the background.</span>
+                    </span>) : "If enabled, Kuro will not check for new releases."}
+                    moreHelp={__isElectronDesktop__ ? "You cannot disable auto-updates for Kuro Denshi." : undefined}
                 />
                 <Field.Select
                     label="Update Channel (Experimental)"
                     name="updateChannel"
-                    help={__isElectronDesktop__ ? "Also applies to Seanime Denshi auto-updates." : ""}
+                    help={__isElectronDesktop__ ? "Also applies to Kuro Denshi auto-updates." : ""}
                     options={[
                         { label: "GitHub (Default)", value: "github" },
-                        { label: "Seanime", value: "seanime" },
-                        { label: "Seanime (Canary)", value: "seanime_nightly" },
+                        { label: "Kuro", value: "seanime" },
+                        { label: "Kuro (Canary)", value: "seanime_nightly" },
                     ]}
                 />
                 {serverStatus?.settings?.library?.updateChannel === "seanime" && (
-                    <Alert intent="info" description="You are currently using a release channel hosted on Seanime." />
+                    <Alert intent="info" description="You are currently using a release channel hosted on Kuro." />
                 )}
                 {serverStatus?.settings?.library?.updateChannel === "seanime_nightly" && (
                     <Alert
                         intent="warning"
-                        description="You are currently using the canary release channel hosted on Seanime. This channel may receive unstable updates without much testing."
+                        description="You are currently using the canary release channel hosted on Kuro. This channel may receive unstable updates without much testing."
                     />
                 )}
             </SettingsCard>

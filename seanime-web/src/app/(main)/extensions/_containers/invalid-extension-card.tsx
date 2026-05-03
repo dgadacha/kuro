@@ -56,7 +56,7 @@ export function InvalidExtensionCard(props: InvalidExtensionCardProps) {
                     contentClass="max-w-2xl"
                 >
                     <p>
-                        Seanime failed to load this extension. If you aren't sure what this means, please contact the author.
+                        Kuro failed to load this extension. If you aren't sure what this means, please contact the author.
                     </p>
                     <p>
                         Code: <strong>{extension.code}</strong>
@@ -136,7 +136,7 @@ export function InvalidExtensionCard(props: InvalidExtensionCardProps) {
                 <div>
                     <p className="text-red-400 text-sm">
                         {extension.code === "invalid_manifest" && "Manifest error"}
-                        {extension.code === "invalid_semver_constraint" && "Incompatible with this version of Seanime"}
+                        {extension.code === "invalid_semver_constraint" && "Incompatible with this version of Kuro"}
                         {extension.code === "invalid_payload" && "Invalid or incompatible code"}
                     </p>
                 </div>
@@ -248,7 +248,7 @@ export function UnauthorizedExtensionPluginCard(props: UnauthorizedExtensionPlug
                     {isUnsafe && <Alert
                         intent="warning"
                         className="!text-[--muted] !bg-gray-800"
-                        description="This plugin relies on unsafe flags to function. Seanime cannot guarantee that it is safe to use."
+                        description="This plugin relies on unsafe flags to function. Kuro cannot guarantee that it is safe to use."
                         // className="mb-4"
                     />}
 

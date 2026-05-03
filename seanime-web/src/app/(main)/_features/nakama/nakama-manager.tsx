@@ -305,7 +305,7 @@ export function NakamaManager() {
 
     const confirmRoom = useConfirmationDialog({
         title: "Create a Cloud Room",
-        description: "By continuing, you agree to broadcast your playback state through Seanime's servers to sync with peers while the room is active. You are limited to 10 rooms per day and 4 peers per room (subject to change).",
+        description: "By continuing, you agree to broadcast your playback state through Kuro's servers to sync with peers while the room is active. You are limited to 10 rooms per day and 4 peers per room (subject to change).",
         onConfirm: () => {
             handleCreateRoom()
         },
@@ -457,7 +457,7 @@ export function NakamaManager() {
                                                     Cloud Room
                                                 </p>
                                                 <p className="text-sm text-[--muted] pr-4">
-                                                    Cloud Rooms use Seanime's API to enable hosting watch parties without exposing your server to the
+                                                    Cloud Rooms use Kuro's API to enable hosting watch parties without exposing your server to the
                                                     internet.
                                                 </p>
                                             </div>

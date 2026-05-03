@@ -74,7 +74,7 @@ const generateBridgeScript = (token: string, parentOrigin: string, widgetId: str
     const PARENT_ORIGIN = "${parentOrigin}"
 
     window.webview = {
-        // Send a message to Seanime
+        // Send a message to Kuro
         send: (event, payload) => {
             window.parent.postMessage({
                 type: "${WebviewMessageType.Trigger}",
@@ -84,7 +84,7 @@ const generateBridgeScript = (token: string, parentOrigin: string, widgetId: str
                 token: WEBVIEW_TOKEN
             }, PARENT_ORIGIN)
         },
-        // Receive messages from Seanime
+        // Receive messages from Kuro
         on: (event, callback) => {
             const handler = (e) => {
                 const isTrustedOrigin = e.origin === PARENT_ORIGIN || e.origin === "null"
@@ -114,7 +114,7 @@ const generateBridgeScript = (token: string, parentOrigin: string, widgetId: str
                 token: WEBVIEW_TOKEN
             }, PARENT_ORIGIN)
         },
-        // Notify Seanime when the webview body changed size
+        // Notify Kuro when the webview body changed size
         _onResizeObserved: () => {
             const height = document.body.scrollHeight
             const width = document.body.scrollWidth
@@ -128,7 +128,7 @@ const generateBridgeScript = (token: string, parentOrigin: string, widgetId: str
         }
     }
 
-    // Notify Seanime to resize iframe when content changes
+    // Notify Kuro to resize iframe when content changes
     if (window.ResizeObserver) {
         window.addEventListener("load", () => {
             const resizeObserver = new ResizeObserver(() => {

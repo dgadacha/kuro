@@ -168,7 +168,7 @@ export function ScannerModal() {
                                 onValueChange={v => enhanceWithOfflineDatabase.set(v === "database")}
                                 help={enhanceWithOfflineDatabase.active
                                     ? <span>Matches local files against the entire AniList catalog. Scanning will be slower.</span>
-                                    : <span><span className="text-[--orange]">Slower for large libraries</span>. Seanime will send an API request for
+                                    : <span><span className="text-[--orange]">Slower for large libraries</span>. Kuro will send an API request for
                                                                                                                each anime title found in the library,
                                                                                                                which may lead to rate limits and
                                                                                                                slower scanning.</span>}

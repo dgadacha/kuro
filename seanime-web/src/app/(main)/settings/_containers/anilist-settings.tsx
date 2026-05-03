@@ -22,7 +22,7 @@ export function AnilistSettings(props: Props) {
 
     const confirmDialog = useConfirmationDialog({
         title: "Upload to AniList",
-        description: "This will upload your local Seanime collection to your AniList account. Are you sure you want to proceed?",
+        description: "This will upload your local Kuro collection to your AniList account. Are you sure you want to proceed?",
         actionText: "Upload",
         actionIntent: "primary",
         onConfirm: async () => {

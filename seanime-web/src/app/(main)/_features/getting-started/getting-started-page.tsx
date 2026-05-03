@@ -1,12 +1,9 @@
 import { Status } from "@/api/generated/types"
 import { useGettingStarted } from "@/api/hooks/settings.hooks"
 import { useSetServerStatus } from "@/app/(main)/_hooks/use-server-status"
-import { GlowingEffect } from "@/components/shared/glowing-effect"
 import { LoadingOverlayWithLogo } from "@/components/shared/loading-overlay-with-logo"
-import { SeaImage as Image } from "@/components/shared/sea-image"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Card, CardProps } from "@/components/ui/card"
 import { cn } from "@/components/ui/core/styling"
 import { Field, Form } from "@/components/ui/form"
 import { useRouter } from "@/lib/navigation"
@@ -21,662 +18,318 @@ import {
 import { __isDesktop__, __isElectronDesktop__ } from "@/types/constants"
 import { AnimatePresence, motion } from "motion/react"
 import React from "react"
-import { useFormContext, useWatch } from "react-hook-form"
-import { BiChevronLeft, BiChevronRight, BiDownload, BiFolder, BiPlay, BiRocket } from "react-icons/bi"
-import { FaBook, FaDiscord } from "react-icons/fa"
+import { useWatch } from "react-hook-form"
+import { BiChevronLeft, BiChevronRight, BiPlay, BiRocket } from "react-icons/bi"
+import { FaDiscord } from "react-icons/fa"
 import { HiOutlineDesktopComputer } from "react-icons/hi"
 import { HiEye, HiGlobeAlt, HiServerStack } from "react-icons/hi2"
 import { ImDownload } from "react-icons/im"
 import { IoPlayForwardCircleSharp } from "react-icons/io5"
-import { LuSparkles } from "react-icons/lu"
 import { MdOutlineBroadcastOnHome } from "react-icons/md"
-import { SiMpv, SiQbittorrent, SiTransmission, SiVlcmediaplayer } from "react-icons/si"
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.05,
-            delayChildren: 0.1,
-        },
-    },
-    exit: {
-        opacity: 0,
-        transition: {
-            staggerChildren: 0.03,
-            staggerDirection: -1,
-        },
-    },
-}
-
-const itemVariants = {
-    hidden: {
-        opacity: 0,
-        y: 10,
-    },
-    visible: {
-        opacity: 1,
-        y: 0,
-    },
-    exit: {
-        opacity: 0,
-        y: -10,
-    },
-}
-
-const stepVariants = {
-    enter: (direction: number) => ({
-        x: direction > 0 ? 40 : -40,
-        opacity: 0,
-    }),
-    center: {
-        zIndex: 1,
-        x: 0,
-        opacity: 1,
-    },
-    exit: (direction: number) => ({
-        zIndex: 0,
-        x: direction < 0 ? 40 : -40,
-        opacity: 0,
-    }),
-}
+import { SiMpv, SiVlcmediaplayer } from "react-icons/si"
 
 const STEPS = [
-    {
-        id: "library",
-        title: "Local Anime Library",
-        description: "Choose your anime library folder",
-        icon: BiFolder,
-        gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-        id: "player",
-        title: "Media Player",
-        description: "Configure your video player",
-        icon: BiPlay,
-        gradient: "from-green-500 to-emerald-500",
-    },
-    {
-        id: "torrents",
-        title: "Downloading",
-        description: "Set up downloading",
-        icon: BiDownload,
-        gradient: "from-orange-500 to-red-500",
-    },
-    {
-        id: "debrid",
-        title: "Debrid Service",
-        description: "Optional premium streaming",
-        icon: HiServerStack,
-        gradient: "from-indigo-500 to-indigo-500",
-    },
-    {
-        id: "features",
-        title: "Features",
-        description: "Enable additional features",
-        icon: LuSparkles,
-        gradient: "from-teal-500 to-blue-500",
-    },
-]
+    { id: "player", title: "Lecteur", subtitle: "Choisis ton lecteur vidéo" },
+    { id: "debrid", title: "Debrid", subtitle: "Optionnel — service de cache premium" },
+    { id: "features", title: "Fonctionnalités", subtitle: "Active ce qui t'intéresse" },
+] as const
 
-function StepIndicator({ currentStep, totalSteps, onStepClick }: { currentStep: number; totalSteps: number; onStepClick: (step: number) => void }) {
+const stepVariants = {
+    enter: (dir: number) => ({ x: dir > 0 ? 24 : -24, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir < 0 ? 24 : -24, opacity: 0 }),
+}
+
+function NetflixHeader({ currentStep }: { currentStep: number }) {
     return (
-        <div className="mb-12">
-            <div className="flex items-center justify-center mb-6">
-                <div className="relative mx-auto size-16">
-                    <motion.img
-                        src="/seanime-logo.png"
-                        alt="Seanime Logo"
-                        className="w-full h-full object-contain"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
+        <div className="space-y-8 mb-12 text-center">
+            <div className="flex items-center justify-center gap-3">
+                <img src="/kuro-logo.svg" alt="Kuro" className="size-14" />
+                <span className="text-5xl font-extrabold tracking-tight text-white">KURO</span>
+            </div>
+
+            {/* Linear progress bar — Netflix-style */}
+            <div className="max-w-md mx-auto px-6">
+                <div className="flex items-center justify-between mb-3 text-xs uppercase tracking-widest text-[--muted]">
+                    <span>Étape {currentStep + 1} / {STEPS.length}</span>
+                    <span className="text-white font-semibold">{STEPS[currentStep].title}</span>
+                </div>
+                <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div
+                        className="h-full bg-brand-500"
+                        initial={false}
+                        animate={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
                     />
                 </div>
             </div>
 
-            <div className="text-center mb-8">
-                <p className="text-[--muted] text-sm ">
-                    These settings can be changed later
-                </p>
+            <p className="text-[--muted] text-sm">
+                Tous ces réglages sont modifiables plus tard dans Settings.
+            </p>
+        </div>
+    )
+}
+
+function StepShell({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+    return (
+        <div className="max-w-2xl mx-auto space-y-6">
+            <div className="text-center space-y-3">
+                <h2 className="text-3xl lg:text-4xl font-extrabold text-white">{title}</h2>
+                <p className="text-[--muted] text-sm">{description}</p>
             </div>
-
-            <div className="flex items-start justify-between max-w-4xl mx-auto px-4 rounded-xl relative">
-                {/*<GlowingEffect*/}
-                {/*    spread={40}*/}
-                {/*    glow={true}*/}
-                {/*    disabled={false}*/}
-                {/*    proximity={100}*/}
-                {/*    inactiveZone={0.01}*/}
-                {/*    // movementDuration={4}*/}
-                {/*    className="opacity-30"*/}
-                {/*/>*/}
-
-                {STEPS.map((step, i) => (
-                    <div
-                        key={step.id}
-                        onClick={(e) => {
-                            onStepClick(i)
-                        }}
-                        className={cn("flex flex-col items-center relative group transition-all duration-200 focus:outline-none rounded-lg p-2 w-36",
-                            "cursor-pointer")}
-                    >
-                        <motion.div
-                            className={cn(
-                                "w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-all duration-200",
-                                // i <= currentStep
-                                //     ? `bg-gradient-to-r ${step.gradient} text-white`
-                                //     : "bg-gray-700 text-gray-500",
-                                i <= currentStep
-                                    ? "bg-gradient-to-br from-brand-500/20 to-indigo-500/20 border border-brand-500/20"
-                                    : "bg-[--subtle] text-[--muted]",
-                                i <= currentStep && "group-hover:shadow-md",
-                            )}
-                            initial={{ scale: 0.9 }}
-                            animate={{
-                                scale: i === currentStep ? 1.05 : 1,
-                            }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            <step.icon className="w-6 h-6" />
-                        </motion.div>
-
-                        <div className="text-center">
-                            <h3
-                                className={cn(
-                                    "text-sm font-medium transition-colors duration-200 tracking-wide",
-                                    i <= currentStep ? "text-white" : "text-[--muted]",
-                                    "group-hover:text-[--brand]",
-                                )}
-                            >
-                                {step.title}
-                            </h3>
-                            {/* <p className="text-xs text-gray-500 mt-1 max-w-20">
-                             {step.description}
-                             </p> */}
-                        </div>
-
-                        {/* {i < STEPS.length - 1 && (
-                         <div className="absolute top-8 left-full w-[40%] h-0.5 -translate-y-0 hidden md:block">
-                         <div className={cn(
-                         "h-full transition-all duration-300",
-                         i < currentStep
-                         ? "bg-[--subtle]"
-                         : "bg-gray-600"
-                         )} />
-                         </div>
-                         )} */}
-                    </div>
-                ))}
+            <div className="rounded-xl bg-white/[0.03] border border-white/10 p-6">
+                {children}
             </div>
         </div>
     )
 }
 
-function StepCard({ children, className, ...props }: CardProps) {
-    return (
-        <motion.div
-            variants={itemVariants}
-            className={cn(
-                "relative rounded-xl bg-gray-900/50 backdrop-blur-sm border",
-                className,
-            )}
-        >
-            <GlowingEffect
-                spread={40}
-                glow={true}
-                disabled={false}
-                proximity={100}
-                inactiveZone={0.01}
-                // movementDuration={4}
-                className="opacity-30"
-            />
-            <Card className="bg-transparent border-none shadow-none p-6">
-                {children}
-            </Card>
-        </motion.div>
-    )
-}
-
-
-function LibraryStep({ form }: { form: any }) {
-    return (
-        <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-8"
-        >
-            <motion.div variants={itemVariants} className="text-center space-y-4">
-                <h2 className="text-3xl font-bold">Anime Library</h2>
-                <p className="text-[--muted] text-sm max-w-lg mx-auto">
-                    Choose the folder where your anime files are stored. This is where Seanime will scan for your collection.
-                </p>
-            </motion.div>
-
-            <StepCard className="max-w-2xl mx-auto">
-                <motion.div variants={itemVariants}>
-                    <Field.DirectorySelector
-                        name="libraryPath"
-                        label="Anime Library Path"
-                        leftIcon={<BiFolder className="text-blue-500" />}
-                        shouldExist
-                        help="Select the main folder containing your anime collection. You can add more folders later."
-                        className="w-full"
-                    />
-                </motion.div>
-            </StepCard>
-
-        </motion.div>
-    )
-}
-
-function PlayerStep({ form, status }: { form: any, status: Status }) {
-    const { watch } = useFormContext()
+function PlayerStep({ status }: { status: Status }) {
     const defaultPlayer = useWatch({ name: "defaultPlayer" })
 
     return (
-        <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-8"
+        <StepShell
+            title={`${__isDesktop__ ? "Lecteur " : ""}externe`}
+            description="Configure le lecteur qui prendra en charge la lecture vidéo et le suivi de progression."
         >
-            <motion.div variants={itemVariants} className="text-center space-y-4">
+            {__isElectronDesktop__ && (
+                <Alert
+                    intent="info-basic"
+                    className="mb-4"
+                    description="Kuro Denshi inclut un lecteur natif activé par défaut. Tu peux quand même configurer un lecteur externe ici."
+                />
+            )}
 
-                {__isElectronDesktop__ && <div className="max-w-3xl mx-auto p-4 rounded-xl border !mb-8 font-medium">
-                    Seanime Denshi includes a built-in media player that is enabled by default. You can still configure an external media player.
-                </div>}
+            <div className="space-y-6">
+                <Field.Select
+                    name="defaultPlayer"
+                    label="Lecteur"
+                    help={status?.os !== "darwin"
+                        ? "MPV est recommandé pour les sous-titres et le torrent streaming."
+                        : "MPV ou IINA recommandés sur macOS."}
+                    required
+                    leftIcon={<BiPlay className="text-brand-500" />}
+                    options={[
+                        { label: "MPV (recommandé)", value: "mpv" },
+                        { label: "VLC", value: "vlc" },
+                        ...(status?.os === "windows" ? [{ label: "MPC-HC", value: "mpc-hc" }] : []),
+                        ...(status?.os === "darwin" ? [{ label: "IINA", value: "iina" }] : []),
+                    ]}
+                />
 
-                <h2 className="text-3xl font-bold">{__isDesktop__ ? "External " : ""}Media Player</h2>
-                <p className="text-[--muted] text-sm max-w-lg mx-auto">
-                    Configure your preferred external media player for watching anime and tracking progress automatically.
-                </p>
-            </motion.div>
-
-            <StepCard className="max-w-2xl mx-auto">
-                <motion.div variants={itemVariants} className="space-y-6">
-                    <Field.Select
-                        name="defaultPlayer"
-                        label="Desktop Media Player"
-                        help={status?.os !== "darwin"
-                            ? "MPV is recommended for better subtitle rendering, torrent streaming."
-                            : "Both MPV and IINA are recommended for macOS."}
-                        required
-                        leftIcon={<BiPlay className="text-green-500" />}
-                        options={[
-                            { label: "MPV (Recommended)", value: "mpv" },
-                            { label: "VLC", value: "vlc" },
-                            ...(status?.os === "windows" ? [{ label: "MPC-HC", value: "mpc-hc" }] : []),
-                            ...(status?.os === "darwin" ? [{ label: "IINA", value: "iina" }] : []),
-                        ]}
-                    />
-
-                    <AnimatePresence mode="wait">
-                        {defaultPlayer === "mpv" && (
-                            <>
-                                <p>
-                                    On Windows, install MPV easily using Scoop or Chocolatey. On macOS, install MPV using Homebrew.
-                                </p>
-                                <motion.div
-                                    key="mpv"
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="space-y-4 p-4 rounded-lg bg-gray-800/30"
-                                >
-                                    <div className="flex items-center space-x-3">
-                                        <SiMpv className="w-6 h-6 text-indigo-400" />
-                                        <h4 className="font-semibold">MPV Configuration</h4>
-                                    </div>
-                                    <Field.Text
-                                        name="mpvSocket"
-                                        label="Socket / Pipe Path"
-                                        help="Path for MPV IPC communication"
-                                    />
-                                </motion.div>
-                            </>
-                        )}
-
-                        {defaultPlayer === "iina" && (
-                            <motion.div
-                                key="iina"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="space-y-4 p-4 rounded-lg bg-gray-800/30"
-                            >
-                                <div className="flex items-center space-x-3">
-                                    <IoPlayForwardCircleSharp className="w-6 h-6 text-blue-400" />
-                                    <h4 className="font-semibold">IINA Configuration</h4>
-                                </div>
-                                <Field.Text
-                                    name="iinaSocket"
-                                    label="Socket / Pipe Path"
-                                    help="Path for IINA IPC communication"
-                                />
-
-                                <Alert
-                                    intent="info-basic"
-                                    description={<p>For IINA to work correctly with Seanime, make sure <strong>Quit after all windows are
-                                                                                                               closed</strong> is <span
-                                        className="underline"
-                                    >checked</span> and <strong>Keep window open after playback
-                                                                finishes</strong> is <span className="underline">unchecked</span> in
-                                                    your IINA general settings.</p>}
-                                />
-                            </motion.div>
-                        )}
-
-                        {defaultPlayer === "vlc" && (
-                            <motion.div
-                                key="vlc"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="space-y-4 p-4 rounded-lg bg-gray-800/30"
-                            >
-                                <div className="flex items-center space-x-3">
-                                    <SiVlcmediaplayer className="w-6 h-6 text-orange-500" />
-                                    <h4 className="font-semibold">VLC Configuration</h4>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Field.Text name="mediaPlayerHost" label="Host" />
-                                    <Field.Number name="vlcPort" label="Port" formatOptions={{ useGrouping: false }} />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Field.Text name="vlcUsername" label="Username" />
-                                    <Field.Text name="vlcPassword" label="Password" type="password" />
-                                </div>
-                                <Field.Text name="vlcPath" label="VLC Executable Path" />
-                            </motion.div>
-                        )}
-
-                        {defaultPlayer === "mpc-hc" && (
-                            <motion.div
-                                key="mpc-hc"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="space-y-4 p-4 rounded-lg bg-gray-800/30"
-                            >
-                                <div className="flex items-center space-x-3">
-                                    <HiOutlineDesktopComputer className="w-6 h-6 text-blue-500" />
-                                    <h4 className="font-semibold">MPC-HC Configuration</h4>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Field.Text name="mediaPlayerHost" label="Host" />
-                                    <Field.Number name="mpcPort" label="Port" formatOptions={{ useGrouping: false }} />
-                                </div>
-                                <Field.Text name="mpcPath" label="MPC-HC Executable Path" />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </motion.div>
-            </StepCard>
-        </motion.div>
-    )
-}
-
-function TorrentStep({ form }: { form: any }) {
-    const { watch } = useFormContext()
-    const defaultTorrentClient = useWatch({ name: "defaultTorrentClient" })
-
-    return (
-        <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-8"
-        >
-            <motion.div variants={itemVariants} className="text-center space-y-4">
-                <h2 className="text-3xl font-bold">Downloading</h2>
-                <p className="text-[--muted] text-sm max-w-lg mx-auto">
-                    Configure your torrent client for downloading.
-                </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 gap-6 max-w-4xl mx-auto">
-
-                <StepCard>
-                    <motion.div variants={itemVariants} className="space-y-4">
-                        <div className="flex items-center space-x-3 mb-4">
-                            <ImDownload className="w-6 h-6 text-blue-500" />
-                            <h3 className="text-xl font-semibold">Torrent Client</h3>
-                        </div>
-                        <p className="text-sm text-[--muted]">
-                            Client used to download anime torrents
-                        </p>
-                        <Field.Select
-                            name="defaultTorrentClient"
-                            label="Client"
-                            options={[
-                                { label: "qBittorrent", value: "qbittorrent" },
-                                { label: "Transmission", value: "transmission" },
-                                { label: "None", value: "none" },
-                            ]}
-                        />
-                    </motion.div>
-                </StepCard>
-            </div>
-
-            <AnimatePresence mode="wait">
-                {(defaultTorrentClient === "qbittorrent" || defaultTorrentClient === "transmission") && (
-                    <StepCard className="max-w-4xl mx-auto">
+                <AnimatePresence mode="wait">
+                    {defaultPlayer === "mpv" && (
                         <motion.div
-                            key={defaultTorrentClient}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="space-y-6"
+                            key="mpv"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="space-y-3 p-4 rounded-lg bg-black/40 border border-white/5"
                         >
-                            {defaultTorrentClient === "qbittorrent" && (
-                                <>
-                                    <div className="flex items-center space-x-3">
-                                        <SiQbittorrent className="w-8 h-8 text-blue-600" />
-                                        <h4 className="text-xl font-semibold">qBittorrent Settings</h4>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <Field.Text name="qbittorrentHost" label="Host" />
-                                        <Field.Text name="qbittorrentUsername" label="Username" />
-                                        <Field.Text name="qbittorrentPassword" label="Password" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 lg:grid-cols-[200px_1fr]">
-                                        <Field.Number name="qbittorrentPort" label="Port" formatOptions={{ useGrouping: false }} />
-                                        <Field.Text name="qbittorrentPath" label="Executable Path" />
-                                    </div>
-                                </>
-                            )}
-
-                            {defaultTorrentClient === "transmission" && (
-                                <>
-                                    <div className="flex items-center space-x-3">
-                                        <SiTransmission className="w-8 h-8 text-red-600" />
-                                        <h4 className="text-xl font-semibold">Transmission Settings</h4>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <Field.Text name="transmissionHost" label="Host" />
-                                        <Field.Text name="transmissionUsername" label="Username" />
-                                        <Field.Text name="transmissionPassword" label="Password" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 lg:grid-cols-[200px_1fr]">
-                                        <Field.Number name="transmissionPort" label="Port" formatOptions={{ useGrouping: false }} />
-                                        <Field.Text name="transmissionPath" label="Executable Path" />
-                                    </div>
-                                </>
-                            )}
+                            <div className="flex items-center gap-3">
+                                <SiMpv className="size-5 text-brand-400" />
+                                <h4 className="font-semibold text-white">MPV</h4>
+                            </div>
+                            <p className="text-xs text-[--muted]">
+                                Sur Windows, installe MPV via Scoop ou Chocolatey. Sur macOS, via Homebrew.
+                            </p>
+                            <Field.Text name="mpvSocket" label="Socket / Pipe" />
                         </motion.div>
-                    </StepCard>
-                )}
-            </AnimatePresence>
-        </motion.div>
+                    )}
+
+                    {defaultPlayer === "iina" && (
+                        <motion.div
+                            key="iina"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="space-y-3 p-4 rounded-lg bg-black/40 border border-white/5"
+                        >
+                            <div className="flex items-center gap-3">
+                                <IoPlayForwardCircleSharp className="size-5 text-brand-400" />
+                                <h4 className="font-semibold text-white">IINA</h4>
+                            </div>
+                            <Field.Text name="iinaSocket" label="Socket / Pipe" />
+                            <Alert
+                                intent="info-basic"
+                                description={
+                                    <p className="text-xs">
+                                        Dans IINA → Préférences générales : <strong>Quitter après fermeture</strong> doit être <span
+                                        className="underline"
+                                    >coché</span>, et <strong>Garder la fenêtre ouverte après lecture</strong> <span className="underline">décoché</span>.
+                                    </p>
+                                }
+                            />
+                        </motion.div>
+                    )}
+
+                    {defaultPlayer === "vlc" && (
+                        <motion.div
+                            key="vlc"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="space-y-3 p-4 rounded-lg bg-black/40 border border-white/5"
+                        >
+                            <div className="flex items-center gap-3">
+                                <SiVlcmediaplayer className="size-5 text-brand-400" />
+                                <h4 className="font-semibold text-white">VLC</h4>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field.Text name="mediaPlayerHost" label="Host" />
+                                <Field.Number name="vlcPort" label="Port" formatOptions={{ useGrouping: false }} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field.Text name="vlcUsername" label="Username" />
+                                <Field.Text name="vlcPassword" label="Password" type="password" />
+                            </div>
+                            <Field.Text name="vlcPath" label="Chemin VLC" />
+                        </motion.div>
+                    )}
+
+                    {defaultPlayer === "mpc-hc" && (
+                        <motion.div
+                            key="mpc-hc"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="space-y-3 p-4 rounded-lg bg-black/40 border border-white/5"
+                        >
+                            <div className="flex items-center gap-3">
+                                <HiOutlineDesktopComputer className="size-5 text-brand-400" />
+                                <h4 className="font-semibold text-white">MPC-HC</h4>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field.Text name="mediaPlayerHost" label="Host" />
+                                <Field.Number name="mpcPort" label="Port" formatOptions={{ useGrouping: false }} />
+                            </div>
+                            <Field.Text name="mpcPath" label="Chemin MPC-HC" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </StepShell>
     )
 }
 
-function DebridStep({ form }: { form: any }) {
+function DebridStep() {
     const debridProvider = useWatch({ name: "debridProvider" })
 
     return (
-        <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-8"
+        <StepShell
+            title="Debrid (optionnel)"
+            description="Les services de debrid (Real-Debrid, AllDebrid, TorBox) offrent du streaming instantané depuis le cloud. Laisse vide si tu n'en as pas."
         >
-            <motion.div variants={itemVariants} className="text-center space-y-4">
-                <h2 className="text-3xl font-bold">Debrid Service</h2>
-                <p className="text-[--muted] text-sm max-w-lg mx-auto">
-                    Debrid services offer faster downloads and instant streaming from the cloud.
-                </p>
-            </motion.div>
+            <div className="space-y-5">
+                <Field.Select
+                    name="debridProvider"
+                    label="Service"
+                    leftIcon={<HiServerStack className="text-brand-500" />}
+                    options={[
+                        { label: "Aucun", value: "none" },
+                        { label: "TorBox", value: "torbox" },
+                        { label: "Real-Debrid", value: "realdebrid" },
+                        { label: "AllDebrid", value: "alldebrid" },
+                    ]}
+                />
 
-            <StepCard className="max-w-2xl mx-auto">
-                <motion.div variants={itemVariants} className="space-y-6">
-                    <Field.Select
-                        name="debridProvider"
-                        label="Debrid Service"
-                        leftIcon={<HiServerStack className="text-[--purple]" />}
-                        options={[
-                            { label: "None", value: "none" },
-                            { label: "TorBox", value: "torbox" },
-                            { label: "Real-Debrid", value: "realdebrid" },
-                            { label: "AllDebrid", value: "alldebrid" },
-                        ]}
-                    />
-
-                    <AnimatePresence>
-                        {debridProvider !== "none" && debridProvider !== "" && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="space-y-4 p-4 rounded-lg bg-gray-800/30"
-                            >
-                                <Field.Text
-                                    name="debridApiKey"
-                                    label="API Key"
-                                    help="The API key provided by the debrid service."
-                                />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </motion.div>
-            </StepCard>
-        </motion.div>
+                <AnimatePresence>
+                    {debridProvider && debridProvider !== "none" && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="p-4 rounded-lg bg-black/40 border border-white/5"
+                        >
+                            <Field.Text
+                                name="debridApiKey"
+                                label="Clé API"
+                                help="Fournie par ton service debrid."
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </StepShell>
     )
 }
 
-function FeaturesStep({ form }: { form: any }) {
-    const features = [
-        {
-            name: "enableManga",
-            icon: FaBook,
-            title: "Manga",
-            description: "Read and download manga chapters",
-            gradient: "from-orange-500 to-yellow-700",
-        },
-        {
-            name: "enableTorrentStreaming",
-            icon: BiDownload,
-            title: "Torrent Streaming",
-            description: "Stream torrents without waiting for download",
-            gradient: "from-cyan-500 to-teal-500",
-        },
-        {
-            name: "enableAdultContent",
-            icon: HiEye,
-            title: "NSFW Content",
-            description: "Show adult content in library and search",
-            gradient: "from-red-500 to-pink-500",
-        },
-        {
-            name: "enableOnlinestream",
-            icon: HiGlobeAlt,
-            title: "Online Streaming",
-            description: "Watch anime from online sources",
-            gradient: "from-indigo-500 to-violet-500",
-        },
-        {
-            name: "enableRichPresence",
-            icon: FaDiscord,
-            title: "Discord Rich Presence",
-            description: "Show what you're watching on Discord",
-            gradient: "from-indigo-500 to-blue-500",
-        },
-        {
-            name: "enableTranscode",
-            icon: MdOutlineBroadcastOnHome,
-            title: "Transcoding / Direct Play",
-            description: "Stream downloaded files on other devices",
-            gradient: "from-cyan-500 to-indigo-500",
-        },
-    ]
+const FEATURES = [
+    {
+        name: "enableTorrentStreaming",
+        icon: ImDownload,
+        title: "Torrent streaming",
+        description: "Lance la lecture pendant que le torrent se télécharge",
+    },
+    {
+        name: "enableOnlinestream",
+        icon: HiGlobeAlt,
+        title: "Online streaming",
+        description: "Regarde via les sources en ligne (extensions)",
+    },
+    {
+        name: "enableAdultContent",
+        icon: HiEye,
+        title: "Contenu NSFW",
+        description: "Affiche le contenu adulte dans les recherches",
+    },
+    {
+        name: "enableRichPresence",
+        icon: FaDiscord,
+        title: "Discord Rich Presence",
+        description: "Affiche ce que tu regardes sur Discord",
+    },
+    {
+        name: "enableTranscode",
+        icon: MdOutlineBroadcastOnHome,
+        title: "Transcoding",
+        description: "Stream les fichiers locaux vers d'autres appareils",
+    },
+] as const
 
+function FeaturesStep() {
     return (
-        <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-8"
-        >
-            <motion.div variants={itemVariants} className="text-center space-y-4">
-                <h2 className="text-3xl font-bold">Additional Features</h2>
-                <p className="text-[--muted] text-sm max-w-lg mx-auto">
-                    Choose which additional features you'd like to enable. You can enable or disable these later in settings.
+        <div className="max-w-3xl mx-auto space-y-6">
+            <div className="text-center space-y-3">
+                <h2 className="text-3xl lg:text-4xl font-extrabold text-white">Fonctionnalités</h2>
+                <p className="text-[--muted] text-sm">
+                    Active ce que tu veux. Modifiable plus tard dans Settings.
                 </p>
-            </motion.div>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-w-6xl mx-auto">
-                {features.map((feature, index) => (
-                    <motion.div
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {FEATURES.map((feature) => (
+                    <Field.Checkbox
                         key={feature.name}
-                        variants={itemVariants}
-                        custom={index}
-                    >
-                        <Field.Checkbox
-                            name={feature.name}
-                            label={
-                                <div className="flex items-start space-x-4 p-4">
-                                    <div
-                                        className={cn(
-                                            "w-12 h-12 rounded-lg flex items-center justify-center",
-                                            `bg-gradient-to-br ${feature.gradient}`,
-                                        )}
-                                    >
-                                        <feature.icon className="w-6 h-6 text-white" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="font-semibold text-sm">{feature.title}</h3>
-                                        <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                                            {feature.description}
-                                        </p>
-                                    </div>
+                        name={feature.name}
+                        size="lg"
+                        label={
+                            <div className="flex items-start gap-3 p-4">
+                                <div className="size-10 rounded-lg flex items-center justify-center bg-brand-500/15 border border-brand-500/30 text-brand-400 shrink-0">
+                                    <feature.icon className="size-5" />
                                 </div>
-                            }
-                            size="lg"
-                            labelClass={cn(
-                                "block cursor-pointer transition-all duration-200 overflow-hidden w-full rounded-xl",
-                                "bg-gray-900/50 hover:bg-gray-800/80",
-                                "border border-gray-700/50",
-                                // "hover:shadow-lg hover:scale-[1.02]",
-                                "data-[checked=true]:bg-gradient-to-br data-[checked=true]:from-gray-900 data-[checked=true]:to-gray-900",
-                                "data-[checked=true]:border-gray-400",
-                                // "data-[checked=true]:shadow-lg data-[checked=true]:scale-[1.02]"
-                            )}
-                            containerClass="flex items-center justify-between h-full"
-                            className="absolute top-2 right-2 z-10"
-                            fieldClass="relative"
-                        />
-                    </motion.div>
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="font-semibold text-sm text-white">{feature.title}</h3>
+                                    <p className="text-xs text-[--muted] mt-0.5 leading-relaxed">
+                                        {feature.description}
+                                    </p>
+                                </div>
+                            </div>
+                        }
+                        labelClass={cn(
+                            "block cursor-pointer transition-all duration-200 overflow-hidden w-full rounded-xl",
+                            "bg-white/[0.03] hover:bg-white/[0.06]",
+                            "border border-white/10",
+                            "data-[checked=true]:bg-brand-500/10 data-[checked=true]:border-brand-500/50",
+                        )}
+                        containerClass="flex items-center justify-between h-full"
+                        className="absolute top-2 right-2 z-10"
+                        fieldClass="relative"
+                    />
                 ))}
             </div>
-        </motion.div>
+        </div>
     )
 }
 
@@ -684,15 +337,11 @@ export function GettingStartedPage({ status }: { status: Status }) {
     const router = useRouter()
     const { getDefaultVlcPath, getDefaultQBittorrentPath, getDefaultTransmissionPath } = useDefaultSettingsPaths()
     const setServerStatus = useSetServerStatus()
-
-    const { mutate, data, isPending, isSuccess } = useGettingStarted()
+    const { mutate, data, isPending } = useGettingStarted()
 
     const [currentStep, setCurrentStep] = React.useState(0)
     const [direction, setDirection] = React.useState(0)
 
-    /**
-     * If the settings are returned, redirect to the home page
-     */
     React.useEffect(() => {
         if (!isPending && !!data?.settings) {
             setServerStatus(data)
@@ -706,56 +355,38 @@ export function GettingStartedPage({ status }: { status: Status }) {
     const mpvSocketPath = React.useMemo(() => getDefaultMpvSocket(status.os), [status.os])
     const iinaSocketPath = React.useMemo(() => getDefaultIinaSocket(status.os), [status.os])
 
-    const nextStep = () => {
-        if (currentStep < STEPS.length - 1) {
+    const isLast = currentStep === STEPS.length - 1
+    const isFirst = currentStep === 0
+
+    const next = () => {
+        if (!isLast) {
             setDirection(1)
-            setCurrentStep(currentStep + 1)
+            setCurrentStep((s) => s + 1)
         }
     }
-
-    const prevStep = () => {
-        if (currentStep > 0) {
+    const prev = () => {
+        if (!isFirst) {
             setDirection(-1)
-            setCurrentStep(currentStep - 1)
-        }
-    }
-
-    const goToStep = (step: number) => {
-        if (step >= 0 && step < STEPS.length) {
-            setDirection(step > currentStep ? 1 : -1)
-            setCurrentStep(step)
+            setCurrentStep((s) => s - 1)
         }
     }
 
     if (isPending) return <LoadingOverlayWithLogo />
 
     if (!data) return (
-        <div className="min-h-screen bg-gradient-to-br from-[--background] via-[--background] to-indigo-900/10 relative">
-            <div className="fixed h-100vh w-100vw inset-0 ">
-                <div className="fixed h-100vh w-100vw bg-gray-950/20 z-[1] backdrop-blur-sm firefox:backdrop-blur-none inset-0"></div>
-                <Image
-                    src="/background.jpeg"
-                    alt="bg"
-                    fill
-                    sizes="100vw"
-                    className="opacity-[0.05] firefox:opacity-[0.01]"
-                />
-            </div>
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {/* <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" /> */}
-                {/* <div classfName="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" /> */}
-                {/* <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl" /> */}
+        <div className="min-h-screen bg-black relative overflow-hidden">
+            {/* Subtle red ambient glow — Netflix wash */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute -top-32 left-1/2 -translate-x-1/2 size-[60rem] bg-brand-500/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-0 right-0 size-[40rem] bg-brand-700/10 rounded-full blur-[100px]" />
             </div>
 
-            <div className="container max-w-6xl mx-auto px-4 py-8 relative z-10">
+            <div className="container max-w-5xl mx-auto px-4 py-10 relative z-10">
                 <Form
                     schema={gettingStartedSchema}
-                    onSubmit={data => {
-                        if (currentStep === STEPS.length - 1) {
-                            mutate(getDefaultSettings(data))
-                        } else {
-                            nextStep()
-                        }
+                    onSubmit={(d) => {
+                        if (isLast) mutate(getDefaultSettings(d))
+                        else next()
                     }}
                     defaultValues={{
                         mediaPlayerHost: "127.0.0.1",
@@ -775,9 +406,9 @@ export function GettingStartedPage({ status }: { status: Status }) {
                         iinaSocket: iinaSocketPath,
                         enableRichPresence: false,
                         autoScan: false,
-                        enableManga: true,
-                        enableOnlinestream: false,
-                        enableAdultContent: true,
+                        enableManga: false,
+                        enableOnlinestream: true,
+                        enableAdultContent: false,
                         enableTorrentStreaming: true,
                         enableTranscode: false,
                         debridProvider: "none",
@@ -786,9 +417,9 @@ export function GettingStartedPage({ status }: { status: Status }) {
                         enableWatchContinuity: true,
                     }}
                 >
-                    {(f) => (
-                        <div className="space-y-8">
-                            <StepIndicator currentStep={currentStep} totalSteps={STEPS.length} onStepClick={goToStep} />
+                    {() => (
+                        <div className="space-y-10">
+                            <NetflixHeader currentStep={currentStep} />
 
                             <AnimatePresence mode="wait" custom={direction}>
                                 <motion.div
@@ -798,61 +429,48 @@ export function GettingStartedPage({ status }: { status: Status }) {
                                     initial="enter"
                                     animate="center"
                                     exit="exit"
-                                    transition={{
-                                        x: { duration: 0.3, ease: "easeInOut" },
-                                        opacity: { duration: 0.2 },
-                                    }}
-                                    className=""
+                                    transition={{ x: { duration: 0.3, ease: "easeOut" }, opacity: { duration: 0.2 } }}
                                 >
-                                    {currentStep === 0 && <LibraryStep form={f} />}
-                                    {currentStep === 1 && <PlayerStep form={f} status={status} />}
-                                    {currentStep === 2 && <TorrentStep form={f} />}
-                                    {currentStep === 3 && <DebridStep form={f} />}
-                                    {currentStep === 4 && <FeaturesStep form={f} />}
+                                    {currentStep === 0 && <PlayerStep status={status} />}
+                                    {currentStep === 1 && <DebridStep />}
+                                    {currentStep === 2 && <FeaturesStep />}
                                 </motion.div>
                             </AnimatePresence>
 
                             <motion.div
                                 className="flex justify-between items-center max-w-2xl mx-auto pt-8"
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 16 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
+                                transition={{ delay: 0.3 }}
                             >
                                 <Button
                                     type="button"
-                                    intent="gray-outline"
-                                    onClick={e => {
-                                        e.preventDefault()
-                                        prevStep()
-                                    }}
-                                    disabled={currentStep === 0}
-                                    className="flex items-center space-x-2"
+                                    intent="gray-subtle"
+                                    onClick={(e) => { e.preventDefault(); prev() }}
+                                    disabled={isFirst}
                                     leftIcon={<BiChevronLeft className="text-xl" />}
+                                    className="bg-white/10 hover:bg-white/20 !text-white"
                                 >
-                                    Previous
+                                    Précédent
                                 </Button>
 
-                                {currentStep === STEPS.length - 1 ? (
+                                {isLast ? (
                                     <Button
                                         type="submit"
-                                        className="flex items-center bg-gradient-to-r from-brand-600 to-indigo-600 hover:ring-2 ring-brand-600"
                                         loading={isPending}
-                                        rightIcon={<BiRocket className="size-6" />}
+                                        rightIcon={<BiRocket className="size-5" />}
+                                        className="bg-brand-500 hover:bg-brand-600 !text-white font-bold px-8 rounded-md"
                                     >
-                                        <span>Launch Seanime</span>
+                                        Lancer Kuro
                                     </Button>
                                 ) : (
                                     <Button
                                         type="button"
-                                        intent="gray-glass"
-                                        onClick={e => {
-                                            e.preventDefault()
-                                            nextStep()
-                                        }}
-                                        className="flex items-center space-x-2"
+                                        onClick={(e) => { e.preventDefault(); next() }}
                                         rightIcon={<BiChevronRight className="text-xl" />}
+                                        className="bg-brand-500 hover:bg-brand-600 !text-white font-bold px-8 rounded-md"
                                     >
-                                        Next
+                                        Continuer
                                     </Button>
                                 )}
                             </motion.div>
@@ -860,15 +478,11 @@ export function GettingStartedPage({ status }: { status: Status }) {
                     )}
                 </Form>
 
-                <motion.p
-                    className="text-center text-[--muted] mt-12"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1 }}
-                >
-                    By 5rahim
-                </motion.p>
+                <p className="text-center text-[--muted]/60 text-xs mt-12">
+                    Kuro · forké de Kuro
+                </p>
             </div>
         </div>
     )
 }
+
