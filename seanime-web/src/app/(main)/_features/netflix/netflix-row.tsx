@@ -24,26 +24,49 @@ export function NetflixRow({ title, media, isLoading, rootRef, priorityImages }:
     if (!isLoading && items.length === 0) return null
 
     return (
+        <NetflixRowShell title={title} rootRef={rootRef}>
+            {isLoading
+                ? Array.from({ length: ROW.skeletonCount }).map((_, i) => (
+                    <Skeleton
+                        key={i}
+                        className={cn("flex-none aspect-video rounded-md", ROW.cardWidthClass)}
+                    />
+                ))
+                : items.map(m => <NetflixCard key={m.id} media={m} priority={priorityImages} />)}
+        </NetflixRowShell>
+    )
+}
+
+/**
+ * Shared layout for any horizontally-scrolling Netflix row.
+ *
+ * Title and scroller share the SAME px constant so the leftmost card always sits
+ * directly under the title. `scroll-pl-*` mirrors the padding into the snap
+ * scroll-area so a programmatic scroll snaps cleanly to the title's edge.
+ */
+export function NetflixRowShell({
+    title,
+    children,
+    rootRef,
+}: {
+    title: string
+    children: React.ReactNode
+    rootRef?: React.Ref<HTMLDivElement>
+}) {
+    return (
         <section ref={rootRef} className="space-y-3">
-            <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight px-6 lg:px-16">
+            <h2 className={cn("text-xl lg:text-2xl font-bold text-white tracking-tight", ROW.paddingX)}>
                 {title}
             </h2>
-
             <div
                 className={cn(
                     "flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory",
-                    "px-6 lg:px-16",
+                    "scroll-pl-6 lg:scroll-pl-16",
+                    ROW.paddingX,
                     ROW.scrollPaddingY,
                 )}
             >
-                {isLoading
-                    ? Array.from({ length: ROW.skeletonCount }).map((_, i) => (
-                        <Skeleton
-                            key={i}
-                            className={cn("flex-none aspect-video rounded-md", ROW.cardWidthClass)}
-                        />
-                    ))
-                    : items.map(m => <NetflixCard key={m.id} media={m} priority={priorityImages} />)}
+                {children}
             </div>
         </section>
     )
