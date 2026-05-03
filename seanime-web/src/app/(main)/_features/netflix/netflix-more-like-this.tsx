@@ -29,9 +29,9 @@ export function NetflixMoreLikeThis({ details }: Props) {
             <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight">
                 {t("entry.more_like_this")}
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 py-2">
                 {items.slice(0, 10).map(m => (
-                    <NetflixCard key={m.id} media={m} />
+                    <NetflixCard key={m.id} media={m} variant="grid" />
                 ))}
             </div>
         </section>

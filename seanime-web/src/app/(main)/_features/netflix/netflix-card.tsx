@@ -9,9 +9,14 @@ type Props = {
     media: AL_BaseAnime
     /** Hint loader to fetch eagerly for above-the-fold rows. */
     priority?: boolean
+    /**
+     * Fixed-width carousel mode (the default) vs grid mode where the card
+     * stretches to fill its grid cell.
+     */
+    variant?: "row" | "grid"
 }
 
-export const NetflixCard = React.memo(function NetflixCard({ media, priority }: Props) {
+export const NetflixCard = React.memo(function NetflixCard({ media, priority, variant = "row" }: Props) {
     const img = media.bannerImage || media.coverImage?.extraLarge || media.coverImage?.large || ""
     const title = media.title?.userPreferred || ""
 
@@ -28,11 +33,12 @@ export const NetflixCard = React.memo(function NetflixCard({ media, priority }: 
             href={`/entry?id=${media.id}`}
             aria-label={title}
             className={cn(
-                "group relative flex-none snap-start",
-                ROW.cardWidthClass,
+                "group relative snap-start block",
+                variant === "row" ? cn("flex-none", ROW.cardWidthClass) : "w-full",
                 "aspect-video rounded-md overflow-hidden bg-gray-900",
                 "ring-0 ring-brand-500 hover:ring-2 transition-[transform,box-shadow,outline] duration-200",
-                "hover:scale-[1.05] hover:z-[2] hover:shadow-2xl transform-gpu",
+                // Softer hover so it doesn't crash into neighboring grid cells.
+                "hover:scale-[1.03] hover:z-[2] hover:shadow-2xl transform-gpu origin-center",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500",
             )}
         >

@@ -100,9 +100,9 @@ export function NetflixLists() {
                 })}
             </div>
 
-            {/* Grid */}
+            {/* Grid — gap-y bigger than gap-x so vertical hover-scale doesn't clip into rows. */}
             {isLoading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-4 gap-y-6 py-2">
                     {Array.from({ length: 12 }).map((_, i) => (
                         <Skeleton key={i} className="w-full aspect-video rounded-md" />
                     ))}
@@ -112,8 +112,8 @@ export function NetflixLists() {
                     {search ? t("lists.no_match") : t("lists.empty")}
                 </div>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
-                    {media.map(m => <NetflixCard key={m.id} media={m} />)}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-4 gap-y-6 py-2">
+                    {media.map(m => <NetflixCard key={m.id} media={m} variant="grid" />)}
                 </div>
             )}
         </div>
