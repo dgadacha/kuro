@@ -190,86 +190,15 @@ export default function Page() {
                                         value="seanime"
                                         className="group"
                                     ><LuWandSparkles className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.app")}</TabsTrigger>
-                                    {/* <TabsTrigger
-                                     value="local"
-                                     className="group"
-                                     ><LuUserCog className="text-xl mr-3 transition-transform duration-200" /> Local Account</TabsTrigger> */}
-                                    <TabsTrigger
-                                        value="library"
-                                        className="group"
-                                    ><LuLibrary className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.library")}</TabsTrigger>
-                                    <TabsTrigger
-                                        value="playback"
-                                        className="group"
-                                    ><LuCirclePlay className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.playback")}</TabsTrigger>
-                                </Card>
-
-                                {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
-                                {/*    Anime playback*/}
-                                {/*</div>*/}
-
-                                <Card className="lg:p-2 contents lg:block border-0 bg-transparent lg:border lg:bg-gray-950/80">
-
-                                    <TabsTrigger
-                                        value="media-player"
-                                        className="group"
-                                    ><LuMonitorPlay className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.media_player")}</TabsTrigger>
-                                    <TabsTrigger
-                                        value="external-player-link"
-                                        className="group"
-                                    ><LuCircleArrowOutUpRight className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.external_player_link")}</TabsTrigger>
-                                    <TabsTrigger
-                                        value="mediastream"
-                                        className="relative group"
-                                    ><LuTabletSmartphone className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.transcoding")}</TabsTrigger>
-                                </Card>
-
-                                {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
-                                {/*    Torrenting*/}
-                                {/*</div>*/}
-
-                                <Card className="lg:p-2 contents lg:block border-0 bg-transparent lg:border lg:bg-gray-950/80">
-                                    <TabsTrigger
-                                        value="torrent"
-                                        className="group"
-                                    ><LuFileSearch className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.torrent_provider")}</TabsTrigger>
-                                    <TabsTrigger
-                                        value="torrent-client"
-                                        className="group"
-                                    ><MdOutlineDownloading className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.torrent_client")}</TabsTrigger>
-                                    <TabsTrigger
-                                        value="torrentstream"
-                                        className="relative group"
-                                    ><SiBittorrent className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.torrent_streaming")}</TabsTrigger>
-                                    <TabsTrigger
-                                        value="debrid"
-                                        className="group"
-                                    ><HiOutlineServerStack className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.debrid")}</TabsTrigger>
-                                </Card>
-
-                                {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
-                                {/*    Other features*/}
-                                {/*</div>*/}
-
-                                <Card className="lg:p-2 contents lg:block border-0 bg-transparent lg:border lg:bg-gray-950/80">
                                     <TabsTrigger
                                         value="onlinestream"
                                         className="group"
                                     ><CgMediaPodcast className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.online_streaming")}</TabsTrigger>
-
                                     <TabsTrigger
                                         value="nakama"
                                         className="group relative"
                                     ><MdOutlineConnectWithoutContact className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.nakama")}</TabsTrigger>
-                                    <TabsTrigger
-                                        value="discord"
-                                        className="group"
-                                    ><FaDiscord className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.discord")}</TabsTrigger>
                                 </Card>
-
-                                {/*<div className="text-xs lg:text-[--muted] text-center py-1.5 uppercase px-3 border-gray-800 tracking-wide font-medium">*/}
-                                {/*    Server & Interface*/}
-                                {/*</div>*/}
 
                                 <Card className="lg:p-2 contents lg:block border-0 bg-transparent lg:border lg:bg-gray-950/80">
                                     <TabsTrigger

@@ -13,18 +13,16 @@ import {
 import { MediaSyncTrackButton } from "@/app/(main)/_features/media/_containers/media-sync-track-button"
 import { usePluginAnimeEntryEpisodeTabsListener } from "@/app/(main)/_features/plugin/plugin-entry-episode-tabs.tsx"
 import { PluginWebviewSlot } from "@/app/(main)/_features/plugin/webview/plugin-webviews"
-import { useHasDebridService, useHasTorrentProvider, useServerStatus } from "@/app/(main)/_hooks/use-server-status"
+import { useServerStatus } from "@/app/(main)/_hooks/use-server-status"
 import { NextAiringEpisode } from "@/app/(main)/entry/_components/next-airing-episode"
-import { EntrySectionTabs, useAnimeEntryPageView } from "@/app/(main)/entry/_containers/anime-entry-page"
+import { useAnimeEntryPageView } from "@/app/(main)/entry/_containers/anime-entry-page"
 import { AnimeEntryDropdownMenu } from "@/app/(main)/entry/_containers/entry-actions/anime-entry-dropdown-menu"
 import { AnimeEntrySilenceToggle } from "@/app/(main)/entry/_containers/entry-actions/anime-entry-silence-toggle"
-import { TorrentSearchButton } from "@/app/(main)/entry/_containers/torrent-search/torrent-search-button"
 import { SeaLink } from "@/components/shared/sea-link"
 import { Badge } from "@/components/ui/badge"
 import { Button, ButtonProps, IconButton } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
 import { Tooltip } from "@/components/ui/tooltip"
-import { TORRENT_CLIENT } from "@/lib/server/settings"
 import { getCustomSourceExtensionId, getCustomSourceMediaSiteUrl, isCustomSource } from "@/lib/server/utils"
 import { useThemeSettings } from "@/lib/theme/theme-hooks"
 import React from "react"
@@ -57,8 +55,6 @@ export function MetaSection(props: { entry: Anime_Entry, details: AL_AnimeDetail
 
     if (!entry.media) return null
 
-    const { hasTorrentProvider } = useHasTorrentProvider()
-    const { hasDebridService } = useHasDebridService()
     const { currentView, setView, isLibraryView } = useAnimeEntryPageView()
 
     const pluginEpisodeTabs = usePluginAnimeEntryEpisodeTabsListener({
@@ -157,23 +153,6 @@ export function MetaSection(props: { entry: Anime_Entry, details: AL_AnimeDetail
                     </>}
                     <AnimeEntryDropdownMenu entry={entry} details={details} />
 
-
-                    {(
-                        entry.media.status !== "NOT_YET_RELEASED"
-                        && (
-                            serverStatus?.settings?.torrent?.defaultTorrentClient !== TORRENT_CLIENT.NONE
-                            || hasDebridService
-                        )
-                        && !entry._isNakamaEntry
-                    ) && (
-                        <TorrentSearchButton
-                            entry={entry}
-                            onClick={() => {
-                                if (currentView !== "library") setView("library")
-                            }}
-                        />
-                    )}
-
                     {entry._isNakamaEntry && currentView === "library" &&
                         <div className="flex items-center gap-2 h-10 px-4 border rounded-md flex-none">
                             <MdOutlineConnectWithoutContact className="size-6 animate-pulse text-[--blue]" />
@@ -183,8 +162,6 @@ export function MetaSection(props: { entry: Anime_Entry, details: AL_AnimeDetail
                     <PluginAnimePageButtons media={entry.media!} />
 
                 </div>
-
-                <EntrySectionTabs entry={entry} pluginTabs={pluginEpisodeTabs.tabs} />
 
                 <NextAiringEpisode media={entry.media} />
 
