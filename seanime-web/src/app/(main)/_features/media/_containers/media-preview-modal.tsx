@@ -10,7 +10,7 @@ import {
 } from "@/app/(main)/_features/media/_components/media-entry-metadata-components"
 import { MediaPageHeaderEntryDetails } from "@/app/(main)/_features/media/_components/media-page-header-components"
 import { useHasDebridService, useHasTorrentProvider, useServerStatus } from "@/app/(main)/_hooks/use-server-status"
-import { RelationsRecommendationsSection } from "@/app/(main)/entry/_components/relations-recommendations-section"
+import { NetflixMoreLikeThis } from "@/app/(main)/_features/netflix/netflix-more-like-this"
 import { EpisodeSection } from "@/app/(main)/entry/_containers/episode-list/episode-section"
 import { TorrentSearchButton } from "@/app/(main)/entry/_containers/torrent-search/torrent-search-button"
 import { __torrentSearch_selectedTorrentsAtom } from "@/app/(main)/entry/_containers/torrent-search/torrent-search-container"
@@ -290,7 +290,7 @@ function Content({ entry, entryLoading, detailsLoading, details, type }: {
                             hideCarousel
                             maxCol={2}
                         />}
-                        {type === "anime" && <RelationsRecommendationsSection entry={entry as Anime_Entry} details={details} maxCol={5} />}
+                        {type === "anime" && <NetflixMoreLikeThis details={details as any} />}
                     </div>}
                 </div>
 
