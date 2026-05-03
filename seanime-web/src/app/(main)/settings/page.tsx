@@ -66,7 +66,6 @@ import { TbDatabaseExclamation } from "react-icons/tb"
 import { VscDebugAlt } from "react-icons/vsc"
 import { toast } from "sonner"
 import { SettingsCard, SettingsNavCard, SettingsPageHeader } from "./_components/settings-card"
-import { DenshiSettings } from "./_containers/denshi-settings"
 import { DiscordRichPresenceSettings } from "./_containers/discord-rich-presence-settings"
 import { LocalSettings } from "./_containers/local-settings"
 import { NakamaSettings } from "./_containers/nakama-settings"
@@ -271,12 +270,6 @@ export default function Page() {
                                 {/*</div>*/}
 
                                 <Card className="lg:p-2 contents lg:block border-0 bg-transparent lg:border lg:bg-gray-950/80">
-                                    {__isElectronDesktop__ && (
-                                        <TabsTrigger
-                                            value="denshi"
-                                            className="group"
-                                        ><LuMonitor className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.denshi")}</TabsTrigger>
-                                    )}
                                     <TabsTrigger
                                         value="ui"
                                         className="group"
@@ -925,19 +918,6 @@ export default function Page() {
 
                         </TabsContent>
 
-                        {__isElectronDesktop__ && (
-                            <TabsContent value="denshi" className={tabContentClass}>
-
-                                <SettingsPageHeader
-                                    title="Denshi"
-                                    description="Desktop client settings"
-                                    icon={LuMonitor}
-                                />
-
-                                <DenshiSettings />
-
-                            </TabsContent>
-                        )}
 
 
                         {/*<TabsContent value="data" className="space-y-4">*/}

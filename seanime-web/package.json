@@ -5,14 +5,8 @@
     "type": "module",
     "scripts": {
         "dev": "env-cmd -f .env.web rsbuild dev",
-        "dev:mobile": "env-cmd -f .env.mobile rsbuild dev",
-        "dev:desktop": "env-cmd -f .env.desktop rsbuild dev",
-        "dev:denshi": "env-cmd -f .env.denshi rsbuild dev",
         "build": "tsgo && rsbuild build",
         "build:rsdoctor": "RSDOCTOR=true rsbuild build",
-        "build:desktop": "tsgo && env-cmd -f .env.desktop rsbuild build",
-        "build:denshi": "tsgo && env-cmd -f .env.denshi rsbuild build",
-        "build:development:desktop": "tsgo && env-cmd -f .env.development.desktop rsbuild build",
         "preview": "rsbuild preview"
     },
     "dependencies": {
