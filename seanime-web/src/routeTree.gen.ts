@@ -32,7 +32,6 @@ const ScanLogViewerIndexLazyRouteImport = createFileRoute('/scan-log-viewer/')()
 const IssueReportIndexLazyRouteImport = createFileRoute('/issue-report/')()
 const DocsIndexLazyRouteImport = createFileRoute('/docs/')()
 const MainWebviewIndexLazyRouteImport = createFileRoute('/_main/webview/')()
-const MainScheduleIndexLazyRouteImport = createFileRoute('/_main/schedule/')()
 const MainListsIndexLazyRouteImport = createFileRoute('/_main/lists/')()
 const MainDebridIndexLazyRouteImport = createFileRoute('/_main/debrid/')()
 const MainExtensionsPlaygroundIndexLazyRouteImport = createFileRoute(
@@ -83,13 +82,6 @@ const MainWebviewIndexLazyRoute = MainWebviewIndexLazyRouteImport.update({
   getParentRoute: () => MainRoute,
 } as any).lazy(() =>
   import('./routes/_main/webview/index.lazy').then((d) => d.Route),
-)
-const MainScheduleIndexLazyRoute = MainScheduleIndexLazyRouteImport.update({
-  id: '/schedule/',
-  path: '/schedule/',
-  getParentRoute: () => MainRoute,
-} as any).lazy(() =>
-  import('./routes/_main/schedule/index.lazy').then((d) => d.Route),
 )
 const MainListsIndexLazyRoute = MainListsIndexLazyRouteImport.update({
   id: '/lists/',
@@ -214,7 +206,6 @@ export interface FileRoutesByFullPath {
   '/splashscreen/crash/': typeof SplashscreenCrashIndexRoute
   '/debrid/': typeof MainDebridIndexLazyRoute
   '/lists/': typeof MainListsIndexLazyRoute
-  '/schedule/': typeof MainScheduleIndexLazyRoute
   '/webview/': typeof MainWebviewIndexLazyRoute
   '/auth/callback/': typeof MainAuthCallbackIndexRoute
   '/extensions/playground/': typeof MainExtensionsPlaygroundIndexLazyRoute
@@ -239,7 +230,6 @@ export interface FileRoutesByTo {
   '/splashscreen/crash': typeof SplashscreenCrashIndexRoute
   '/debrid': typeof MainDebridIndexLazyRoute
   '/lists': typeof MainListsIndexLazyRoute
-  '/schedule': typeof MainScheduleIndexLazyRoute
   '/webview': typeof MainWebviewIndexLazyRoute
   '/auth/callback': typeof MainAuthCallbackIndexRoute
   '/extensions/playground': typeof MainExtensionsPlaygroundIndexLazyRoute
@@ -266,7 +256,6 @@ export interface FileRoutesById {
   '/splashscreen/crash/': typeof SplashscreenCrashIndexRoute
   '/_main/debrid/': typeof MainDebridIndexLazyRoute
   '/_main/lists/': typeof MainListsIndexLazyRoute
-  '/_main/schedule/': typeof MainScheduleIndexLazyRoute
   '/_main/webview/': typeof MainWebviewIndexLazyRoute
   '/_main/auth/callback/': typeof MainAuthCallbackIndexRoute
   '/_main/extensions/playground/': typeof MainExtensionsPlaygroundIndexLazyRoute
@@ -293,7 +282,6 @@ export interface FileRouteTypes {
     | '/splashscreen/crash/'
     | '/debrid/'
     | '/lists/'
-    | '/schedule/'
     | '/webview/'
     | '/auth/callback/'
     | '/extensions/playground/'
@@ -318,7 +306,6 @@ export interface FileRouteTypes {
     | '/splashscreen/crash'
     | '/debrid'
     | '/lists'
-    | '/schedule'
     | '/webview'
     | '/auth/callback'
     | '/extensions/playground'
@@ -344,7 +331,6 @@ export interface FileRouteTypes {
     | '/splashscreen/crash/'
     | '/_main/debrid/'
     | '/_main/lists/'
-    | '/_main/schedule/'
     | '/_main/webview/'
     | '/_main/auth/callback/'
     | '/_main/extensions/playground/'
@@ -417,13 +403,6 @@ declare module '@tanstack/react-router' {
       path: '/webview'
       fullPath: '/webview/'
       preLoaderRoute: typeof MainWebviewIndexLazyRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/schedule/': {
-      id: '/_main/schedule/'
-      path: '/schedule'
-      fullPath: '/schedule/'
-      preLoaderRoute: typeof MainScheduleIndexLazyRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/lists/': {
@@ -547,7 +526,6 @@ interface MainRouteChildren {
   MainSettingsIndexRoute: typeof MainSettingsIndexRoute
   MainDebridIndexLazyRoute: typeof MainDebridIndexLazyRoute
   MainListsIndexLazyRoute: typeof MainListsIndexLazyRoute
-  MainScheduleIndexLazyRoute: typeof MainScheduleIndexLazyRoute
   MainWebviewIndexLazyRoute: typeof MainWebviewIndexLazyRoute
   MainAuthCallbackIndexRoute: typeof MainAuthCallbackIndexRoute
   MainExtensionsPlaygroundIndexLazyRoute: typeof MainExtensionsPlaygroundIndexLazyRoute
@@ -567,7 +545,6 @@ const MainRouteChildren: MainRouteChildren = {
   MainSettingsIndexRoute: MainSettingsIndexRoute,
   MainDebridIndexLazyRoute: MainDebridIndexLazyRoute,
   MainListsIndexLazyRoute: MainListsIndexLazyRoute,
-  MainScheduleIndexLazyRoute: MainScheduleIndexLazyRoute,
   MainWebviewIndexLazyRoute: MainWebviewIndexLazyRoute,
   MainAuthCallbackIndexRoute: MainAuthCallbackIndexRoute,
   MainExtensionsPlaygroundIndexLazyRoute:

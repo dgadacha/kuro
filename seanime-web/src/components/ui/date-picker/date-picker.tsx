@@ -1,7 +1,11 @@
-import { weekStartsOnAtom } from "@/app/(main)/schedule/_components/schedule-calendar"
 import { cva } from "class-variance-authority"
 import { Day, formatISO, getYear, Locale, setYear } from "date-fns"
 import { useAtomValue } from "jotai/react"
+import { atomWithStorage } from "jotai/utils"
+
+// inlined from the deleted schedule-calendar — kept here so the
+// date-picker can still personalize its first-day-of-week.
+const weekStartsOnAtom = atomWithStorage("sea-calendar-week-starts-on", 1)
 import * as React from "react"
 import { PropsBase } from "react-day-picker"
 import { BasicField, BasicFieldOptions, extractBasicFieldProps } from "../basic-field"
