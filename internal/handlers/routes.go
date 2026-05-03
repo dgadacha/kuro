@@ -46,7 +46,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 		"/events",
 		"/api/v1/image-proxy",
 		"/api/v1/mediastream/transcode/",
-		"/api/v1/torrent-client/list",
 		"/api/v1/proxy",
 		"/api/v1/directstream/stream",
 	}
@@ -168,25 +167,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1.PATCH("/settings/auto-downloader", h.HandleSaveAutoDownloaderSettings)
 	v1.PATCH("/settings/media-player", h.HandleSaveMediaPlayerSettings)
 
-	// Auto Downloader
-	v1.POST("/auto-downloader/run", h.HandleRunAutoDownloader)
-	v1.POST("/auto-downloader/run/simulation", h.HandleRunAutoDownloaderSimulation)
-	v1.GET("/auto-downloader/rule/:id", h.HandleGetAutoDownloaderRule)
-	v1.GET("/auto-downloader/rule/anime/:id", h.HandleGetAutoDownloaderRulesByAnime)
-	v1.GET("/auto-downloader/rules", h.HandleGetAutoDownloaderRules)
-	v1.POST("/auto-downloader/rule", h.HandleCreateAutoDownloaderRule)
-	v1.PATCH("/auto-downloader/rule", h.HandleUpdateAutoDownloaderRule)
-	v1.DELETE("/auto-downloader/rule/:id", h.HandleDeleteAutoDownloaderRule)
-
-	v1.GET("/auto-downloader/items", h.HandleGetAutoDownloaderItems)
-	v1.DELETE("/auto-downloader/item", h.HandleDeleteAutoDownloaderItem)
-
-	v1.GET("/auto-downloader/profiles", h.HandleGetAutoDownloaderProfiles)
-	v1.GET("/auto-downloader/profile/:id", h.HandleGetAutoDownloaderProfile)
-	v1.POST("/auto-downloader/profile", h.HandleCreateAutoDownloaderProfile)
-	v1.PATCH("/auto-downloader/profile", h.HandleUpdateAutoDownloaderProfile)
-	v1.DELETE("/auto-downloader/profile/:id", h.HandleDeleteAutoDownloaderProfile)
-
 	// Other
 	v1.POST("/test-dump", h.HandleTestDump)
 
@@ -230,36 +210,13 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1Anilist.POST("/cache-layer/status", h.HandleToggleAnilistCacheLayerStatus)
 
 	//
-	// MAL
-	//
-
-	v1.POST("/mal/auth", h.HandleMALAuth)
-
-	v1.POST("/mal/logout", h.HandleMALLogout)
-
-	//
 	// Library
 	//
 
 	v1Library := v1.Group("/library")
 
-	v1Library.POST("/scan", h.HandleScanLocalFiles)
-
-	v1Library.DELETE("/empty-directories", h.HandleRemoveEmptyDirectories)
-
-	v1Library.GET("/local-files", h.HandleGetLocalFiles)
-	v1Library.POST("/local-files", h.HandleLocalFileBulkAction)
-	v1Library.PATCH("/local-files", h.HandleUpdateLocalFiles)
-	v1Library.DELETE("/local-files", h.HandleDeleteLocalFiles)
-	v1Library.GET("/local-files/dump", h.HandleDumpLocalFilesToFile)
-	v1Library.POST("/local-files/import", h.HandleImportLocalFiles)
-	v1Library.PATCH("/local-file", h.HandleUpdateLocalFileData)
-	v1Library.PATCH("/local-files/super-update", h.HandleSuperUpdateLocalFiles)
-
 	v1Library.GET("/collection", h.HandleGetLibraryCollection)
 	v1Library.GET("/schedule", h.HandleGetAnimeCollectionSchedule)
-
-	v1Library.GET("/scan-summaries", h.HandleGetScanSummaries)
 
 	v1Library.GET("/missing-episodes", h.HandleGetMissingEpisodes)
 	v1Library.GET("/upcoming-episodes", h.HandleGetUpcomingEpisodes)
@@ -277,15 +234,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1Library.POST("/unknown-media", h.HandleAddUnknownMedia)
 
 	//
-	// Library Explorer
-	//
-	v1LibraryExplorer := v1Library.Group("/explorer")
-
-	v1LibraryExplorer.GET("/file-tree", h.HandleGetLibraryExplorerFileTree)
-	v1LibraryExplorer.POST("/file-tree/refresh", h.HandleRefreshLibraryExplorerFileTree)
-	v1LibraryExplorer.POST("/directory-children", h.HandleLoadLibraryExplorerDirectoryChildren)
-
-	//
 	// Anime
 	//
 	v1.GET("/anime/episode-collection/:id", h.HandleGetAnimeEpisodeCollection)
@@ -295,11 +243,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	//
 
 	v1.POST("/torrent/search", h.HandleSearchTorrent)
-	v1.POST("/torrent-client/download", h.HandleTorrentClientDownload)
-	v1.GET("/torrent-client/list", h.HandleGetActiveTorrentList)
-	v1.POST("/torrent-client/action", h.HandleTorrentClientAction)
-	v1.POST("/torrent-client/get-files", h.HandleTorrentClientGetFiles)
-	v1.POST("/torrent-client/rule-magnet", h.HandleTorrentClientAddMagnetFromRule)
 
 	//
 	// Auto Select
@@ -384,44 +327,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1.DELETE("/metadata/parent", h.HandleDeleteMediaMetadataParent)
 
 	//
-	// Manga
-	//
-
-	v1Manga := v1.Group("/manga")
-	v1Manga.POST("/anilist/collection", h.HandleGetAnilistMangaCollection)
-	v1Manga.GET("/anilist/collection/raw", h.HandleGetRawAnilistMangaCollection)
-	v1Manga.POST("/anilist/collection/raw", h.HandleGetRawAnilistMangaCollection)
-	v1Manga.GET("/anilist/collection/raw/tags", h.HandleGetRawAnilistMangaCollectionTags)
-	v1Manga.POST("/anilist/list", h.HandleAnilistListManga)
-	v1Manga.GET("/collection", h.HandleGetMangaCollection)
-	v1Manga.GET("/latest-chapter-numbers", h.HandleGetMangaLatestChapterNumbersMap)
-	v1Manga.POST("/refetch-chapter-containers", h.HandleRefetchMangaChapterContainers)
-	v1Manga.GET("/entry/:id", h.HandleGetMangaEntry)
-	v1Manga.GET("/entry/:id/details", h.HandleGetMangaEntryDetails)
-	v1Manga.DELETE("/entry/cache", h.HandleEmptyMangaEntryCache)
-	v1Manga.POST("/chapters", h.HandleGetMangaEntryChapters)
-	v1Manga.POST("/pages", h.HandleGetMangaEntryPages)
-	v1Manga.POST("/update-progress", h.HandleUpdateMangaProgress)
-
-	v1Manga.GET("/downloaded-chapters/:id", h.HandleGetMangaEntryDownloadedChapters)
-	v1Manga.GET("/downloads", h.HandleGetMangaDownloadsList)
-	v1Manga.POST("/download-chapters", h.HandleDownloadMangaChapters)
-	v1Manga.POST("/download-data", h.HandleGetMangaDownloadData)
-	v1Manga.DELETE("/download-chapter", h.HandleDeleteMangaDownloadedChapters)
-	v1Manga.GET("/download-queue", h.HandleGetMangaDownloadQueue)
-	v1Manga.POST("/download-queue/start", h.HandleStartMangaDownloadQueue)
-	v1Manga.POST("/download-queue/stop", h.HandleStopMangaDownloadQueue)
-	v1Manga.DELETE("/download-queue", h.HandleClearAllChapterDownloadQueue)
-	v1Manga.POST("/download-queue/reset-errored", h.HandleResetErroredChapterDownloadQueue)
-
-	v1Manga.POST("/search", h.HandleMangaManualSearch)
-	v1Manga.POST("/manual-mapping", h.HandleMangaManualMapping)
-	v1Manga.POST("/get-mapping", h.HandleGetMangaMapping)
-	v1Manga.POST("/remove-mapping", h.HandleRemoveMangaMapping)
-
-	v1Manga.GET("/local-page/:path", h.HandleGetLocalMangaPage)
-
-	//
 	// File Cache
 	//
 
@@ -436,7 +341,6 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	//
 
 	v1Discord := v1.Group("/discord")
-	v1Discord.POST("/presence/manga", h.HandleSetDiscordMangaActivity)
 	v1Discord.POST("/presence/legacy-anime", h.HandleSetDiscordLegacyAnimeActivity)
 	v1Discord.POST("/presence/anime", h.HandleSetDiscordAnimeActivityWithProgress)
 	v1Discord.POST("/presence/anime-update", h.HandleUpdateDiscordAnimeActivityWithProgress)
