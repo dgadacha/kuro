@@ -9,6 +9,7 @@ import {
 import { LoadingOverlayWithLogo } from "@/components/shared/loading-overlay-with-logo"
 import { SeaImage } from "@/components/shared/sea-image"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useSearchParams } from "@/lib/navigation"
 import { useSetAtom } from "jotai/react"
 import React from "react"
@@ -67,9 +68,11 @@ export default function WatchPage() {
         )
     }
 
-    if (isLoading || !animeEntry) return <LoadingOverlayWithLogo />
-
+    // The player needs the entry. We only block the *player* render on it,
+    // not the splash — that way new tabs always see the splash instantly,
+    // even if the API call is slow / hasn't returned yet.
     if (started) {
+        if (!animeEntry) return <LoadingOverlayWithLogo title={t("watch.start")} />
         return (
             <div data-watch-page className="min-h-screen bg-black -mt-16 lg:-mt-[68px]">
                 <OnlinestreamPage
@@ -81,9 +84,9 @@ export default function WatchPage() {
         )
     }
 
-    // Pre-play splash — Netflix/YouTube-style
-    const banner = animeEntry.media?.bannerImage || animeEntry.media?.coverImage?.extraLarge || ""
-    const title = animeEntry.media?.title?.userPreferred ?? ""
+    // Pre-play splash — Netflix/YouTube-style. Renders immediately.
+    const banner = animeEntry?.media?.bannerImage || animeEntry?.media?.coverImage?.extraLarge || ""
+    const title = animeEntry?.media?.title?.userPreferred ?? ""
 
     return (
         <div data-watch-splash className="min-h-screen bg-black -mt-16 lg:-mt-[68px] relative overflow-hidden">
@@ -102,9 +105,13 @@ export default function WatchPage() {
                 <p className="uppercase tracking-widest text-xs lg:text-sm text-brand-400 font-semibold">
                     {t("entry.episode_short")} {Number.isNaN(epNumber) ? "?" : epNumber}
                 </p>
-                <h1 className="text-3xl lg:text-5xl font-extrabold text-white max-w-3xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-                    {title}
-                </h1>
+                {title ? (
+                    <h1 className="text-3xl lg:text-5xl font-extrabold text-white max-w-3xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                        {title}
+                    </h1>
+                ) : (
+                    <Skeleton className="h-12 w-80 max-w-full" />
+                )}
 
                 <Button
                     onClick={handleStart}
