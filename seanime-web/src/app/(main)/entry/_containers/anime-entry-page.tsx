@@ -35,7 +35,8 @@ import { IoLibraryOutline } from "react-icons/io5"
 import { PiMonitorPlayDuotone } from "react-icons/pi"
 import { useUnmount } from "react-use"
 
-export const __anime_entryPageViewAtom = atom<string>("library")
+// Default to online streaming — that's the primary playback path now.
+export const __anime_entryPageViewAtom = atom<string>("onlinestream")
 
 export function useAnimeEntryPageView() {
     const [currentView, setView] = useAtom(__anime_entryPageViewAtom)

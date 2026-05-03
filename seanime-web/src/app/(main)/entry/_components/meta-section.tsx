@@ -1,9 +1,7 @@
 import { AL_AnimeDetailsById_Media, Anime_Entry } from "@/api/generated/types"
 import { ToggleLockFilesButton } from "@/app/(main)/_features/anime-library/_containers/toggle-lock-files-button"
 import { TrailerModal } from "@/app/(main)/_features/anime/_components/trailer-modal"
-import { AnimeEntryStudio } from "@/app/(main)/_features/media/_components/anime-entry-studio"
 import {
-    AnimeEntryRankings,
     MediaEntryAudienceScore,
     MediaEntryGenresList,
 } from "@/app/(main)/_features/media/_components/media-entry-metadata-components"
@@ -101,30 +99,7 @@ export function MetaSection(props: { entry: Anime_Entry, details: AL_AnimeDetail
                     >
 
                         <MediaEntryAudienceScore meanScore={entry.media?.meanScore} badgeClass="bg-transparent" />
-
-
-                        {!isCustomSource(entry.mediaId) ? <AnimeEntryStudio studios={details?.studios} /> : (
-                            <Badge
-                                size="lg"
-                                intent="gray"
-                                className="rounded-full px-0 border-transparent bg-transparent transition-all hover:bg-transparent hover:text-white hover:-translate-y-0.5"
-                                data-anime-entry-studio-badge
-                            >
-                                {details?.studios?.nodes?.[0]?.name}
-                            </Badge>
-                        )}
-
                         <MediaEntryGenresList genres={details?.genres} />
-
-                        <div
-                            data-anime-meta-section-rankings-container
-                            className={cn(
-                                "w-full",
-                            )}
-                        >
-                            <AnimeEntryRankings rankings={details?.rankings} />
-                        </div>
-
                     </div>
                 </MediaPageHeaderEntryDetails>
 
