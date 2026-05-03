@@ -90,7 +90,12 @@
     "debrid_streaming": "Debrid streaming",
     "no_provider_available": "No provider available. Install a provider extension first.",
     "trailer": "Trailer",
-    "more_like_this": "More like this"
+    "more_like_this": "More like this",
+    "pick_provider": "Pick a provider",
+    "switch_dub": "Dub (when available)",
+    "episode_short": "EP",
+    "episodes_load_error": "Couldn't load episodes from this provider.",
+    "open_in_new_tab": "Open player in new tab"
   },
   "errors": {
     "unknown": "Unknown error",

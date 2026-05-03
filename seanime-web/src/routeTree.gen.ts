@@ -17,6 +17,7 @@ import { Route as MainIndexRouteImport } from './routes/_main/index'
 import { Route as MainErrorTestRouteImport } from './routes/_main/error-test'
 import { Route as SplashscreenCrashIndexRouteImport } from './routes/splashscreen/crash/index'
 import { Route as PublicAuthIndexRouteImport } from './routes/public/auth/index'
+import { Route as MainWatchIndexRouteImport } from './routes/_main/watch/index'
 import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainSearchIndexRouteImport } from './routes/_main/search/index'
 import { Route as MainOfflineIndexRouteImport } from './routes/_main/offline/index'
@@ -106,6 +107,11 @@ const PublicAuthIndexRoute = PublicAuthIndexRouteImport.update({
   id: '/public/auth/',
   path: '/public/auth/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MainWatchIndexRoute = MainWatchIndexRouteImport.update({
+  id: '/watch/',
+  path: '/watch/',
+  getParentRoute: () => MainRoute,
 } as any)
 const MainSettingsIndexRoute = MainSettingsIndexRouteImport.update({
   id: '/settings/',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/offline/': typeof MainOfflineIndexRoute
   '/search/': typeof MainSearchIndexRoute
   '/settings/': typeof MainSettingsIndexRoute
+  '/watch/': typeof MainWatchIndexRoute
   '/public/auth/': typeof PublicAuthIndexRoute
   '/splashscreen/crash/': typeof SplashscreenCrashIndexRoute
   '/debrid/': typeof MainDebridIndexLazyRoute
@@ -226,6 +233,7 @@ export interface FileRoutesByTo {
   '/offline': typeof MainOfflineIndexRoute
   '/search': typeof MainSearchIndexRoute
   '/settings': typeof MainSettingsIndexRoute
+  '/watch': typeof MainWatchIndexRoute
   '/public/auth': typeof PublicAuthIndexRoute
   '/splashscreen/crash': typeof SplashscreenCrashIndexRoute
   '/debrid': typeof MainDebridIndexLazyRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/_main/offline/': typeof MainOfflineIndexRoute
   '/_main/search/': typeof MainSearchIndexRoute
   '/_main/settings/': typeof MainSettingsIndexRoute
+  '/_main/watch/': typeof MainWatchIndexRoute
   '/public/auth/': typeof PublicAuthIndexRoute
   '/splashscreen/crash/': typeof SplashscreenCrashIndexRoute
   '/_main/debrid/': typeof MainDebridIndexLazyRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/offline/'
     | '/search/'
     | '/settings/'
+    | '/watch/'
     | '/public/auth/'
     | '/splashscreen/crash/'
     | '/debrid/'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/search'
     | '/settings'
+    | '/watch'
     | '/public/auth'
     | '/splashscreen/crash'
     | '/debrid'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/_main/offline/'
     | '/_main/search/'
     | '/_main/settings/'
+    | '/_main/watch/'
     | '/public/auth/'
     | '/splashscreen/crash/'
     | '/_main/debrid/'
@@ -433,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicAuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_main/watch/': {
+      id: '/_main/watch/'
+      path: '/watch'
+      fullPath: '/watch/'
+      preLoaderRoute: typeof MainWatchIndexRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/settings/': {
       id: '/_main/settings/'
       path: '/settings'
@@ -524,6 +543,7 @@ interface MainRouteChildren {
   MainOfflineIndexRoute: typeof MainOfflineIndexRoute
   MainSearchIndexRoute: typeof MainSearchIndexRoute
   MainSettingsIndexRoute: typeof MainSettingsIndexRoute
+  MainWatchIndexRoute: typeof MainWatchIndexRoute
   MainDebridIndexLazyRoute: typeof MainDebridIndexLazyRoute
   MainListsIndexLazyRoute: typeof MainListsIndexLazyRoute
   MainWebviewIndexLazyRoute: typeof MainWebviewIndexLazyRoute
@@ -543,6 +563,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainOfflineIndexRoute: MainOfflineIndexRoute,
   MainSearchIndexRoute: MainSearchIndexRoute,
   MainSettingsIndexRoute: MainSettingsIndexRoute,
+  MainWatchIndexRoute: MainWatchIndexRoute,
   MainDebridIndexLazyRoute: MainDebridIndexLazyRoute,
   MainListsIndexLazyRoute: MainListsIndexLazyRoute,
   MainWebviewIndexLazyRoute: MainWebviewIndexLazyRoute,

@@ -19,7 +19,7 @@ import { DebridStreamPage } from "@/app/(main)/entry/_containers/debrid-stream/d
 import { EpisodeSection } from "@/app/(main)/entry/_containers/episode-list/episode-section"
 import { __torrentSearch_selectionAtom, TorrentSearchDrawer } from "@/app/(main)/entry/_containers/torrent-search/torrent-search-drawer"
 import { TorrentStreamPage } from "@/app/(main)/entry/_containers/torrent-stream/torrent-stream-page"
-import { OnlinestreamPage } from "@/app/(main)/onlinestream/_containers/onlinestream-page"
+import { NetflixEpisodeList } from "@/app/(main)/_features/netflix/netflix-episode-list"
 import { PageWrapper } from "@/components/shared/page-wrapper"
 import { cn } from "@/components/ui/core/styling"
 import { StaticTabs } from "@/components/ui/tabs"
@@ -373,11 +373,7 @@ export function AnimeEntryPage() {
                                 {/*>*/}
                                 {/*    <h2 className="text-xl lg:text-3xl flex items-center gap-3">Online streaming</h2>*/}
                                 {/*</div>*/}
-                                <OnlinestreamPage
-                                    animeEntry={animeEntry}
-                                    animeEntryLoading={animeEntryLoading}
-                                    hideBackButton
-                                />
+                                <NetflixEpisodeList animeEntry={animeEntry} />
                                 {bottomSection}
                             </div>
                         </PageWrapper>}

@@ -44,6 +44,8 @@ export function NetflixTopBar() {
         { name: t("nav.discover"), href: "/discover", isCurrent: pathname.startsWith("/discover") },
     ]
 
+    // Player route is fullscreen — no chrome.
+    if (pathname.startsWith("/watch")) return null
     if (serverStatus?.isOffline) return null
 
     return (
