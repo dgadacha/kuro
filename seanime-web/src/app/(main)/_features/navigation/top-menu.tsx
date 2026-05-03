@@ -1,62 +1,29 @@
-import { useMissingEpisodeCount } from "@/app/(main)/_hooks/missing-episodes-loader"
-import { useServerStatus } from "@/app/(main)/_hooks/use-server-status"
 import { NavigationMenu, NavigationMenuProps } from "@/components/ui/navigation-menu"
 import { usePathname } from "@/lib/navigation"
 import React, { useMemo } from "react"
+import { useTranslation } from "react-i18next"
 
 interface TopMenuProps {
     children?: React.ReactNode
 }
 
-export const TopMenu: React.FC<TopMenuProps> = (props) => {
-
-    const { children, ...rest } = props
-
-    const serverStatus = useServerStatus()
-
+export const TopMenu: React.FC<TopMenuProps> = () => {
+    const { t } = useTranslation()
     const pathname = usePathname()
 
-    const missingEpisodeCount = useMissingEpisodeCount()
-
     const navigationItems = useMemo<NavigationMenuProps["items"]>(() => {
-
         return [
-            {
-                href: "/",
-                // icon: IoLibrary,
-                isCurrent: pathname === "/",
-                name: "Home",
-            },
-            {
-                href: "/schedule",
-                icon: null,
-                isCurrent: pathname.startsWith("/schedule"),
-                name: "Schedule",
-                // addon: missingEpisodeCount > 0 ? <Badge
-                //     className="absolute -top-1 right-2 h-2 w-2 p-0 z-[5]" size="sm"
-                //     intent="alert-solid"
-                // /> : undefined,
-            },
-            ...[serverStatus?.settings?.library?.enableManga && {
-                href: "/manga",
-                icon: null,
-                isCurrent: pathname.startsWith("/manga"),
-                name: "Manga",
-            }].filter(Boolean) as NavigationMenuProps["items"],
-            {
-                href: "/lists",
-                icon: null,
-                isCurrent: pathname.startsWith("/lists"),
-                name: "My lists",
-            },
+            { href: "/", isCurrent: pathname === "/", name: t("nav.home") },
+            { href: "/schedule", icon: null, isCurrent: pathname.startsWith("/schedule"), name: t("nav.schedule") },
+            { href: "/lists", icon: null, isCurrent: pathname.startsWith("/lists"), name: t("nav.lists") },
             {
                 href: "/discover",
                 icon: null,
                 isCurrent: pathname.startsWith("/discover") || pathname.startsWith("/search"),
-                name: "Discover",
+                name: t("nav.discover"),
             },
-        ].filter(Boolean)
-    }, [pathname, missingEpisodeCount, serverStatus?.settings?.library?.enableManga])
+        ]
+    }, [t, pathname])
 
     return (
         <NavigationMenu
@@ -66,5 +33,4 @@ export const TopMenu: React.FC<TopMenuProps> = (props) => {
             data-top-menu
         />
     )
-
 }
