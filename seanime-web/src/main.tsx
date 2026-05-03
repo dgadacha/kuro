@@ -1,4 +1,5 @@
 import { ClientProviders, queryClient, store } from "@/app/client-providers"
+import "@/lib/i18n" // initialize i18n before any component mounts
 import "./app/globals.css"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import React from "react"

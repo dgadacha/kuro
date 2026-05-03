@@ -10,6 +10,7 @@ import { UpdateModal } from "@/app/(main)/_features/update/update-modal"
 import { useMissingEpisodeCount } from "@/app/(main)/_hooks/missing-episodes-loader"
 import { useCurrentUser, useServerStatus } from "@/app/(main)/_hooks/use-server-status"
 import { ConfirmationDialog, useConfirmationDialog } from "@/components/shared/confirmation-dialog"
+import { LanguageSwitcher } from "@/components/shared/language-switcher"
 import { SeaLink } from "@/components/shared/sea-link"
 import { AppSidebar, useAppSidebarContext } from "@/components/ui/app-layout"
 import { Avatar } from "@/components/ui/avatar"
@@ -28,6 +29,7 @@ import { useThemeSettings } from "@/lib/theme/theme-hooks"
 import { __isDesktop__, __isElectronDesktop__ } from "@/types/constants"
 import { useAtom } from "jotai"
 import React from "react"
+import { useTranslation } from "react-i18next"
 import { BiChevronRight, BiExtension, BiLogIn, BiLogOut } from "react-icons/bi"
 import { FiLogIn, FiSearch } from "react-icons/fi"
 import { HiOutlineServerStack } from "react-icons/hi2"
@@ -94,6 +96,11 @@ export function MainSidebar() {
                 <div className="flex w-full gap-2 flex-col px-4 shrink-0 pb-2">
                     <SidebarUpdates isCollapsed={isCollapsed} />
                     <SidebarFooter isCollapsed={isCollapsed} onLogout={logout} />
+                    {!isCollapsed && (
+                        <div className="flex justify-center pt-1 pb-1">
+                            <LanguageSwitcher />
+                        </div>
+                    )}
                     <SidebarUser expandedSidebar={expandedSidebar} onLogout={logout} isCollapsed={isCollapsed} />
                 </div>
             </AppSidebar>
@@ -109,6 +116,7 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
     const router = useRouter()
     const pathname = usePathname()
     const serverStatus = useServerStatus()
+    const { t } = useTranslation()
 
     // Commands
     const { setSeaCommandOpen } = useSeaCommand()
@@ -124,21 +132,14 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
         {
             id: "home",
             iconType: IoHomeOutline,
-            name: "Home",
+            name: t("nav.home"),
             href: "/",
             isCurrent: pathname === "/",
         },
-        // ...(import.meta.env.MODE === "development" ? [{
-        //     id: "test",
-        //     iconType: GrTest,
-        //     name: "Test",
-        //     href: "/test",
-        //     isCurrent: pathname === "/test",
-        // }] : []),
         {
             id: "schedule",
             iconType: LuCalendar,
-            name: "Schedule",
+            name: t("nav.schedule"),
             href: "/schedule",
             isCurrent: pathname === "/schedule",
             addon: missingEpisodeCount > 0 ? <Badge
@@ -149,32 +150,33 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
         {
             id: "lists",
             iconType: RiListCheck3,
-            name: "My lists",
+            name: t("nav.lists"),
             href: "/lists",
             isCurrent: pathname === "/lists",
         },
         {
             id: "discover",
             iconType: LuCompass,
-            name: "Discover",
+            name: t("nav.discover"),
             href: "/discover",
             isCurrent: pathname === "/discover",
         },
         {
             id: "search",
             iconType: FiSearch,
-            name: "Search",
+            name: t("nav.search"),
             href: "/search",
             isCurrent: pathname === "/search",
         },
         ...(serverStatus?.debridSettings?.enabled && !!serverStatus?.debridSettings?.provider) ? [{
             id: "debrid",
             iconType: HiOutlineServerStack,
-            name: "Debrid",
+            name: t("nav.debrid"),
             href: "/debrid",
             isCurrent: pathname === "/debrid",
         }] : [],
     ], [
+        t,
         pathname,
         missingEpisodeCount,
         serverStatus?.debridSettings?.enabled,
@@ -267,14 +269,14 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
         return [
             {
                 iconType: BiChevronRight,
-                name: "More",
+                name: t("nav.more"),
                 subContent: <VerticalMenu
                     items={allHidden}
                     isSidebar
                 />,
             } as VerticalMenuItem,
         ]
-    }, [items, ts.unpinnedMenuItems, autoUnpinnedIds, pluginWebviewItems])
+    }, [t, items, ts.unpinnedMenuItems, autoUnpinnedIds, pluginWebviewItems])
 
     return (
         <div>
@@ -302,7 +304,7 @@ function SidebarNavigation({ isCollapsed, containerRef }: { isCollapsed: boolean
                     ...unpinnedMenuItems,
                     {
                         iconType: LuRefreshCw,
-                        name: "Refresh AniList",
+                        name: t("nav.refresh_anilist"),
                         onClick: () => {
                             ctx.setOpen(false)
                             if (isRefreshingAC) return
@@ -364,6 +366,7 @@ function SidebarFooter({ isCollapsed, onLogout }: { isCollapsed: boolean, onLogo
     const pathname = usePathname()
     const serverStatus = useServerStatus()
     const user = useCurrentUser()
+    const { t } = useTranslation()
 
     // Extensions
     const { data: updateData } = useGetExtensionUpdateData()
@@ -375,7 +378,7 @@ function SidebarFooter({ isCollapsed, onLogout }: { isCollapsed: boolean, onLogo
 
     // Sign out
     const confirmSignOut = useConfirmationDialog({
-        title: "Sign out",
+        title: t("nav.sign_out"),
         description: "Are you sure you want to sign out?",
         onConfirm: () => {
             onLogout()
@@ -405,7 +408,7 @@ function SidebarFooter({ isCollapsed, onLogout }: { isCollapsed: boolean, onLogo
                     ...serverStatus?.settings?.nakama?.enabled ? [{
                         iconType: MdOutlineConnectWithoutContact,
                         iconClass: "size-6",
-                        name: "Nakama",
+                        name: t("nav.nakama"),
                         isCurrent: nakamaModalOpen,
                         onClick: () => {
                             ctx.setOpen(false)
@@ -424,7 +427,7 @@ function SidebarFooter({ isCollapsed, onLogout }: { isCollapsed: boolean, onLogo
                     }] : [],
                     {
                         iconType: BiExtension,
-                        name: "Extensions",
+                        name: t("nav.extensions"),
                         href: "/extensions",
                         isCurrent: pathname.includes("/extensions"),
                         addon: (!!updateData?.length || !!pluginWithIssuesCount)
@@ -438,20 +441,20 @@ function SidebarFooter({ isCollapsed, onLogout }: { isCollapsed: boolean, onLogo
                     },
                     {
                         iconType: IoCloudOfflineOutline,
-                        name: "Offline",
+                        name: t("nav.offline"),
                         href: "/offline",
                         isCurrent: pathname.includes("/offline"),
                     },
                     {
                         iconType: LuSettings,
-                        name: "Settings",
+                        name: t("nav.settings"),
                         href: "/settings",
                         isCurrent: pathname === ("/settings"),
                     },
                     ...(ctx.isBelowBreakpoint ? [
                         {
                             iconType: user?.isSimulated ? FiLogIn : BiLogOut,
-                            name: user?.isSimulated ? "Sign in" : "Sign out",
+                            name: user?.isSimulated ? t("nav.sign_in") : t("nav.sign_out"),
                             onClick: user?.isSimulated ? () => setLoginModal(true) : confirmSignOut.open,
                         },
                     ] : []),

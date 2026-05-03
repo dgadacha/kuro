@@ -19,6 +19,7 @@ import { __isDesktop__, __isElectronDesktop__ } from "@/types/constants"
 import { AnimatePresence, motion } from "motion/react"
 import React from "react"
 import { useWatch } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { BiChevronLeft, BiChevronRight, BiPlay, BiRocket } from "react-icons/bi"
 import { FaDiscord } from "react-icons/fa"
 import { HiOutlineDesktopComputer } from "react-icons/hi"
@@ -28,11 +29,8 @@ import { IoPlayForwardCircleSharp } from "react-icons/io5"
 import { MdOutlineBroadcastOnHome } from "react-icons/md"
 import { SiMpv, SiVlcmediaplayer } from "react-icons/si"
 
-const STEPS = [
-    { id: "player", title: "Lecteur", subtitle: "Choisis ton lecteur vidéo" },
-    { id: "debrid", title: "Debrid", subtitle: "Optionnel — service de cache premium" },
-    { id: "features", title: "Fonctionnalités", subtitle: "Active ce qui t'intéresse" },
-] as const
+const STEP_IDS = ["player", "debrid", "features"] as const
+const STEP_TOTAL = STEP_IDS.length
 
 const stepVariants = {
     enter: (dir: number) => ({ x: dir > 0 ? 24 : -24, opacity: 0 }),
@@ -41,6 +39,10 @@ const stepVariants = {
 }
 
 function NetflixHeader({ currentStep }: { currentStep: number }) {
+    const { t } = useTranslation()
+    const stepKey = STEP_IDS[currentStep]
+    const stepTitle = t(`onboarding.step_${stepKey}`)
+
     return (
         <div className="space-y-8 mb-12 text-center">
             <div className="flex items-center justify-center gap-3">
@@ -48,25 +50,22 @@ function NetflixHeader({ currentStep }: { currentStep: number }) {
                 <span className="text-5xl font-extrabold tracking-tight text-white">KURO</span>
             </div>
 
-            {/* Linear progress bar — Netflix-style */}
             <div className="max-w-md mx-auto px-6">
                 <div className="flex items-center justify-between mb-3 text-xs uppercase tracking-widest text-[--muted]">
-                    <span>Étape {currentStep + 1} / {STEPS.length}</span>
-                    <span className="text-white font-semibold">{STEPS[currentStep].title}</span>
+                    <span>{t("onboarding.step_n_of", { n: currentStep + 1, total: STEP_TOTAL })}</span>
+                    <span className="text-white font-semibold">{stepTitle}</span>
                 </div>
                 <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                     <motion.div
                         className="h-full bg-brand-500"
                         initial={false}
-                        animate={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+                        animate={{ width: `${((currentStep + 1) / STEP_TOTAL) * 100}%` }}
                         transition={{ duration: 0.4, ease: "easeOut" }}
                     />
                 </div>
             </div>
 
-            <p className="text-[--muted] text-sm">
-                Tous ces réglages sont modifiables plus tard dans Settings.
-            </p>
+            <p className="text-[--muted] text-sm">{t("onboarding.settings_modifiable")}</p>
         </div>
     )
 }
@@ -86,32 +85,34 @@ function StepShell({ title, description, children }: { title: string; descriptio
 }
 
 function PlayerStep({ status }: { status: Status }) {
+    const { t } = useTranslation()
     const defaultPlayer = useWatch({ name: "defaultPlayer" })
+    const externalPrefix = __isDesktop__ ? t("onboarding.external_prefix") : ""
 
     return (
         <StepShell
-            title={`${__isDesktop__ ? "Lecteur " : ""}externe`}
-            description="Configure le lecteur qui prendra en charge la lecture vidéo et le suivi de progression."
+            title={t("onboarding.player_title", { prefix: externalPrefix })}
+            description={t("onboarding.player_subtitle")}
         >
             {__isElectronDesktop__ && (
                 <Alert
                     intent="info-basic"
                     className="mb-4"
-                    description="Kuro Denshi inclut un lecteur natif activé par défaut. Tu peux quand même configurer un lecteur externe ici."
+                    description={t("onboarding.denshi_note")}
                 />
             )}
 
             <div className="space-y-6">
                 <Field.Select
                     name="defaultPlayer"
-                    label="Lecteur"
+                    label={t("onboarding.step_player")}
                     help={status?.os !== "darwin"
-                        ? "MPV est recommandé pour les sous-titres et le torrent streaming."
-                        : "MPV ou IINA recommandés sur macOS."}
+                        ? "MPV is recommended for subtitle rendering and torrent streaming."
+                        : "MPV or IINA recommended on macOS."}
                     required
                     leftIcon={<BiPlay className="text-brand-500" />}
                     options={[
-                        { label: "MPV (recommandé)", value: "mpv" },
+                        { label: "MPV (recommended)", value: "mpv" },
                         { label: "VLC", value: "vlc" },
                         ...(status?.os === "windows" ? [{ label: "MPC-HC", value: "mpc-hc" }] : []),
                         ...(status?.os === "darwin" ? [{ label: "IINA", value: "iina" }] : []),
@@ -131,9 +132,6 @@ function PlayerStep({ status }: { status: Status }) {
                                 <SiMpv className="size-5 text-brand-400" />
                                 <h4 className="font-semibold text-white">MPV</h4>
                             </div>
-                            <p className="text-xs text-[--muted]">
-                                Sur Windows, installe MPV via Scoop ou Chocolatey. Sur macOS, via Homebrew.
-                            </p>
                             <Field.Text name="mpvSocket" label="Socket / Pipe" />
                         </motion.div>
                     )}
@@ -151,16 +149,6 @@ function PlayerStep({ status }: { status: Status }) {
                                 <h4 className="font-semibold text-white">IINA</h4>
                             </div>
                             <Field.Text name="iinaSocket" label="Socket / Pipe" />
-                            <Alert
-                                intent="info-basic"
-                                description={
-                                    <p className="text-xs">
-                                        Dans IINA → Préférences générales : <strong>Quitter après fermeture</strong> doit être <span
-                                        className="underline"
-                                    >coché</span>, et <strong>Garder la fenêtre ouverte après lecture</strong> <span className="underline">décoché</span>.
-                                    </p>
-                                }
-                            />
                         </motion.div>
                     )}
 
@@ -184,7 +172,7 @@ function PlayerStep({ status }: { status: Status }) {
                                 <Field.Text name="vlcUsername" label="Username" />
                                 <Field.Text name="vlcPassword" label="Password" type="password" />
                             </div>
-                            <Field.Text name="vlcPath" label="Chemin VLC" />
+                            <Field.Text name="vlcPath" label="VLC path" />
                         </motion.div>
                     )}
 
@@ -204,7 +192,7 @@ function PlayerStep({ status }: { status: Status }) {
                                 <Field.Text name="mediaPlayerHost" label="Host" />
                                 <Field.Number name="mpcPort" label="Port" formatOptions={{ useGrouping: false }} />
                             </div>
-                            <Field.Text name="mpcPath" label="Chemin MPC-HC" />
+                            <Field.Text name="mpcPath" label="MPC-HC path" />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -214,20 +202,21 @@ function PlayerStep({ status }: { status: Status }) {
 }
 
 function DebridStep() {
+    const { t } = useTranslation()
     const debridProvider = useWatch({ name: "debridProvider" })
 
     return (
         <StepShell
-            title="Debrid (optionnel)"
-            description="Les services de debrid (Real-Debrid, AllDebrid, TorBox) offrent du streaming instantané depuis le cloud. Laisse vide si tu n'en as pas."
+            title={t("onboarding.debrid_title")}
+            description={t("onboarding.debrid_subtitle")}
         >
             <div className="space-y-5">
                 <Field.Select
                     name="debridProvider"
-                    label="Service"
+                    label={t("onboarding.debrid_label")}
                     leftIcon={<HiServerStack className="text-brand-500" />}
                     options={[
-                        { label: "Aucun", value: "none" },
+                        { label: t("onboarding.debrid_none"), value: "none" },
                         { label: "TorBox", value: "torbox" },
                         { label: "Real-Debrid", value: "realdebrid" },
                         { label: "AllDebrid", value: "alldebrid" },
@@ -244,8 +233,8 @@ function DebridStep() {
                         >
                             <Field.Text
                                 name="debridApiKey"
-                                label="Clé API"
-                                help="Fournie par ton service debrid."
+                                label={t("onboarding.debrid_apikey")}
+                                help={t("onboarding.debrid_apikey_help")}
                             />
                         </motion.div>
                     )}
@@ -255,51 +244,51 @@ function DebridStep() {
     )
 }
 
-const FEATURES = [
-    {
-        name: "enableTorrentStreaming",
-        icon: ImDownload,
-        title: "Torrent streaming",
-        description: "Lance la lecture pendant que le torrent se télécharge",
-    },
-    {
-        name: "enableOnlinestream",
-        icon: HiGlobeAlt,
-        title: "Online streaming",
-        description: "Regarde via les sources en ligne (extensions)",
-    },
-    {
-        name: "enableAdultContent",
-        icon: HiEye,
-        title: "Contenu NSFW",
-        description: "Affiche le contenu adulte dans les recherches",
-    },
-    {
-        name: "enableRichPresence",
-        icon: FaDiscord,
-        title: "Discord Rich Presence",
-        description: "Affiche ce que tu regardes sur Discord",
-    },
-    {
-        name: "enableTranscode",
-        icon: MdOutlineBroadcastOnHome,
-        title: "Transcoding",
-        description: "Stream les fichiers locaux vers d'autres appareils",
-    },
-] as const
-
 function FeaturesStep() {
+    const { t } = useTranslation()
+
+    const features = [
+        {
+            name: "enableTorrentStreaming",
+            icon: ImDownload,
+            title: t("onboarding.feature_torrent_streaming"),
+            description: t("onboarding.feature_torrent_streaming_desc"),
+        },
+        {
+            name: "enableOnlinestream",
+            icon: HiGlobeAlt,
+            title: t("onboarding.feature_online_streaming"),
+            description: t("onboarding.feature_online_streaming_desc"),
+        },
+        {
+            name: "enableAdultContent",
+            icon: HiEye,
+            title: t("onboarding.feature_nsfw"),
+            description: t("onboarding.feature_nsfw_desc"),
+        },
+        {
+            name: "enableRichPresence",
+            icon: FaDiscord,
+            title: t("onboarding.feature_discord"),
+            description: t("onboarding.feature_discord_desc"),
+        },
+        {
+            name: "enableTranscode",
+            icon: MdOutlineBroadcastOnHome,
+            title: t("onboarding.feature_transcoding"),
+            description: t("onboarding.feature_transcoding_desc"),
+        },
+    ]
+
     return (
         <div className="max-w-3xl mx-auto space-y-6">
             <div className="text-center space-y-3">
-                <h2 className="text-3xl lg:text-4xl font-extrabold text-white">Fonctionnalités</h2>
-                <p className="text-[--muted] text-sm">
-                    Active ce que tu veux. Modifiable plus tard dans Settings.
-                </p>
+                <h2 className="text-3xl lg:text-4xl font-extrabold text-white">{t("onboarding.features_title")}</h2>
+                <p className="text-[--muted] text-sm">{t("onboarding.features_subtitle")}</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {FEATURES.map((feature) => (
+                {features.map((feature) => (
                     <Field.Checkbox
                         key={feature.name}
                         name={feature.name}
@@ -335,6 +324,7 @@ function FeaturesStep() {
 
 export function GettingStartedPage({ status }: { status: Status }) {
     const router = useRouter()
+    const { t } = useTranslation()
     const { getDefaultVlcPath, getDefaultQBittorrentPath, getDefaultTransmissionPath } = useDefaultSettingsPaths()
     const setServerStatus = useSetServerStatus()
     const { mutate, data, isPending } = useGettingStarted()
@@ -355,27 +345,16 @@ export function GettingStartedPage({ status }: { status: Status }) {
     const mpvSocketPath = React.useMemo(() => getDefaultMpvSocket(status.os), [status.os])
     const iinaSocketPath = React.useMemo(() => getDefaultIinaSocket(status.os), [status.os])
 
-    const isLast = currentStep === STEPS.length - 1
+    const isLast = currentStep === STEP_TOTAL - 1
     const isFirst = currentStep === 0
 
-    const next = () => {
-        if (!isLast) {
-            setDirection(1)
-            setCurrentStep((s) => s + 1)
-        }
-    }
-    const prev = () => {
-        if (!isFirst) {
-            setDirection(-1)
-            setCurrentStep((s) => s - 1)
-        }
-    }
+    const next = () => { if (!isLast) { setDirection(1); setCurrentStep((s) => s + 1) } }
+    const prev = () => { if (!isFirst) { setDirection(-1); setCurrentStep((s) => s - 1) } }
 
     if (isPending) return <LoadingOverlayWithLogo />
 
     if (!data) return (
         <div className="min-h-screen bg-black relative overflow-hidden">
-            {/* Subtle red ambient glow — Netflix wash */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute -top-32 left-1/2 -translate-x-1/2 size-[60rem] bg-brand-500/10 rounded-full blur-[120px]" />
                 <div className="absolute bottom-0 right-0 size-[40rem] bg-brand-700/10 rounded-full blur-[100px]" />
@@ -451,7 +430,7 @@ export function GettingStartedPage({ status }: { status: Status }) {
                                     leftIcon={<BiChevronLeft className="text-xl" />}
                                     className="bg-white/10 hover:bg-white/20 !text-white"
                                 >
-                                    Précédent
+                                    {t("common.previous")}
                                 </Button>
 
                                 {isLast ? (
@@ -461,7 +440,7 @@ export function GettingStartedPage({ status }: { status: Status }) {
                                         rightIcon={<BiRocket className="size-5" />}
                                         className="bg-brand-500 hover:bg-brand-600 !text-white font-bold px-8 rounded-md"
                                     >
-                                        Lancer Kuro
+                                        {t("onboarding.launch")}
                                     </Button>
                                 ) : (
                                     <Button
@@ -470,7 +449,7 @@ export function GettingStartedPage({ status }: { status: Status }) {
                                         rightIcon={<BiChevronRight className="text-xl" />}
                                         className="bg-brand-500 hover:bg-brand-600 !text-white font-bold px-8 rounded-md"
                                     >
-                                        Continuer
+                                        {t("common.next")}
                                     </Button>
                                 )}
                             </motion.div>
@@ -479,10 +458,9 @@ export function GettingStartedPage({ status }: { status: Status }) {
                 </Form>
 
                 <p className="text-center text-[--muted]/60 text-xs mt-12">
-                    Kuro · forké de Kuro
+                    {t("onboarding.footer")}
                 </p>
             </div>
         </div>
     )
 }
-

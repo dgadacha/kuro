@@ -1,0 +1,108 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "loading": "Chargement…",
+    "previous": "Précédent",
+    "next": "Continuer",
+    "back": "Retour",
+    "yes": "Oui",
+    "no": "Non",
+    "search": "Rechercher",
+    "settings": "Paramètres",
+    "more_info": "Plus d'infos",
+    "play": "Lecture",
+    "language": "Langue",
+    "english": "Anglais",
+    "french": "Français"
+  },
+  "nav": {
+    "home": "Accueil",
+    "schedule": "Planning",
+    "lists": "Mes listes",
+    "discover": "Découvrir",
+    "search": "Rechercher",
+    "debrid": "Debrid",
+    "extensions": "Extensions",
+    "offline": "Hors ligne",
+    "settings": "Paramètres",
+    "nakama": "Nakama",
+    "refresh_anilist": "Rafraîchir AniList",
+    "sign_in": "Se connecter",
+    "sign_out": "Se déconnecter",
+    "more": "Plus"
+  },
+  "home": {
+    "rows": {
+      "trending": "Tendances actuelles",
+      "popular": "Populaires",
+      "current_season": "Cette saison",
+      "past_season": "La saison passée",
+      "movies": "Films d'animation",
+      "upcoming": "Prochainement"
+    },
+    "hero": {
+      "play": "Lecture",
+      "more_info": "Plus d'infos",
+      "slide_label": "Slide {{n}} : {{title}}",
+      "slideshow_aria": "Sélection à la une"
+    }
+  },
+  "discover": {
+    "tab_anime": "Anime",
+    "tab_schedule": "Planning"
+  },
+  "settings": {
+    "tabs": {
+      "app": "Application",
+      "library": "Bibliothèque locale",
+      "playback": "Lecture vidéo",
+      "media_player": "Lecteur externe",
+      "external_player_link": "Lien lecteur externe",
+      "direct_play": "Direct Play",
+      "torrent_provider": "Fournisseur de torrents",
+      "torrent_client": "Client torrent",
+      "torrent_streaming": "Torrent streaming",
+      "debrid": "Service Debrid",
+      "online_streaming": "Streaming en ligne",
+      "nakama": "Nakama",
+      "discord": "Discord",
+      "data": "Données",
+      "ui": "Interface",
+      "logs": "Journaux",
+      "anilist": "AniList"
+    }
+  },
+  "onboarding": {
+    "step_n_of": "Étape {{n}} / {{total}}",
+    "settings_modifiable": "Tous ces réglages sont modifiables plus tard dans les Paramètres.",
+    "step_player": "Lecteur",
+    "step_debrid": "Debrid",
+    "step_features": "Fonctionnalités",
+    "player_title": "Lecteur{{prefix}}",
+    "external_prefix": " externe",
+    "player_subtitle": "Configure le lecteur qui prendra en charge la lecture vidéo et le suivi de progression.",
+    "denshi_note": "Kuro Denshi inclut un lecteur natif activé par défaut. Tu peux quand même configurer un lecteur externe ici.",
+    "debrid_title": "Debrid (optionnel)",
+    "debrid_subtitle": "Les services de debrid (Real-Debrid, AllDebrid, TorBox) offrent du streaming instantané depuis le cloud. Laisse vide si tu n'en as pas.",
+    "debrid_label": "Service",
+    "debrid_none": "Aucun",
+    "debrid_apikey": "Clé API",
+    "debrid_apikey_help": "Fournie par ton service debrid.",
+    "features_title": "Fonctionnalités",
+    "features_subtitle": "Active ce que tu veux. Modifiable plus tard dans les Paramètres.",
+    "feature_torrent_streaming": "Torrent streaming",
+    "feature_torrent_streaming_desc": "Lance la lecture pendant que le torrent se télécharge",
+    "feature_online_streaming": "Streaming en ligne",
+    "feature_online_streaming_desc": "Regarde via les sources en ligne (extensions)",
+    "feature_nsfw": "Contenu NSFW",
+    "feature_nsfw_desc": "Affiche le contenu adulte dans les recherches",
+    "feature_discord": "Discord Rich Presence",
+    "feature_discord_desc": "Affiche ce que tu regardes sur Discord",
+    "feature_transcoding": "Transcoding",
+    "feature_transcoding_desc": "Stream les fichiers locaux vers d'autres appareils",
+    "launch": "Lancer Kuro",
+    "footer": "Kuro · forké de Seanime"
+  }
+}

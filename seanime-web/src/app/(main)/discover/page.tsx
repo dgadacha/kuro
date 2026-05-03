@@ -15,10 +15,12 @@ import { useRouter, useSearchParams } from "@/lib/navigation"
 import { useAtom } from "jotai/react"
 import { AnimatePresence, motion } from "motion/react"
 import React from "react"
+import { useTranslation } from "react-i18next"
 
 
 export default function Page() {
 
+    const { t } = useTranslation()
     const serverStatus = useServerStatus()
     const router = useRouter()
     const [pageType, setPageType] = useAtom(__discord_pageTypeAtom)
@@ -52,8 +54,8 @@ export default function Page() {
                             className="h-10 overflow-hidden"
                             triggerClass="px-4 py-1"
                             items={[
-                                { name: "Anime", isCurrent: pageType === "anime", onClick: () => setPageType("anime") },
-                                { name: "Schedule", isCurrent: pageType === "schedule", onClick: () => setPageType("schedule") },
+                                { name: t("discover.tab_anime"), isCurrent: pageType === "anime", onClick: () => setPageType("anime") },
+                                { name: t("discover.tab_schedule"), isCurrent: pageType === "schedule", onClick: () => setPageType("schedule") },
                             ]}
                         />
                     </div>

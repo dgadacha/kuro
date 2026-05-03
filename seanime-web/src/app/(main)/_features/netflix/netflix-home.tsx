@@ -9,6 +9,7 @@ import {
     useDiscoverUpcomingAnime,
 } from "@/app/(main)/discover/_lib/handle-discover-queries"
 import React from "react"
+import { useTranslation } from "react-i18next"
 
 export function NetflixHome() {
     return (
@@ -35,10 +36,11 @@ export function NetflixHome() {
  */
 
 function TrendingRow() {
+    const { t } = useTranslation()
     const { data, isLoading } = useDiscoverTrendingAnime()
     return (
         <NetflixRow
-            title="Tendances actuelles"
+            title={t("home.rows.trending")}
             media={data?.Page?.media}
             isLoading={isLoading}
             priorityImages
@@ -47,31 +49,36 @@ function TrendingRow() {
 }
 
 function PopularRow() {
+    const { t } = useTranslation()
     const ref = React.useRef<HTMLDivElement>(null)
     const { data, isLoading } = useDiscoverPopularAnime(ref)
-    return <NetflixRow rootRef={ref} title="Populaires" media={data?.Page?.media} isLoading={isLoading} />
+    return <NetflixRow rootRef={ref} title={t("home.rows.popular")} media={data?.Page?.media} isLoading={isLoading} />
 }
 
 function CurrentSeasonRow() {
+    const { t } = useTranslation()
     const ref = React.useRef<HTMLDivElement>(null)
     const { data, isLoading } = useDiscoverCurrentSeasonAnime(ref)
-    return <NetflixRow rootRef={ref} title="Cette saison" media={data?.Page?.media} isLoading={isLoading} />
+    return <NetflixRow rootRef={ref} title={t("home.rows.current_season")} media={data?.Page?.media} isLoading={isLoading} />
 }
 
 function PastSeasonRow() {
+    const { t } = useTranslation()
     const ref = React.useRef<HTMLDivElement>(null)
     const { data, isLoading } = useDiscoverPastSeasonAnime(ref)
-    return <NetflixRow rootRef={ref} title="La saison passée" media={data?.Page?.media} isLoading={isLoading} />
+    return <NetflixRow rootRef={ref} title={t("home.rows.past_season")} media={data?.Page?.media} isLoading={isLoading} />
 }
 
 function MoviesRow() {
+    const { t } = useTranslation()
     const ref = React.useRef<HTMLDivElement>(null)
     const { data, isLoading } = useDiscoverTrendingMovies(ref)
-    return <NetflixRow rootRef={ref} title="Films d'animation" media={data?.Page?.media} isLoading={isLoading} />
+    return <NetflixRow rootRef={ref} title={t("home.rows.movies")} media={data?.Page?.media} isLoading={isLoading} />
 }
 
 function UpcomingRow() {
+    const { t } = useTranslation()
     const ref = React.useRef<HTMLDivElement>(null)
     const { data, isLoading } = useDiscoverUpcomingAnime(ref)
-    return <NetflixRow rootRef={ref} title="Prochainement" media={data?.Page?.media} isLoading={isLoading} />
+    return <NetflixRow rootRef={ref} title={t("home.rows.upcoming")} media={data?.Page?.media} isLoading={isLoading} />
 }

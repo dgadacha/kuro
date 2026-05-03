@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
 import { Skeleton } from "@/components/ui/skeleton"
 import React from "react"
+import { useTranslation } from "react-i18next"
 import { BiInfoCircle, BiPlay } from "react-icons/bi"
 
 export function NetflixHero() {
+    const { t } = useTranslation()
     const { data, isLoading } = useDiscoverTrendingAnime()
 
     const pool = React.useMemo<AL_BaseAnime[]>(
@@ -74,7 +76,7 @@ export function NetflixHero() {
                                 className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-8"
                                 leftIcon={<BiPlay className="text-2xl" />}
                             >
-                                Lecture
+                                {t("home.hero.play")}
                             </Button>
                         </SeaLink>
 
@@ -85,7 +87,7 @@ export function NetflixHero() {
                                 className="bg-white/20 hover:bg-white/30 !text-white font-semibold rounded-md px-8 backdrop-blur-sm"
                                 leftIcon={<BiInfoCircle className="text-2xl" />}
                             >
-                                Plus d'infos
+                                {t("home.hero.more_info")}
                             </Button>
                         </SeaLink>
                     </div>

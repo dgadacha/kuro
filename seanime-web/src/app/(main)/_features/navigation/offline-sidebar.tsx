@@ -8,14 +8,17 @@ import { VerticalMenu } from "@/components/ui/vertical-menu"
 import { usePathname } from "@/lib/navigation"
 import { useThemeSettings } from "@/lib/theme/theme-hooks"
 import React from "react"
+import { useTranslation } from "react-i18next"
 import { IoCloudyOutline, IoLibraryOutline } from "react-icons/io5"
 import { LuSettings } from "react-icons/lu"
+import { LanguageSwitcher } from "@/components/shared/language-switcher"
 import { PluginSidebarTray } from "../plugin/tray/plugin-sidebar-tray"
 
 
 export function OfflineSidebar() {
     const ctx = useAppSidebarContext()
     const ts = useThemeSettings()
+    const { t } = useTranslation()
 
     const [expandedSidebar, setExpandSidebar] = React.useState(false)
     const isCollapsed = ts.expandSidebarOnHover ? (!ctx.isBelowBreakpoint && !expandedSidebar) : !ctx.isBelowBreakpoint
@@ -80,7 +83,7 @@ export function OfflineSidebar() {
                         items={[
                             {
                                 iconType: IoLibraryOutline,
-                                name: "Anime Library",
+                                name: t("nav.offline"),
                                 href: "/offline",
                                 isCurrent: pathname === "/offline",
                             },
@@ -112,13 +115,18 @@ export function OfflineSidebar() {
                                 },
                                 {
                                     iconType: LuSettings,
-                                    name: "Settings",
+                                    name: t("nav.settings"),
                                     href: "/settings",
                                     isCurrent: pathname === ("/settings"),
                                 },
                             ]}
                         />
                     </div>
+                    {!isCollapsed && (
+                        <div className="flex justify-center">
+                            <LanguageSwitcher />
+                        </div>
+                    )}
                     <div className="flex w-full gap-2 flex-col">
                         <div
                             className={cn(
