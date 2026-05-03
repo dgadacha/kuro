@@ -28,13 +28,14 @@ export function NetflixHero() {
     const [hovering, setHovering] = React.useState(false)
     const [index, setIndex] = useSlideshow(pool.length, HERO.rotateMs, { paused: hovering })
 
-    if (isLoading || pool.length === 0) {
-        return <Skeleton className={cn("w-full rounded-none", HERO.heightClass)} />
-    }
-
+    // Hooks must run unconditionally — keep them above the loading early-return.
     const featured = pool[index] ?? pool[0]
     const rawDescription = featured?.description?.replace(/(<([^>]+)>)/gi, "") || ""
     const { text: description } = useTranslatedText(rawDescription)
+
+    if (isLoading || pool.length === 0) {
+        return <Skeleton className={cn("w-full rounded-none", HERO.heightClass)} />
+    }
 
     return (
         <section
