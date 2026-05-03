@@ -89,7 +89,8 @@
     "torrent_streaming": "Torrent streaming",
     "debrid_streaming": "Streaming Debrid",
     "no_provider_available": "Aucun provider disponible. Installe d'abord une extension provider.",
-    "trailer": "Bande-annonce"
+    "trailer": "Bande-annonce",
+    "more_like_this": "Dans le même style"
   },
   "errors": {
     "unknown": "Erreur inconnue",

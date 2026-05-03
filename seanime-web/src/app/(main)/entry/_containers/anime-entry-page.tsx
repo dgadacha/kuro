@@ -1,8 +1,8 @@
 import { Anime_Entry } from "@/api/generated/types"
 import { useGetAnilistAnimeDetails } from "@/api/hooks/anilist.hooks"
 import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
-import { MediaEntryCharactersSection } from "@/app/(main)/_features/media/_components/media-entry-characters-section"
 import { MediaEntryPageLoadingDisplay } from "@/app/(main)/_features/media/_components/media-entry-page-loading-display"
+import { NetflixMoreLikeThis } from "@/app/(main)/_features/netflix/netflix-more-like-this"
 import { usePluginAnimeEntryEpisodeTabs } from "@/app/(main)/_features/plugin/plugin-entry-episode-tabs"
 import {
     PluginAnimeEntryEpisodeTab,
@@ -15,7 +15,6 @@ import { useSeaCommandInject } from "@/app/(main)/_features/sea-command/use-inje
 import { vc_isFullscreen } from "@/app/(main)/_features/video-core/video-core-atoms"
 import { useServerStatus } from "@/app/(main)/_hooks/use-server-status"
 import { MetaSection } from "@/app/(main)/entry/_components/meta-section"
-import { RelationsRecommendationsSection } from "@/app/(main)/entry/_components/relations-recommendations-section"
 import { DebridStreamPage } from "@/app/(main)/entry/_containers/debrid-stream/debrid-stream-page"
 import { EpisodeSection } from "@/app/(main)/entry/_containers/episode-list/episode-section"
 import { __torrentSearch_selectionAtom, TorrentSearchDrawer } from "@/app/(main)/entry/_containers/torrent-search/torrent-search-drawer"
@@ -258,8 +257,7 @@ export function AnimeEntryPage() {
 
     const bottomSection = <>
         <PluginWebviewSlot slot="after-anime-entry-episode-list" />
-        <MediaEntryCharactersSection details={animeDetails} />
-        <RelationsRecommendationsSection entry={animeEntry} details={animeDetails} />
+        <NetflixMoreLikeThis details={animeDetails} />
     </>
 
     return (
