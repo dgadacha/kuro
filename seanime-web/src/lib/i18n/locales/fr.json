@@ -54,6 +54,12 @@
     "start": "Lancer la lecture",
     "click_hint": "Les navigateurs bloquent l'autoplay dans un nouvel onglet — un clic et c'est parti."
   },
+  "modal": {
+    "full_page": "Plus d'infos",
+    "episodes": "Épisodes",
+    "episodes_count": "épisodes",
+    "genres": "Genres"
+  },
   "lists": {
     "title": "Mes listes",
     "search_placeholder": "Rechercher dans mes listes…",

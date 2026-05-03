@@ -1,7 +1,7 @@
 import { AL_BaseAnime } from "@/api/generated/types"
+import { useNetflixDetailModal } from "@/app/(main)/_features/netflix/netflix-detail-modal"
 import { FORMAT_LABEL, ROW } from "@/app/(main)/_features/netflix/netflix.constants"
 import { SeaImage } from "@/components/shared/sea-image"
-import { SeaLink } from "@/components/shared/sea-link"
 import { cn } from "@/components/ui/core/styling"
 import React from "react"
 
@@ -17,6 +17,7 @@ type Props = {
 }
 
 export const NetflixCard = React.memo(function NetflixCard({ media, priority, variant = "row" }: Props) {
+    const { openDetail } = useNetflixDetailModal()
     const img = media.bannerImage || media.coverImage?.extraLarge || media.coverImage?.large || ""
     const title = media.title?.userPreferred || ""
 
@@ -29,15 +30,21 @@ export const NetflixCard = React.memo(function NetflixCard({ media, priority, va
     }, [media.seasonYear, media.format, media.episodes])
 
     return (
-        <SeaLink
+        <a
             href={`/entry?id=${media.id}`}
             aria-label={title}
+            onClick={(e) => {
+                // Plain left-click → modal. Cmd/Ctrl-click, middle-click, etc.
+                // → fall through to native nav so "open in new tab" still works.
+                if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+                e.preventDefault()
+                openDetail(media.id)
+            }}
             className={cn(
-                "group relative snap-start block",
+                "group relative snap-start block cursor-pointer",
                 variant === "row" ? cn("flex-none", ROW.cardWidthClass) : "w-full",
                 "aspect-video rounded-md overflow-hidden bg-gray-900",
                 "ring-0 ring-brand-500 hover:ring-2 transition-[transform,box-shadow,outline] duration-200",
-                // Softer hover so it doesn't crash into neighboring grid cells.
                 "hover:scale-[1.03] hover:z-[2] hover:shadow-2xl transform-gpu origin-center",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500",
             )}
@@ -62,6 +69,6 @@ export const NetflixCard = React.memo(function NetflixCard({ media, priority, va
                     </p>
                 )}
             </div>
-        </SeaLink>
+        </a>
     )
 })
