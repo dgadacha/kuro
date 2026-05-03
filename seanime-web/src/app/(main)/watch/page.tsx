@@ -13,7 +13,8 @@ import React from "react"
 export default function WatchPage() {
     const searchParams = useSearchParams()
     const idParam = searchParams.get("id")
-    const epParam = searchParams.get("ep")
+    // accept both ?episode= (matches OnlinestreamPage internal convention) and ?ep= (legacy)
+    const epParam = searchParams.get("episode") ?? searchParams.get("ep")
     const providerParam = searchParams.get("provider")
     const dubParam = searchParams.get("dub")
 

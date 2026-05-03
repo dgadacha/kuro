@@ -115,7 +115,8 @@ function EpisodeRow({
     dubbed: boolean
     t: (key: string) => string
 }) {
-    const href = `/watch?id=${mediaId}&ep=${ep.number}${provider ? `&provider=${encodeURIComponent(provider)}` : ""}${dubbed ? "&dub=1" : ""}`
+    // OnlinestreamPage reads `episode` from the URL — match its convention.
+    const href = `/watch?id=${mediaId}&episode=${ep.number}${provider ? `&provider=${encodeURIComponent(provider)}` : ""}${dubbed ? "&dub=1" : ""}`
 
     return (
         <li>
