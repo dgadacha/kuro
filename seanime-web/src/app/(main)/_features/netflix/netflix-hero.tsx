@@ -7,6 +7,7 @@ import { SeaImage } from "@/components/shared/sea-image"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useTranslatedText } from "@/lib/translate/use-translated-text"
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { BiInfoCircle, BiPlay } from "react-icons/bi"
@@ -32,7 +33,8 @@ export function NetflixHero() {
     }
 
     const featured = pool[index] ?? pool[0]
-    const description = featured?.description?.replace(/(<([^>]+)>)/gi, "") || ""
+    const rawDescription = featured?.description?.replace(/(<([^>]+)>)/gi, "") || ""
+    const { text: description } = useTranslatedText(rawDescription)
 
     return (
         <section

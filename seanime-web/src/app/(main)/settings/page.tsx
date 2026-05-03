@@ -15,6 +15,7 @@ import { __settings_tabAtom } from "@/app/(main)/settings/_components/settings-p
 import { SettingsIsDirty, SettingsSubmitButton } from "@/app/(main)/settings/_components/settings-submit-button"
 import { AnimeLibrarySettings } from "@/app/(main)/settings/_containers/anime-library-settings"
 import { DebridSettings } from "@/app/(main)/settings/_containers/debrid-settings"
+import { DeeplSettings } from "@/app/(main)/settings/_containers/deepl-settings"
 import { FilecacheSettings } from "@/app/(main)/settings/_containers/filecache-settings"
 import { LogsSettings } from "@/app/(main)/settings/_containers/logs-settings"
 import { MediastreamSettings } from "@/app/(main)/settings/_containers/mediastream-settings"
@@ -51,6 +52,7 @@ import {
     LuCircleArrowOutUpRight,
     LuCirclePlay,
     LuFileSearch,
+    LuLanguages,
     LuLibrary,
     LuMonitor,
     LuMonitorPlay,
@@ -274,10 +276,10 @@ export default function Page() {
                                         value="ui"
                                         className="group"
                                     ><MdOutlinePalette className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.ui")}</TabsTrigger>
-                                    {/* <TabsTrigger
-                                     value="cache"
-                                     className="group"
-                                     ><TbDatabaseExclamation className="text-xl mr-3 transition-transform duration-200" /> Cache</TabsTrigger> */}
+                                    <TabsTrigger
+                                        value="deepl"
+                                        className="group"
+                                    ><LuLanguages className="text-xl mr-3 transition-transform duration-200" /> {t("settings.tabs.deepl")}</TabsTrigger>
                                     <TabsTrigger
                                         value="logs"
                                         className="group"
@@ -892,6 +894,18 @@ export default function Page() {
                             />
 
                             <TorrentstreamSettings settings={torrentstreamSettings} />
+
+                        </TabsContent>
+
+                        <TabsContent value="deepl" className={tabContentClass}>
+
+                            <SettingsPageHeader
+                                title={t("settings.tabs.deepl")}
+                                description={t("settings.deepl.page_desc")}
+                                icon={LuLanguages}
+                            />
+
+                            <DeeplSettings />
 
                         </TabsContent>
 

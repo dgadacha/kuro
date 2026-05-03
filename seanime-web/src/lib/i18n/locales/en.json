@@ -134,7 +134,20 @@
       "ui": "User Interface",
       "logs": "Logs & Cache",
       "denshi": "Denshi",
-      "anilist": "AniList"
+      "anilist": "AniList",
+      "deepl": "DeepL Translation"
+    },
+    "deepl": {
+      "page_desc": "Translate anime descriptions on the fly",
+      "intro": "Kuro can translate AniList descriptions to French via DeepL. Get a free key on",
+      "signup_link": "DeepL API Free",
+      "intro_suffix": "(no card, 500k characters/month — plenty for normal use).",
+      "key_label": "DeepL API key",
+      "key_storage_note": "Stored only in your browser's localStorage. Sent per-request to the backend, never persisted server-side.",
+      "test_title": "Quick test",
+      "test_button": "Translate sample",
+      "test_ok": "Working — translations will now show on anime pages when language is set to French.",
+      "test_failed": "Translation failed. Check the key + your monthly quota."
     }
   },
   "donate": "Donate",

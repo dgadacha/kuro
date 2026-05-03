@@ -174,6 +174,9 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 
 	v1.POST("/open-in-explorer", h.HandleOpenInExplorer)
 
+	// Translation proxy (DeepL) — key supplied per-request from the client.
+	v1.POST("/translate", h.HandleTranslateText)
+
 	v1.POST("/media-player/start", h.HandleStartDefaultMediaPlayer)
 
 	//

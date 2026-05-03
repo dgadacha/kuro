@@ -8,6 +8,7 @@ import { IconButton } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
 import { Modal } from "@/components/ui/modal"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useTranslatedText } from "@/lib/translate/use-translated-text"
 import { atom, useAtom, useSetAtom } from "jotai"
 import React from "react"
 import { useTranslation } from "react-i18next"
@@ -65,7 +66,8 @@ function Body({ mediaId }: { mediaId: number }) {
 
     const banner = entry.media?.bannerImage || entry.media?.coverImage?.extraLarge
     const title = entry.media?.title?.userPreferred ?? ""
-    const description = entry.media?.description?.replace(/(<([^>]+)>)/gi, "")
+    const rawDescription = entry.media?.description?.replace(/(<([^>]+)>)/gi, "") ?? ""
+    const { text: description, isTranslating } = useTranslatedText(rawDescription)
     const year = entry.media?.startDate?.year
     const episodes = entry.media?.episodes
     const score = entry.media?.meanScore
@@ -99,7 +101,7 @@ function Body({ mediaId }: { mediaId: number }) {
                                 </span>
                             )}
                         </div>
-                        <p className="text-gray-200 leading-relaxed text-sm lg:text-base">
+                        <p className={cn("text-gray-200 leading-relaxed text-sm lg:text-base", isTranslating && "opacity-60")}>
                             {description}
                         </p>
                     </div>
