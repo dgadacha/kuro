@@ -13,11 +13,20 @@ for the Kuro-specific additions (Netflix profiles), which are real Go code.
 ## Repo / git
 
 - **Origin remote** = upstream seanime (`5rahim/seanime`). Don't push to it.
-- **`kuro` remote** = the user's fork at <https://github.com/dgadacha/kuro>. **Always push there.**
+- **`kuro` remote** (GitHub) = the user's fork at <https://github.com/dgadacha/kuro>.
+- **`kuro-gitlab` remote** (GitLab) = mirror at <https://gitlab.com/kidnar/kuro>.
+  Same project the docker registry lives under, so source + image are co-located.
+- **Push to BOTH after every commit:** `git push kuro main && git push kuro-gitlab main`.
+  Forgetting one means the user has to ask. The GitLab remote URL embeds a
+  glpat token (visible via `git remote -v`); when rotating the token, update
+  the URL with `git remote set-url kuro-gitlab https://oauth2:NEW@gitlab.com/kidnar/kuro.git`.
 - Commits use `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` per
   the harness convention. Use `git commit -m "$(cat <<'EOF' … EOF)"` HEREDOC pattern.
-- Push after each meaningful milestone (the user expects to see progress on GitHub).
-- Branch: `main`.
+- Push after each meaningful milestone (the user expects to see progress on
+  both GitHub and GitLab).
+- Branch: `main`. **Force-push is disabled on the GitLab `main`** (protected
+  branch). If histories diverge, use `git pull --allow-unrelated-histories
+  -X ours kuro-gitlab main --no-edit` to merge then push.
 
 ## How to run
 
