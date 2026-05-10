@@ -67,8 +67,10 @@ deploy:k8s:
     - kubectl config use-context $KUBE_CONTEXT
     - kubectl version --client=true --output=yaml
   script:
-    # Apply manifests (idempotent — same as `kubectl apply -f k8s/` from a laptop).
-    - kubectl apply -f k8s/namespace.yaml
+    # Apply only the namespace-scoped manifests (the agent's RBAC is bound
+    # to a Role inside `kuro`, on purpose — it can't touch cluster-wide
+    # resources like Namespace itself, and shouldn't need to: the namespace
+    # is created once at infra setup time and lives forever).
     - kubectl apply -f k8s/pvc.yaml
     - kubectl apply -f k8s/service.yaml
     - kubectl apply -f k8s/ingress.yaml
