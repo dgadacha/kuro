@@ -411,7 +411,10 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1KuroProfiles.DELETE("/:uid", h.HandleDeleteKuroProfile)
 	v1KuroProfiles.GET("/:uid/history", h.HandleListKuroProfileHistory)
 	v1KuroProfiles.PUT("/:uid/history", h.HandleUpsertKuroProfileHistoryItem)
+	v1KuroProfiles.POST("/:uid/history", h.HandleUpsertKuroProfileHistoryItemPOST) // sendBeacon
+	v1KuroProfiles.DELETE("/:uid/history", h.HandleClearKuroProfileHistory)
 	v1KuroProfiles.DELETE("/:uid/history/:mediaId", h.HandleDeleteKuroProfileHistoryItem)
+	v1KuroProfiles.DELETE("/:uid/history/:mediaId/episode/:episodeNumber", h.HandleDeleteKuroProfileHistoryEpisode)
 
 	//
 	// Sync

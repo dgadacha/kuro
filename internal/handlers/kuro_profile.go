@@ -139,7 +139,8 @@ func (h *Handler) HandleUpsertKuroProfileHistoryItem(c echo.Context) error {
 
 // HandleDeleteKuroProfileHistoryItem
 //
-//	@summary removes a single (profile, media) watch entry.
+//	@summary removes ALL watch entries for a (profile, media) pair (i.e. the
+//	         whole series, every episode).
 //	@route /api/v1/kuro-profiles/{uid}/history/{mediaId} [DELETE]
 //	@returns bool
 func (h *Handler) HandleDeleteKuroProfileHistoryItem(c echo.Context) error {
@@ -152,4 +153,46 @@ func (h *Handler) HandleDeleteKuroProfileHistoryItem(c echo.Context) error {
 		return h.RespondWithError(c, err)
 	}
 	return h.RespondWithData(c, true)
+}
+
+// HandleDeleteKuroProfileHistoryEpisode
+//
+//	@summary removes a single watched-episode row.
+//	@route /api/v1/kuro-profiles/{uid}/history/{mediaId}/episode/{episodeNumber} [DELETE]
+//	@returns bool
+func (h *Handler) HandleDeleteKuroProfileHistoryEpisode(c echo.Context) error {
+	uid := c.Param("uid")
+	mediaID, err := strconv.Atoi(c.Param("mediaId"))
+	if err != nil {
+		return h.RespondWithError(c, err)
+	}
+	episodeNumber, err := strconv.Atoi(c.Param("episodeNumber"))
+	if err != nil {
+		return h.RespondWithError(c, err)
+	}
+	if err := h.App.Database.DeleteKuroProfileWatchHistoryEpisode(uid, mediaID, episodeNumber); err != nil {
+		return h.RespondWithError(c, err)
+	}
+	return h.RespondWithData(c, true)
+}
+
+// HandleClearKuroProfileHistory
+//
+//	@summary wipes every history row for a profile (full reset).
+//	@route /api/v1/kuro-profiles/{uid}/history [DELETE]
+//	@returns bool
+func (h *Handler) HandleClearKuroProfileHistory(c echo.Context) error {
+	uid := c.Param("uid")
+	if err := h.App.Database.ClearKuroProfileWatchHistory(uid); err != nil {
+		return h.RespondWithError(c, err)
+	}
+	return h.RespondWithData(c, true)
+}
+
+// HandleUpsertKuroProfileHistoryItemPOST is the POST alias for the upsert
+// endpoint. The browser's `navigator.sendBeacon` (used by the watch page on
+// pagehide / visibility change) only ever fires POST, so we accept it here
+// alongside PUT.
+func (h *Handler) HandleUpsertKuroProfileHistoryItemPOST(c echo.Context) error {
+	return h.HandleUpsertKuroProfileHistoryItem(c)
 }

@@ -114,8 +114,9 @@ func (db *Database) ListKuroProfileWatchHistory(profileUID string) ([]*models.Ku
 	return res, nil
 }
 
-// UpsertKuroProfileWatchHistoryItem inserts or updates the (profile_uid, media_id)
-// row. The composite unique index on those two columns lets us bounce on conflict.
+// UpsertKuroProfileWatchHistoryItem inserts or updates the
+// (profile_uid, media_id, episode_number) row. Per-episode keying lets the
+// history page surface each watched episode individually.
 func (db *Database) UpsertKuroProfileWatchHistoryItem(item *models.KuroProfileWatchHistory) (*models.KuroProfileWatchHistory, error) {
 	if item == nil {
 		return nil, errors.New("item required")
@@ -128,9 +129,12 @@ func (db *Database) UpsertKuroProfileWatchHistoryItem(item *models.KuroProfileWa
 	}
 	err := db.gormdb.
 		Clauses(clause.OnConflict{
-			Columns: []clause.Column{{Name: "profile_uid"}, {Name: "media_id"}},
+			Columns: []clause.Column{
+				{Name: "profile_uid"},
+				{Name: "media_id"},
+				{Name: "episode_number"},
+			},
 			DoUpdates: clause.AssignmentColumns([]string{
-				"episode_number",
 				"current_time",
 				"duration",
 				"updated_at",
@@ -143,15 +147,38 @@ func (db *Database) UpsertKuroProfileWatchHistoryItem(item *models.KuroProfileWa
 	// Re-fetch so we return the row with up-to-date timestamps.
 	var refreshed models.KuroProfileWatchHistory
 	if err := db.gormdb.
-		Where("profile_uid = ? AND media_id = ?", item.ProfileUID, item.MediaID).
+		Where("profile_uid = ? AND media_id = ? AND episode_number = ?",
+			item.ProfileUID, item.MediaID, item.EpisodeNumber).
 		First(&refreshed).Error; err != nil {
 		return nil, err
 	}
 	return &refreshed, nil
 }
 
+// DeleteKuroProfileWatchHistoryItem removes ALL rows for this (profile, media)
+// pair — i.e. every watched episode of this anime. Used by the "delete the
+// whole series from history" action.
 func (db *Database) DeleteKuroProfileWatchHistoryItem(profileUID string, mediaID int) error {
 	return db.gormdb.
 		Where("profile_uid = ? AND media_id = ?", profileUID, mediaID).
+		Delete(&models.KuroProfileWatchHistory{}).Error
+}
+
+// DeleteKuroProfileWatchHistoryEpisode removes a single (profile, media, episode)
+// row. Used by the per-episode delete action.
+func (db *Database) DeleteKuroProfileWatchHistoryEpisode(profileUID string, mediaID, episodeNumber int) error {
+	return db.gormdb.
+		Where("profile_uid = ? AND media_id = ? AND episode_number = ?",
+			profileUID, mediaID, episodeNumber).
+		Delete(&models.KuroProfileWatchHistory{}).Error
+}
+
+// ClearKuroProfileWatchHistory wipes every watch entry for a profile.
+func (db *Database) ClearKuroProfileWatchHistory(profileUID string) error {
+	if profileUID == "" {
+		return errors.New("profile uid required")
+	}
+	return db.gormdb.
+		Where("profile_uid = ?", profileUID).
 		Delete(&models.KuroProfileWatchHistory{}).Error
 }

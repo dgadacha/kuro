@@ -89,8 +89,28 @@
       "planning": "À regarder",
       "completed": "Terminés",
       "paused": "En pause",
-      "dropped": "Abandonnés"
+      "dropped": "Abandonnés",
+      "history": "Historique"
+    },
+    "actions": {
+      "menu": "Actions",
+      "move_to": "Déplacer vers",
+      "delete": "Retirer de mes listes",
+      "delete_confirm": "Retirer cet anime de tes listes AniList ?"
     }
+  },
+  "history": {
+    "no_profile": "Active un profil pour voir l'historique de visionnage.",
+    "empty": "Aucun épisode regardé pour le moment.",
+    "episodes_count": "épisodes vus",
+    "expand": "Voir les épisodes",
+    "collapse": "Masquer les épisodes",
+    "clear_all": "Tout effacer",
+    "clear_confirm": "Effacer tout l'historique de ce profil ?",
+    "delete_series": "Supprimer la série",
+    "delete_series_with_unlist_confirm": "Supprimer aussi cet anime de tes listes AniList (En cours, etc.) ?",
+    "delete_episode": "Supprimer cet épisode",
+    "delete_episode_confirm": "Supprimer cet épisode de l'historique ?"
   },
   "search": {
     "title": "Recherche",

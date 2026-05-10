@@ -243,6 +243,55 @@ export function useProfileHistoryUpsert() {
 }
 
 // -----------------------------------------------------------------------------
+// History delete actions
+// -----------------------------------------------------------------------------
+
+/**
+ * Three flavours of history deletion:
+ *   - deleteSeries(mediaId)             every episode of one anime
+ *   - deleteEpisode(mediaId, ep)        a single episode row
+ *   - clearAll()                        wipe the whole profile's history
+ *
+ * All scoped to the active profile and invalidate the cached list so the
+ * History page + Continue Watching row update without a manual refresh.
+ */
+export function useProfileHistoryActions() {
+    const uid = useActiveProfileId()
+    const queryClient = useQueryClient()
+
+    const invalidate = React.useCallback(() => {
+        if (!uid) return
+        queryClient.invalidateQueries({ queryKey: [...QK_HISTORY(uid)] })
+    }, [uid, queryClient])
+
+    const deleteSeries = React.useCallback(
+        async (mediaId: number) => {
+            if (!uid) return
+            await fetch(`${EP_HISTORY(uid)}/${mediaId}`, { method: "DELETE" })
+            invalidate()
+        },
+        [uid, invalidate],
+    )
+
+    const deleteEpisode = React.useCallback(
+        async (mediaId: number, episodeNumber: number) => {
+            if (!uid) return
+            await fetch(`${EP_HISTORY(uid)}/${mediaId}/episode/${episodeNumber}`, { method: "DELETE" })
+            invalidate()
+        },
+        [uid, invalidate],
+    )
+
+    const clearAll = React.useCallback(async () => {
+        if (!uid) return
+        await fetch(EP_HISTORY(uid), { method: "DELETE" })
+        invalidate()
+    }, [uid, invalidate])
+
+    return { deleteSeries, deleteEpisode, clearAll }
+}
+
+// -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
 

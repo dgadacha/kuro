@@ -607,11 +607,15 @@ type KuroProfile struct {
 
 type KuroProfileWatchHistory struct {
 	BaseModel
-	// Composite uniqueness: each (profile, media) pair appears at most once.
-	// This makes the upsert "save where I am right now" cleanly map to UPDATE OR INSERT.
-	ProfileUID    string  `gorm:"column:profile_uid;size:64;not null;uniqueIndex:idx_kuro_profile_media,priority:1" json:"profileUid"`
-	MediaID       int     `gorm:"column:media_id;not null;uniqueIndex:idx_kuro_profile_media,priority:2" json:"mediaId"`
-	EpisodeNumber int     `gorm:"column:episode_number;not null" json:"episodeNumber"`
+	// Composite uniqueness on (profile, media, episode) so each watched
+	// episode keeps its own row. Crunchyroll-style history: the user can
+	// delete one episode without nuking the whole series.
+	//
+	// Old code used a (profile, media) unique index — db.go now drops it
+	// on startup so AutoMigrate can swap to the wider one cleanly.
+	ProfileUID    string  `gorm:"column:profile_uid;size:64;not null;uniqueIndex:idx_kuro_profile_media_episode,priority:1" json:"profileUid"`
+	MediaID       int     `gorm:"column:media_id;not null;index;uniqueIndex:idx_kuro_profile_media_episode,priority:2" json:"mediaId"`
+	EpisodeNumber int     `gorm:"column:episode_number;not null;uniqueIndex:idx_kuro_profile_media_episode,priority:3" json:"episodeNumber"`
 	CurrentTime   float64 `gorm:"column:current_time" json:"currentTime"`
 	Duration      float64 `gorm:"column:duration" json:"duration"`
 }

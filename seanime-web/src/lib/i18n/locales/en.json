@@ -89,8 +89,28 @@
       "planning": "Plan to watch",
       "completed": "Completed",
       "paused": "Paused",
-      "dropped": "Dropped"
+      "dropped": "Dropped",
+      "history": "History"
+    },
+    "actions": {
+      "menu": "Actions",
+      "move_to": "Move to",
+      "delete": "Remove from my lists",
+      "delete_confirm": "Remove this anime from your AniList lists?"
     }
+  },
+  "history": {
+    "no_profile": "Activate a profile to see your watch history.",
+    "empty": "No episodes watched yet.",
+    "episodes_count": "episodes watched",
+    "expand": "Show episodes",
+    "collapse": "Hide episodes",
+    "clear_all": "Clear all",
+    "clear_confirm": "Clear this profile's entire watch history?",
+    "delete_series": "Delete series",
+    "delete_series_with_unlist_confirm": "Also remove this anime from your AniList lists (Currently watching, etc.)?",
+    "delete_episode": "Delete this episode",
+    "delete_episode_confirm": "Remove this episode from history?"
   },
   "search": {
     "title": "Search",

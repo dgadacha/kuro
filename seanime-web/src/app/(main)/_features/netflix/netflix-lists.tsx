@@ -1,6 +1,8 @@
 import { AL_BaseAnime, AL_MediaListStatus } from "@/api/generated/types"
 import { useGetAnimeCollection } from "@/api/hooks/anilist.hooks"
 import { NetflixCard } from "@/app/(main)/_features/netflix/netflix-card"
+import { NetflixHistoryGrid } from "@/app/(main)/_features/netflix/netflix-history-grid"
+import { NetflixListCardMenu } from "@/app/(main)/_features/netflix/netflix-list-card-menu"
 import { cn } from "@/components/ui/core/styling"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TextInput } from "@/components/ui/text-input"
@@ -9,15 +11,17 @@ import React from "react"
 import { useTranslation } from "react-i18next"
 import { FiSearch } from "react-icons/fi"
 
-type ListKey = "all" | "current" | "planning" | "completed" | "paused" | "dropped"
+type ListKey = "all" | "current" | "planning" | "completed" | "paused" | "dropped" | "history"
 
-const STATUS_BY_KEY: Record<Exclude<ListKey, "all">, AL_MediaListStatus> = {
+const STATUS_BY_KEY: Record<Exclude<ListKey, "all" | "history">, AL_MediaListStatus> = {
     current: "CURRENT",
     planning: "PLANNING",
     completed: "COMPLETED",
     paused: "PAUSED",
     dropped: "DROPPED",
 }
+
+type Entry = { media: AL_BaseAnime; status: AL_MediaListStatus | null }
 
 export function NetflixLists() {
     const { t } = useTranslation()
@@ -27,25 +31,36 @@ export function NetflixLists() {
     const [searchInput, setSearchInput] = React.useState("")
     const search = useDebounce(searchInput.trim().toLowerCase(), 250)
 
-    const allEntries = React.useMemo(() => {
+    /** Flat list of entries with their AniList list status preserved. */
+    const allEntries = React.useMemo<Entry[]>(() => {
         const lists = data?.MediaListCollection?.lists ?? []
-        if (active === "all") {
-            return lists.flatMap(l => l?.entries ?? []).filter(Boolean)
+        const wanted = active === "all" || active === "history"
+            ? null
+            : STATUS_BY_KEY[active]
+
+        const out: Entry[] = []
+        for (const list of lists) {
+            if (!list) continue
+            if (wanted && list.status !== wanted) continue
+            for (const entry of list.entries ?? []) {
+                if (!entry?.media) continue
+                out.push({
+                    media: entry.media as AL_BaseAnime,
+                    status: (list.status ?? null) as AL_MediaListStatus | null,
+                })
+            }
         }
-        const target = STATUS_BY_KEY[active]
-        const list = lists.find(l => l?.status === target)
-        return (list?.entries ?? []).filter(Boolean)
+        return out
     }, [data, active])
 
-    const media = React.useMemo<AL_BaseAnime[]>(() => {
-        const items = allEntries.map(e => e!.media).filter(Boolean) as AL_BaseAnime[]
-        if (!search) return items
-        return items.filter(m => {
+    const filtered = React.useMemo<Entry[]>(() => {
+        if (!search) return allEntries
+        return allEntries.filter(({ media }) => {
             const titles = [
-                m.title?.userPreferred,
-                m.title?.romaji,
-                m.title?.english,
-                m.title?.native,
+                media.title?.userPreferred,
+                media.title?.romaji,
+                media.title?.english,
+                media.title?.native,
             ].filter(Boolean) as string[]
             return titles.some(t => t.toLowerCase().includes(search))
         })
@@ -58,7 +73,10 @@ export function NetflixLists() {
         { key: "paused", label: t("lists.tabs.paused") },
         { key: "dropped", label: t("lists.tabs.dropped") },
         { key: "all", label: t("lists.tabs.all") },
+        { key: "history", label: t("lists.tabs.history") },
     ]
+
+    const showSearch = active !== "history"
 
     return (
         <div className="px-6 lg:px-16 py-8 space-y-8">
@@ -67,15 +85,17 @@ export function NetflixLists() {
                     {t("lists.title")}
                 </h1>
 
-                <div className="lg:w-80">
-                    <TextInput
-                        placeholder={t("lists.search_placeholder")}
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        leftIcon={<FiSearch />}
-                        className="bg-white/5 border-white/10 !text-white placeholder:text-[--muted] rounded-md"
-                    />
-                </div>
+                {showSearch && (
+                    <div className="lg:w-80">
+                        <TextInput
+                            placeholder={t("lists.search_placeholder")}
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            leftIcon={<FiSearch />}
+                            className="bg-white/5 border-white/10 !text-white placeholder:text-[--muted] rounded-md"
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Pill tabs */}
@@ -100,22 +120,51 @@ export function NetflixLists() {
                 })}
             </div>
 
-            {/* Grid — gap-y bigger than gap-x so vertical hover-scale doesn't clip into rows. */}
-            {isLoading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-4 gap-y-6 py-2">
+            {/* History tab has its own renderer (per-anime grouping + episode rows). */}
+            {active === "history" ? (
+                <NetflixHistoryGrid />
+            ) : isLoading ? (
+                <ResultGrid>
                     {Array.from({ length: 12 }).map((_, i) => (
                         <Skeleton key={i} className="w-full aspect-video rounded-md" />
                     ))}
-                </div>
-            ) : media.length === 0 ? (
+                </ResultGrid>
+            ) : filtered.length === 0 ? (
                 <div className="text-center py-20 text-[--muted]">
                     {search ? t("lists.no_match") : t("lists.empty")}
                 </div>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-4 gap-y-6 py-2">
-                    {media.map(m => <NetflixCard key={m.id} media={m} variant="grid" />)}
-                </div>
+                <ResultGrid>
+                    {filtered.map(({ media, status }) => (
+                        <ListEntryCard key={media.id} media={media} status={status} />
+                    ))}
+                </ResultGrid>
             )}
+        </div>
+    )
+}
+
+/** Single grid card with the action menu pinned top-right (revealed on hover). */
+function ListEntryCard({
+    media,
+    status,
+}: {
+    media: AL_BaseAnime
+    status: AL_MediaListStatus | null
+}) {
+    return (
+        <div className="relative group">
+            <NetflixCard media={media} variant="grid" />
+            <NetflixListCardMenu mediaId={media.id} currentStatus={status} />
+        </div>
+    )
+}
+
+/** Grid with vertical breathing room so card hover-scale doesn't crash into rows above/below. */
+function ResultGrid({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-4 gap-y-6 py-2">
+            {children}
         </div>
     )
 }

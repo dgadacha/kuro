@@ -85,6 +85,11 @@ func NewDatabase(appDataDir, dbName string, logger *zerolog.Logger) (*Database, 
 
 // MigrateTables performs auto migration on the database
 func migrateTables(db *gorm.DB) error {
+	// Kuro: legacy (profile_uid, media_id) unique index → upgraded to
+	// (profile_uid, media_id, episode_number). AutoMigrate doesn't drop
+	// existing indexes so we drop the old one explicitly. No-op when missing.
+	_ = db.Exec("DROP INDEX IF EXISTS idx_kuro_profile_media").Error
+
 	err := db.AutoMigrate(
 		&models.LocalFiles{},
 		&models.ShelvedLocalFiles{},
