@@ -400,6 +400,20 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1Continuity.GET("/history", h.HandleGetContinuityWatchHistory)
 
 	//
+	// Kuro: Netflix-style profiles + per-profile watch history.
+	// All client-managed (the frontend generates the uid), the server is just
+	// the persistence layer.
+	//
+	v1KuroProfiles := v1.Group("/kuro-profiles")
+	v1KuroProfiles.GET("", h.HandleListKuroProfiles)
+	v1KuroProfiles.POST("", h.HandleCreateKuroProfile)
+	v1KuroProfiles.PATCH("/:uid", h.HandleUpdateKuroProfile)
+	v1KuroProfiles.DELETE("/:uid", h.HandleDeleteKuroProfile)
+	v1KuroProfiles.GET("/:uid/history", h.HandleListKuroProfileHistory)
+	v1KuroProfiles.PUT("/:uid/history", h.HandleUpsertKuroProfileHistoryItem)
+	v1KuroProfiles.DELETE("/:uid/history/:mediaId", h.HandleDeleteKuroProfileHistoryItem)
+
+	//
 	// Sync
 	//
 	v1Local := v1.Group("/local")

@@ -586,6 +586,38 @@ type MediaMetadataParent struct {
 
 ///////////////////////////////////////////////////////////////////////////
 
+// +---------------------+
+// |   Kuro profiles     |
+// +---------------------+
+//
+// Netflix-style multi-profile support. Lives in the same SQLite database as
+// the rest of seanime, scoped under its own tables to make this Kuro-specific
+// addition obvious + easy to lift out if upstream ever ships its own profiles.
+//
+// One row per profile (Account-style: one user owns N profiles).
+// Watch history is per (profile, media) — overwriting on every save.
+
+type KuroProfile struct {
+	BaseModel
+	UID    string `gorm:"column:uid;uniqueIndex;size:64;not null" json:"uid"`
+	Name   string `gorm:"column:name;size:30;not null" json:"name"`
+	Avatar string `gorm:"column:avatar;size:16" json:"avatar"`
+	Color  string `gorm:"column:color;size:16" json:"color"`
+}
+
+type KuroProfileWatchHistory struct {
+	BaseModel
+	// Composite uniqueness: each (profile, media) pair appears at most once.
+	// This makes the upsert "save where I am right now" cleanly map to UPDATE OR INSERT.
+	ProfileUID    string  `gorm:"column:profile_uid;size:64;not null;uniqueIndex:idx_kuro_profile_media,priority:1" json:"profileUid"`
+	MediaID       int     `gorm:"column:media_id;not null;uniqueIndex:idx_kuro_profile_media,priority:2" json:"mediaId"`
+	EpisodeNumber int     `gorm:"column:episode_number;not null" json:"episodeNumber"`
+	CurrentTime   float64 `gorm:"column:current_time" json:"currentTime"`
+	Duration      float64 `gorm:"column:duration" json:"duration"`
+}
+
+///////////////////////////////////////////////////////////////////////////
+
 type StringSlice []string
 
 func (o *StringSlice) Scan(src interface{}) error {

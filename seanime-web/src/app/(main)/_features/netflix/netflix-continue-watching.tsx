@@ -3,7 +3,7 @@ import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
 import { useGetContinuityWatchHistory } from "@/api/hooks/continuity.hooks"
 import { ROW } from "@/app/(main)/_features/netflix/netflix.constants"
 import { NetflixRowShell } from "@/app/(main)/_features/netflix/netflix-row"
-import { useActiveProfileHistory, useActiveProfileId } from "@/lib/profiles/profiles"
+import { ProfileWatchEntry, useActiveProfileHistory, useActiveProfileId } from "@/lib/profiles/profiles"
 import { SeaImage } from "@/components/shared/sea-image"
 import { cn } from "@/components/ui/core/styling"
 import React from "react"
@@ -25,22 +25,36 @@ type HistoryItem = {
 
 /**
  * Source of truth for the row:
- *   - If a profile is active, read from the per-profile localStorage history
- *     (kept up to date by NetflixProfileHistorySaver on /watch).
- *   - Otherwise (user hasn't opted into profiles), fall back to the backend's
- *     /api/v1/continuity/history so the legacy single-user mode keeps working.
+ *   - If a profile is active, read the server-backed per-profile history
+ *     (`/api/v1/kuro-profiles/:uid/history` — the saver on /watch upserts every
+ *     5s + on tab close).
+ *   - Otherwise (user hasn't opted into profiles yet), fall back to seanime's
+ *     legacy `/api/v1/continuity/history` so single-user mode keeps working.
  */
 function useContinueWatchingItems(): HistoryItem[] {
     const profileId = useActiveProfileId()
-    const profileHistory = useActiveProfileHistory()
+    const profileHistory: ProfileWatchEntry[] = useActiveProfileHistory()
     const { data: backendHistory } = useGetContinuityWatchHistory()
 
     return React.useMemo<HistoryItem[]>(() => {
-        const source: Record<number, any> = profileId
-            ? profileHistory
-            : (backendHistory ?? {})
+        // Profile mode: server returns an array sorted by updated_at desc.
+        if (profileId) {
+            return profileHistory
+                .filter(h => h && h.duration > 0 && h.currentTime > 0
+                    && h.currentTime < h.duration - FINISHED_THRESHOLD)
+                .map(h => ({
+                    mediaId: h.mediaId,
+                    episodeNumber: h.episodeNumber,
+                    currentTime: h.currentTime,
+                    duration: h.duration,
+                    progress: Math.max(0, Math.min(1, h.currentTime / h.duration)),
+                    timeUpdated: h.updatedAt ? new Date(h.updatedAt).getTime() : 0,
+                } as HistoryItem))
+                .sort((a, b) => b.timeUpdated - a.timeUpdated)
+        }
 
-        return Object.values(source)
+        // Legacy single-user mode: continuity returns a map keyed by mediaId.
+        return Object.values(backendHistory ?? {})
             .filter((h: any) => h && h.duration > 0 && h.currentTime > 0
                 && h.currentTime < h.duration - FINISHED_THRESHOLD)
             .map((h: any) => ({
@@ -49,9 +63,7 @@ function useContinueWatchingItems(): HistoryItem[] {
                 currentTime: h.currentTime,
                 duration: h.duration,
                 progress: Math.max(0, Math.min(1, h.currentTime / h.duration)),
-                timeUpdated: typeof h.timeUpdated === "number"
-                    ? h.timeUpdated
-                    : (h.timeUpdated ? new Date(h.timeUpdated).getTime() : 0),
+                timeUpdated: h.timeUpdated ? new Date(h.timeUpdated).getTime() : 0,
             } as HistoryItem))
             .sort((a, b) => b.timeUpdated - a.timeUpdated)
     }, [profileId, profileHistory, backendHistory])

@@ -1,7 +1,8 @@
 /**
- * Mounted on /watch. Polls the active <video> element every 5s and writes
- * (mediaId, episodeNumber, currentTime, duration) to localStorage scoped to
- * the active profile. The Continue Watching row reads from this same store.
+ * Mounted on /watch. Polls the active <video> element every 5s and sends an
+ * upsert to /api/v1/kuro-profiles/:uid/history. The Continue Watching row
+ * reads from the same endpoint, so progress survives browser changes / cache
+ * wipes / device hops.
  *
  * Why poll instead of hooking video-core?
  *   The video-core layer already emits a `video-status` WS event every second.
@@ -9,12 +10,14 @@
  *   internal player API. A 5s DOM poll on the public `<video>` element is
  *   trivially cheap, decoupled, and survives any video-core refactor.
  */
-import { upsertProfileHistoryEntry, useActiveProfileId } from "@/lib/profiles/profiles"
+import { pushProfileHistoryEntry, useActiveProfileId } from "@/lib/profiles/profiles"
 import { useSearchParams } from "@/lib/navigation"
+import { useQueryClient } from "@tanstack/react-query"
 import * as React from "react"
 
 const POLL_MS = 5000
 const MIN_TIME_S = 5  // ignore the first ~5s — initial seek noise + ad slates.
+const INVALIDATE_EVERY_N = 6  // refetch the history once every ~30s of playback (cheap)
 
 export function NetflixProfileHistorySaver() {
     const profileId = useActiveProfileId()
@@ -25,11 +28,14 @@ export function NetflixProfileHistorySaver() {
     const mediaId = idParam ? parseInt(idParam, 10) : NaN
     const episodeNumber = epParam ? parseInt(epParam, 10) : NaN
 
+    const queryClient = useQueryClient()
+
     React.useEffect(() => {
         if (!profileId) return
         if (Number.isNaN(mediaId) || Number.isNaN(episodeNumber)) return
 
         let cancelled = false
+        let tickCount = 0
 
         const tick = () => {
             if (cancelled) return
@@ -39,20 +45,25 @@ export function NetflixProfileHistorySaver() {
             if (!Number.isFinite(duration) || duration <= 0) return
             if (currentTime < MIN_TIME_S) return
 
-            upsertProfileHistoryEntry(profileId, {
+            void pushProfileHistoryEntry(profileId, {
                 mediaId,
                 episodeNumber,
                 currentTime,
                 duration,
-                timeUpdated: Date.now(),
             })
-            // Notify same-tab subscribers (the storage event only fires cross-tab).
-            window.dispatchEvent(new CustomEvent("kuro:profile-history-changed"))
+
+            // Periodically nudge the cache so any visible "Continue Watching" row
+            // (e.g. on a second tab open on /) reflects fresh progress without
+            // a manual refresh. We don't invalidate every 5s — that'd be wasteful.
+            tickCount = (tickCount + 1) % INVALIDATE_EVERY_N
+            if (tickCount === 0) {
+                queryClient.invalidateQueries({ queryKey: ["kuro-profiles", profileId, "history"] })
+            }
         }
 
         const interval = setInterval(tick, POLL_MS)
 
-        // Also flush on unload — catches the "user closes tab mid-episode" case.
+        // Also flush on tab close / nav away.
         const onUnload = () => tick()
         window.addEventListener("pagehide", onUnload)
         window.addEventListener("beforeunload", onUnload)
@@ -63,7 +74,7 @@ export function NetflixProfileHistorySaver() {
             window.removeEventListener("pagehide", onUnload)
             window.removeEventListener("beforeunload", onUnload)
         }
-    }, [profileId, mediaId, episodeNumber])
+    }, [profileId, mediaId, episodeNumber, queryClient])
 
     return null
 }

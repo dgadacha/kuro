@@ -30,8 +30,8 @@ export function NetflixProfilePicker() {
     const [modalOpen, setModalOpen] = React.useState(false)
     const [draft, setDraft] = React.useState<Profile | null>(null)
 
-    const onPick = (id: string) => {
-        select(id)
+    const onPick = (uid: string) => {
+        select(uid)
         router.push("/")
     }
 
@@ -45,18 +45,18 @@ export function NetflixProfilePicker() {
         setModalOpen(true)
     }
 
-    const onSubmit = (data: Pick<Profile, "name" | "avatar" | "color">) => {
+    const onSubmit = async (data: Pick<Profile, "name" | "avatar" | "color">) => {
         if (draft) {
-            update(draft.id, data)
+            await update(draft.uid, data)
         } else {
-            add(data)
+            await add(data)
         }
         setModalOpen(false)
     }
 
-    const onDelete = (id: string) => {
+    const onDelete = async (uid: string) => {
         if (!confirm(t("profiles.delete_confirm"))) return
-        remove(id)
+        await remove(uid)
     }
 
     const canAdd = profiles.length < MAX_PROFILES
@@ -72,12 +72,12 @@ export function NetflixProfilePicker() {
             <div className="flex flex-wrap items-start justify-center gap-6 lg:gap-10 max-w-5xl">
                 {profiles.map(profile => (
                     <ProfileCard
-                        key={profile.id}
+                        key={profile.uid}
                         profile={profile}
                         editing={editing}
-                        onPick={() => onPick(profile.id)}
+                        onPick={() => onPick(profile.uid)}
                         onEdit={() => openEdit(profile)}
-                        onDelete={() => onDelete(profile.id)}
+                        onDelete={() => onDelete(profile.uid)}
                     />
                 ))}
 

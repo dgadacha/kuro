@@ -27,7 +27,7 @@ import { useTorrentStreamListener } from "@/app/(main)/entry/_containers/torrent
 import { TorrentStreamOverlay } from "@/app/(main)/entry/_containers/torrent-stream/torrent-stream-overlay"
 import { LoadingOverlayWithLogo } from "@/components/shared/loading-overlay-with-logo"
 import { AppLayout, AppLayoutContent, AppSidebarProvider } from "@/components/ui/app-layout"
-import { activeProfileIdAtom, profilesAtom } from "@/lib/profiles/profiles"
+import { activeProfileIdAtom, useProfiles } from "@/lib/profiles/profiles"
 import { usePathname, useRouter } from "@/lib/navigation"
 import { __isElectronDesktop__ } from "@/types/constants"
 import { useAtomValue } from "jotai"
@@ -140,7 +140,7 @@ function Loader() {
  * exempt to avoid a redirect loop.
  */
 function useProfileGate() {
-    const profiles = useAtomValue(profilesAtom)
+    const profiles = useProfiles()
     const activeId = useAtomValue(activeProfileIdAtom)
     const router = useRouter()
     const pathname = usePathname()
