@@ -25,6 +25,7 @@ variables:
 # -----------------------------------------------------------------------------
 build:image:
   stage: build
+  tags: [salon]                                  # self-hosted runner on the salon node
   image: docker:27.3
   services:
     - docker:27.3-dind
@@ -54,6 +55,7 @@ build:image:
 # -----------------------------------------------------------------------------
 deploy:k8s:
   stage: deploy
+  tags: [salon]                                  # same self-hosted runner
   image: bitnami/kubectl:1.31
   needs: ["build:image"]
   before_script:
