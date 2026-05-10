@@ -56,7 +56,9 @@ build:image:
 deploy:k8s:
   stage: deploy
   tags: [salon]                                  # same self-hosted runner
-  image: bitnami/kubectl:1.31
+  # Bitnami tags by patch version, not by minor — `1.31` doesn't resolve. Stick
+  # to `latest` (cheap to pull, runs in seconds, kubectl is forward-compat).
+  image: bitnami/kubectl:latest
   needs: ["build:image"]
   before_script:
     - kubectl config use-context $KUBE_CONTEXT
