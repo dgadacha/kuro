@@ -10,6 +10,19 @@
   <em>Fork of <a href="https://github.com/5rahim/seanime">Seanime</a>.</em>
 </p>
 
+<p align="center">
+  <a href="https://github.com/dgadacha/kuro"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-dgadacha%2Fkuro-181717?logo=github"/></a>
+  &nbsp;
+  <a href="https://gitlab.com/kidnar/kuro"><img alt="GitLab" src="https://img.shields.io/badge/GitLab-kidnar%2Fkuro-FC6D26?logo=gitlab"/></a>
+  &nbsp;
+  <a href="https://kuro.nc-maiz.org"><img alt="Demo" src="https://img.shields.io/badge/demo-kuro.nc--maiz.org-E50914"/></a>
+</p>
+
+> Source mirrored on both GitHub (<code>dgadacha/kuro</code>) and GitLab
+> (<code>kidnar/kuro</code>) — same `main` branch, push lands on both.
+> The container registry lives under the GitLab project:
+> <code>registry.gitlab.com/kidnar/kuro</code>.
+
 ---
 
 ## What it is
@@ -155,5 +168,9 @@ When no profile is active the app degrades to single-user mode and reads the leg
 ## Credits & license
 
 Kuro is a fork of [5rahim/seanime](https://github.com/5rahim/seanime) — all the heavy lifting (the Go server, the plugin runtime, the AniList client) is theirs.
+
+Source code mirrored on:
+- GitHub — [dgadacha/kuro](https://github.com/dgadacha/kuro)
+- GitLab — [kidnar/kuro](https://gitlab.com/kidnar/kuro) (also hosts the `registry.gitlab.com/kidnar/kuro` container image)
 
 Released under the same license as the upstream project — see [LICENSE](LICENSE).
