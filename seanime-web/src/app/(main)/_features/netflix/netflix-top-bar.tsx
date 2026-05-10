@@ -59,7 +59,7 @@ export function NetflixTopBar() {
             style={{ WebkitAppRegion: "drag" } as any}
         >
             <div
-                className="flex items-center h-16 lg:h-[68px] px-4 sm:px-6 lg:px-12 gap-6 lg:gap-10"
+                className="flex items-center h-16 lg:h-[68px] px-3 sm:px-6 lg:px-12 gap-2 sm:gap-4 lg:gap-10"
                 style={{ WebkitAppRegion: "no-drag" } as any}
             >
                 <SeaLink href="/" className="flex items-center gap-2 shrink-0">
@@ -67,13 +67,15 @@ export function NetflixTopBar() {
                     <span className="hidden sm:inline text-lg lg:text-xl font-extrabold text-white tracking-tight">KURO</span>
                 </SeaLink>
 
-                <nav className="flex items-center gap-1 lg:gap-2">
+                {/* min-w-0 lets the nav shrink rather than push other items out;
+                    whitespace-nowrap on each link prevents wrapping inside a pill. */}
+                <nav className="flex items-center gap-0.5 sm:gap-1 lg:gap-2 min-w-0">
                     {navItems.map(item => (
                         <SeaLink
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "px-2 lg:px-3 py-2 text-sm lg:text-[15px] font-medium rounded-md transition-colors",
+                                "px-2 lg:px-3 py-2 text-[13px] sm:text-sm lg:text-[15px] font-medium rounded-md transition-colors whitespace-nowrap",
                                 item.isCurrent
                                     ? "text-white"
                                     : "text-gray-300 hover:text-white",
@@ -90,7 +92,7 @@ export function NetflixTopBar() {
                     href="/search"
                     aria-label={t("common.search")}
                     className={cn(
-                        "p-2 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors",
+                        "p-2 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors shrink-0",
                         pathname.startsWith("/search") && "text-white bg-white/10",
                     )}
                 >

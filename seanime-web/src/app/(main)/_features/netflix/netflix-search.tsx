@@ -29,9 +29,9 @@ export function NetflixSearch() {
     const media = (data?.Page?.media ?? []).filter((m): m is AL_BaseAnime => !!m)
 
     return (
-        <div className="px-6 lg:px-16 py-8 space-y-10">
-            <div className="max-w-3xl mx-auto space-y-5 text-center">
-                <h1 className="text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+        <div className="px-4 sm:px-6 lg:px-16 py-6 lg:py-8 space-y-8 lg:space-y-10">
+            <div className="max-w-3xl mx-auto space-y-4 lg:space-y-5 text-center">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
                     {t("search.title")}
                 </h1>
                 <TextInput

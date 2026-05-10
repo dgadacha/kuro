@@ -79,9 +79,9 @@ export function NetflixLists() {
     const showSearch = active !== "history"
 
     return (
-        <div className="px-6 lg:px-16 py-8 space-y-8">
+        <div className="px-4 sm:px-6 lg:px-16 py-6 lg:py-8 space-y-6 lg:space-y-8">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-                <h1 className="text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
                     {t("lists.title")}
                 </h1>
 

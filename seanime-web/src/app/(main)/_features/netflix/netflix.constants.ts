@@ -1,16 +1,19 @@
 export const HERO = {
     rotateMs: 12_000,
     poolSize: 8,
-    /** Heights tuned to match 16:9 banner aspect on common viewports. */
-    heightClass: "h-[85vh] min-h-[560px]",
+    /** Heights tuned per viewport. Mobile gets a shorter hero so the rows
+     *  below are reachable without scrolling past a giant banner.          */
+    heightClass: "h-[70vh] min-h-[420px] lg:h-[85vh] lg:min-h-[560px]",
 } as const
 
 export const ROW = {
-    cardWidthClass: "w-[260px] lg:w-[340px]",
+    /** Cards: 220 on mobile (fits ~1.5 of them on a 375px viewport so the
+     *  partial card hints at horizontal scroll), 340 on desktop.           */
+    cardWidthClass: "w-[220px] sm:w-[260px] lg:w-[340px]",
     /** Vertical breathing room so the hover-scale doesn't bleed into the row above/below. */
-    scrollPaddingY: "py-6",
+    scrollPaddingY: "py-4 lg:py-6",
     /** Horizontal padding — kept identical on the title and the scroller so they stay flush. */
-    paddingX: "px-6 lg:px-16",
+    paddingX: "px-4 sm:px-6 lg:px-16",
     skeletonCount: 8,
 } as const
 

@@ -38,6 +38,11 @@ export function NetflixDetailModal() {
         <Modal
             open={open}
             onOpenChange={(v) => { if (!v) setMediaId(null) }}
+            // Bump the overlay above the fixed top bar (z-[60]) — without this
+            // the navbar floats over the modal hero on every screen, and on
+            // mobile the navbar avatar sits exactly where the close button
+            // belongs, swallowing the tap and leaving the user trapped.
+            overlayClass="!z-[70]"
             contentClass="!max-w-5xl !p-0 !rounded-xl overflow-hidden bg-[#0a0a0a] border-white/5"
             hideCloseButton
         >
@@ -45,9 +50,16 @@ export function NetflixDetailModal() {
                 <>
                     <IconButton
                         intent="gray-subtle"
-                        size="sm"
-                        className="absolute right-3 top-3 z-[20] rounded-full bg-black/70 hover:bg-black !text-white"
-                        icon={<BiX className="text-xl" />}
+                        size="md"
+                        className={cn(
+                            "absolute z-[80] rounded-full bg-black/80 hover:bg-black !text-white",
+                            // On mobile the modal fills the viewport — keep the
+                            // close button comfortably tappable (44px target) and
+                            // far enough from the rounded corner.
+                            "right-3 top-3",
+                            "size-11 lg:size-9",
+                        )}
+                        icon={<BiX className="text-2xl" />}
                         onClick={() => setMediaId(null)}
                         aria-label="Close"
                     />
@@ -78,15 +90,16 @@ function Body({ mediaId }: { mediaId: number }) {
     const genres = entry.media?.genres ?? []
 
     return (
-        <div className="max-h-[85vh] overflow-y-auto">
-            {/* Hero */}
-            <div className="relative w-full aspect-[16/8] bg-black">
+        <div className="max-h-[90vh] sm:max-h-[85vh] overflow-y-auto">
+            {/* Hero — taller on mobile to leave room for title + CTA without
+                squeezing into a 2:1 strip that's only 200px tall. */}
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[16/8] bg-black">
                 {banner && (
                     <SeaImage src={banner} alt="" fill priority className="object-cover object-center" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-10 space-y-4">
-                    <h1 className="text-3xl lg:text-5xl font-extrabold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] max-w-2xl">
+                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 lg:p-10 space-y-3 lg:space-y-4">
+                    <h1 className="text-2xl sm:text-3xl lg:text-5xl font-extrabold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] max-w-2xl leading-tight">
                         {title}
                     </h1>
                     <div className="flex items-center gap-3 flex-wrap">
@@ -99,8 +112,8 @@ function Body({ mediaId }: { mediaId: number }) {
             </div>
 
             {/* Body */}
-            <div className="p-6 lg:p-10 space-y-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="p-4 sm:p-6 lg:p-10 space-y-6 lg:space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                     <div className="lg:col-span-2 space-y-3">
                         <div className="flex items-center gap-3 flex-wrap text-sm text-[--muted]">
                             {year && <span className="text-white">{year}</span>}
@@ -127,13 +140,13 @@ function Body({ mediaId }: { mediaId: number }) {
 
                 {/* Episodes */}
                 <section className="space-y-3">
-                    <h2 className="text-xl font-bold text-white">{t("modal.episodes")}</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-white">{t("modal.episodes")}</h2>
                     <NetflixEpisodeList animeEntry={entry as Anime_Entry} />
                 </section>
 
                 {/* More like this */}
                 {!!details && (
-                    <div className={cn("-mx-6 lg:-mx-10")}>
+                    <div className={cn("-mx-4 sm:-mx-6 lg:-mx-10")}>
                         <NetflixMoreLikeThis details={details} />
                     </div>
                 )}

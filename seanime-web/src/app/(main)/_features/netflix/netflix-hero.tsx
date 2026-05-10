@@ -50,14 +50,14 @@ export function NetflixHero() {
             <HeroBackdrops pool={pool} activeIndex={index} />
             <HeroGradients />
 
-            <div className="relative z-[2] h-full flex items-end pb-24 px-6 lg:px-16">
-                <div className="max-w-2xl space-y-5">
-                    <h1 className="text-white font-extrabold text-4xl lg:text-6xl leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+            <div className="relative z-[2] h-full flex items-end pb-16 sm:pb-20 lg:pb-24 px-4 sm:px-6 lg:px-16">
+                <div className="max-w-2xl space-y-3 sm:space-y-4 lg:space-y-5">
+                    <h1 className="text-white font-extrabold text-3xl sm:text-4xl lg:text-6xl leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
                         {featured.title?.userPreferred}
                     </h1>
 
                     {!!featured.genres?.length && (
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-200">
+                        <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 text-xs sm:text-sm text-gray-200">
                             {featured.genres.slice(0, 4).map((g, i) => (
                                 <React.Fragment key={g}>
                                     {i > 0 && <span className="text-brand-500">•</span>}
@@ -68,26 +68,26 @@ export function NetflixHero() {
                     )}
 
                     {!!description && (
-                        <p className="text-base lg:text-lg text-gray-100/90 line-clamp-3 max-w-xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                        <p className="text-sm sm:text-base lg:text-lg text-gray-100/90 line-clamp-3 max-w-xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                             {description}
                         </p>
                     )}
 
-                    <div className="flex items-center gap-3 pt-2">
+                    <div className="flex items-center gap-2 sm:gap-3 pt-2">
                         <Button
-                            size="lg"
-                            className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-8"
-                            leftIcon={<BiPlay className="text-2xl" />}
+                            size="md"
+                            className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-4 sm:px-6 lg:px-8 lg:!h-12 lg:!text-base"
+                            leftIcon={<BiPlay className="text-xl sm:text-2xl" />}
                             onClick={() => openDetail(featured.id)}
                         >
                             {t("home.hero.play")}
                         </Button>
 
                         <Button
-                            size="lg"
+                            size="md"
                             intent="gray-subtle"
-                            className="bg-white/20 hover:bg-white/30 !text-white font-semibold rounded-md px-8 backdrop-blur-sm"
-                            leftIcon={<BiInfoCircle className="text-2xl" />}
+                            className="bg-white/20 hover:bg-white/30 !text-white font-semibold rounded-md px-4 sm:px-6 lg:px-8 lg:!h-12 lg:!text-base backdrop-blur-sm"
+                            leftIcon={<BiInfoCircle className="text-xl sm:text-2xl" />}
                             onClick={() => openDetail(featured.id)}
                         >
                             {t("home.hero.more_info")}
@@ -100,7 +100,7 @@ export function NetflixHero() {
                 <div
                     role="tablist"
                     aria-label="Sélection à la une"
-                    className="absolute bottom-6 right-6 lg:right-16 z-[3] flex items-center gap-1.5"
+                    className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 lg:right-16 z-[3] flex items-center gap-1.5"
                 >
                     {pool.map((m, i) => (
                         <button
