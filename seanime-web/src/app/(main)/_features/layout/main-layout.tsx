@@ -27,8 +27,10 @@ import { useTorrentStreamListener } from "@/app/(main)/entry/_containers/torrent
 import { TorrentStreamOverlay } from "@/app/(main)/entry/_containers/torrent-stream/torrent-stream-overlay"
 import { LoadingOverlayWithLogo } from "@/components/shared/loading-overlay-with-logo"
 import { AppLayout, AppLayoutContent, AppSidebarProvider } from "@/components/ui/app-layout"
+import { activeProfileIdAtom, profilesAtom } from "@/lib/profiles/profiles"
 import { usePathname, useRouter } from "@/lib/navigation"
 import { __isElectronDesktop__ } from "@/types/constants"
+import { useAtomValue } from "jotai"
 import React from "react"
 import { useServerStatus } from "../../_hooks/use-server-status"
 import { useInvalidateQueriesListener } from "../../_listeners/invalidate-queries.listeners"
@@ -96,6 +98,7 @@ function Loader() {
     useTorrentStreamListener()
     useChangelogTourListener()
     useAuthEventListeners()
+    useProfileGate()
 
     const serverStatus = useServerStatus()
     const router = useRouter()
@@ -121,4 +124,36 @@ function Loader() {
     }
 
     return null
+}
+
+/**
+ * Netflix-style profile gate.
+ *
+ * Behaviour:
+ *   - 0 profiles:  no gating — Kuro works exactly like before (single user).
+ *                  The user opts in via the top-bar menu.
+ *   - 1+ profiles, none selected:  redirect to /profiles to force a pick.
+ *   - 1+ profiles, valid one selected:  pass through.
+ *
+ * /watch is always allowed (so opening an episode in a new tab doesn't
+ * interrupt with a profile picker), and /profiles itself is obviously
+ * exempt to avoid a redirect loop.
+ */
+function useProfileGate() {
+    const profiles = useAtomValue(profilesAtom)
+    const activeId = useAtomValue(activeProfileIdAtom)
+    const router = useRouter()
+    const pathname = usePathname()
+
+    React.useEffect(() => {
+        if (pathname === "/profiles" || pathname.startsWith("/profiles/")) return
+        if (pathname.startsWith("/watch")) return
+        if (pathname.startsWith("/auth")) return
+        if (pathname.startsWith("/offline")) return
+
+        if (profiles.length === 0) return  // user hasn't opted into profiles yet
+
+        const valid = !!activeId && profiles.some(p => p.id === activeId)
+        if (!valid) router.push("/profiles")
+    }, [pathname, profiles, activeId])
 }

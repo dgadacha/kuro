@@ -1,4 +1,5 @@
 import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
+import { NetflixProfileHistorySaver } from "@/app/(main)/_features/netflix/netflix-profile-history-saver"
 import { OnlinestreamPage } from "@/app/(main)/onlinestream/_containers/onlinestream-page"
 import {
     __onlinestream_resumeAtSecondsAtom,
@@ -75,6 +76,8 @@ export default function WatchPage() {
         if (!animeEntry) return <LoadingOverlayWithLogo title={t("watch.start")} />
         return (
             <div data-watch-page className="min-h-screen bg-black -mt-16 lg:-mt-[68px]">
+                {/* Per-profile watch history mirror — see netflix-profile-history-saver. */}
+                <NetflixProfileHistorySaver />
                 <OnlinestreamPage
                     animeEntry={animeEntry}
                     animeEntryLoading={isLoading}

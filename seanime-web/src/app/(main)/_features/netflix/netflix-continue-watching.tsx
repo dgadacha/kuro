@@ -3,6 +3,7 @@ import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
 import { useGetContinuityWatchHistory } from "@/api/hooks/continuity.hooks"
 import { ROW } from "@/app/(main)/_features/netflix/netflix.constants"
 import { NetflixRowShell } from "@/app/(main)/_features/netflix/netflix-row"
+import { useActiveProfileHistory, useActiveProfileId } from "@/lib/profiles/profiles"
 import { SeaImage } from "@/components/shared/sea-image"
 import { cn } from "@/components/ui/core/styling"
 import React from "react"
@@ -22,13 +23,24 @@ type HistoryItem = {
     timeUpdated: number
 }
 
-export function NetflixContinueWatching() {
-    const { t } = useTranslation()
-    const { data: history } = useGetContinuityWatchHistory()
+/**
+ * Source of truth for the row:
+ *   - If a profile is active, read from the per-profile localStorage history
+ *     (kept up to date by NetflixProfileHistorySaver on /watch).
+ *   - Otherwise (user hasn't opted into profiles), fall back to the backend's
+ *     /api/v1/continuity/history so the legacy single-user mode keeps working.
+ */
+function useContinueWatchingItems(): HistoryItem[] {
+    const profileId = useActiveProfileId()
+    const profileHistory = useActiveProfileHistory()
+    const { data: backendHistory } = useGetContinuityWatchHistory()
 
-    const items = React.useMemo<HistoryItem[]>(() => {
-        if (!history) return []
-        return Object.values(history)
+    return React.useMemo<HistoryItem[]>(() => {
+        const source: Record<number, any> = profileId
+            ? profileHistory
+            : (backendHistory ?? {})
+
+        return Object.values(source)
             .filter((h: any) => h && h.duration > 0 && h.currentTime > 0
                 && h.currentTime < h.duration - FINISHED_THRESHOLD)
             .map((h: any) => ({
@@ -37,10 +49,17 @@ export function NetflixContinueWatching() {
                 currentTime: h.currentTime,
                 duration: h.duration,
                 progress: Math.max(0, Math.min(1, h.currentTime / h.duration)),
-                timeUpdated: h.timeUpdated ? new Date(h.timeUpdated).getTime() : 0,
+                timeUpdated: typeof h.timeUpdated === "number"
+                    ? h.timeUpdated
+                    : (h.timeUpdated ? new Date(h.timeUpdated).getTime() : 0),
             } as HistoryItem))
             .sort((a, b) => b.timeUpdated - a.timeUpdated)
-    }, [history])
+    }, [profileId, profileHistory, backendHistory])
+}
+
+export function NetflixContinueWatching() {
+    const { t } = useTranslation()
+    const items = useContinueWatchingItems()
 
     if (items.length === 0) return null
 

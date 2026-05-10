@@ -20,6 +20,7 @@ import { Route as PublicAuthIndexRouteImport } from './routes/public/auth/index'
 import { Route as MainWatchIndexRouteImport } from './routes/_main/watch/index'
 import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainSearchIndexRouteImport } from './routes/_main/search/index'
+import { Route as MainProfilesIndexRouteImport } from './routes/_main/profiles/index'
 import { Route as MainOfflineIndexRouteImport } from './routes/_main/offline/index'
 import { Route as MainMediastreamIndexRouteImport } from './routes/_main/mediastream/index'
 import { Route as MainExtensionsIndexRouteImport } from './routes/_main/extensions/index'
@@ -127,6 +128,13 @@ const MainSearchIndexRoute = MainSearchIndexRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_main/search/index.lazy').then((d) => d.Route),
 )
+const MainProfilesIndexRoute = MainProfilesIndexRouteImport.update({
+  id: '/profiles/',
+  path: '/profiles/',
+  getParentRoute: () => MainRoute,
+} as any).lazy(() =>
+  import('./routes/_main/profiles/index.lazy').then((d) => d.Route),
+)
 const MainOfflineIndexRoute = MainOfflineIndexRouteImport.update({
   id: '/offline/',
   path: '/offline/',
@@ -206,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/extensions/': typeof MainExtensionsIndexRoute
   '/mediastream/': typeof MainMediastreamIndexRoute
   '/offline/': typeof MainOfflineIndexRoute
+  '/profiles/': typeof MainProfilesIndexRoute
   '/search/': typeof MainSearchIndexRoute
   '/settings/': typeof MainSettingsIndexRoute
   '/watch/': typeof MainWatchIndexRoute
@@ -231,6 +240,7 @@ export interface FileRoutesByTo {
   '/extensions': typeof MainExtensionsIndexRoute
   '/mediastream': typeof MainMediastreamIndexRoute
   '/offline': typeof MainOfflineIndexRoute
+  '/profiles': typeof MainProfilesIndexRoute
   '/search': typeof MainSearchIndexRoute
   '/settings': typeof MainSettingsIndexRoute
   '/watch': typeof MainWatchIndexRoute
@@ -258,6 +268,7 @@ export interface FileRoutesById {
   '/_main/extensions/': typeof MainExtensionsIndexRoute
   '/_main/mediastream/': typeof MainMediastreamIndexRoute
   '/_main/offline/': typeof MainOfflineIndexRoute
+  '/_main/profiles/': typeof MainProfilesIndexRoute
   '/_main/search/': typeof MainSearchIndexRoute
   '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/watch/': typeof MainWatchIndexRoute
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/extensions/'
     | '/mediastream/'
     | '/offline/'
+    | '/profiles/'
     | '/search/'
     | '/settings/'
     | '/watch/'
@@ -310,6 +322,7 @@ export interface FileRouteTypes {
     | '/extensions'
     | '/mediastream'
     | '/offline'
+    | '/profiles'
     | '/search'
     | '/settings'
     | '/watch'
@@ -336,6 +349,7 @@ export interface FileRouteTypes {
     | '/_main/extensions/'
     | '/_main/mediastream/'
     | '/_main/offline/'
+    | '/_main/profiles/'
     | '/_main/search/'
     | '/_main/settings/'
     | '/_main/watch/'
@@ -466,6 +480,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainSearchIndexRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/profiles/': {
+      id: '/_main/profiles/'
+      path: '/profiles'
+      fullPath: '/profiles/'
+      preLoaderRoute: typeof MainProfilesIndexRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/offline/': {
       id: '/_main/offline/'
       path: '/offline'
@@ -541,6 +562,7 @@ interface MainRouteChildren {
   MainExtensionsIndexRoute: typeof MainExtensionsIndexRoute
   MainMediastreamIndexRoute: typeof MainMediastreamIndexRoute
   MainOfflineIndexRoute: typeof MainOfflineIndexRoute
+  MainProfilesIndexRoute: typeof MainProfilesIndexRoute
   MainSearchIndexRoute: typeof MainSearchIndexRoute
   MainSettingsIndexRoute: typeof MainSettingsIndexRoute
   MainWatchIndexRoute: typeof MainWatchIndexRoute
@@ -561,6 +583,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainExtensionsIndexRoute: MainExtensionsIndexRoute,
   MainMediastreamIndexRoute: MainMediastreamIndexRoute,
   MainOfflineIndexRoute: MainOfflineIndexRoute,
+  MainProfilesIndexRoute: MainProfilesIndexRoute,
   MainSearchIndexRoute: MainSearchIndexRoute,
   MainSettingsIndexRoute: MainSettingsIndexRoute,
   MainWatchIndexRoute: MainWatchIndexRoute,

@@ -55,6 +55,23 @@
     "resume_at": "Reprendre à",
     "click_hint": "Les navigateurs bloquent l'autoplay dans un nouvel onglet — un clic et c'est parti."
   },
+  "profiles": {
+    "who_is_watching": "Qui regarde ?",
+    "welcome": "Bienvenue sur Kuro",
+    "select": "Sélectionner",
+    "manage": "Gérer les profils",
+    "done": "Terminé",
+    "switch": "Changer de profil",
+    "enable": "Activer les profils",
+    "add": "Ajouter un profil",
+    "edit": "Modifier le profil",
+    "delete": "Supprimer",
+    "delete_confirm": "Supprimer ce profil ? Son historique sera perdu.",
+    "name_label": "Nom",
+    "name_placeholder": "Prénom ou pseudo",
+    "avatar_label": "Avatar",
+    "color_label": "Couleur"
+  },
   "modal": {
     "full_page": "Plus d'infos",
     "episodes": "Épisodes",

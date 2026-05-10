@@ -9,14 +9,15 @@ import { Avatar } from "@/components/ui/avatar"
 import { cn } from "@/components/ui/core/styling"
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { usePathname, useRouter } from "@/lib/navigation"
+import { useActiveProfile, useProfileActions } from "@/lib/profiles/profiles"
 import { useAtom } from "jotai"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { BiLogIn, BiLogOut } from "react-icons/bi"
+import { BiLogIn, BiLogOut, BiUser } from "react-icons/bi"
 import { FiSearch } from "react-icons/fi"
 import { HiOutlineServerStack } from "react-icons/hi2"
 import { IoCloudOfflineOutline } from "react-icons/io5"
-import { LuRefreshCw, LuSettings } from "react-icons/lu"
+import { LuRefreshCw, LuSettings, LuUsers } from "react-icons/lu"
 import { MdOutlineConnectWithoutContact } from "react-icons/md"
 import { TbPuzzle } from "react-icons/tb"
 import { nakamaModalOpenAtom } from "../nakama/nakama-manager"
@@ -112,6 +113,9 @@ function ProfileDropdown() {
     const [, setNakamaModalOpen] = useAtom(nakamaModalOpenAtom)
     const [, setLoginModal] = useAtom(isLoginModalOpenAtom)
 
+    const activeProfile = useActiveProfile()
+    const { profiles, select } = useProfileActions()
+
     const confirmSignOut = useConfirmationDialog({
         title: t("nav.sign_out"),
         description: "Are you sure?",
@@ -119,7 +123,17 @@ function ProfileDropdown() {
     })
 
     const avatarSrc = user?.viewer?.avatar?.medium || undefined
-    const displayName = user?.viewer?.name || (user?.isSimulated ? t("nav.sign_in") : "")
+    const displayName = activeProfile?.name || user?.viewer?.name || (user?.isSimulated ? t("nav.sign_in") : "")
+
+    // Switch profile = drop the active selection then bounce to /profiles. The
+    // gate in MainLayout would do this anyway but the explicit push gives an
+    // instant transition with no flash of the previous page.
+    const onSwitchProfile = () => {
+        select(null)
+        router.push("/profiles")
+    }
+
+    const onManageProfiles = () => router.push("/profiles")
 
     return (
         <>
@@ -130,18 +144,41 @@ function ProfileDropdown() {
                         aria-label="Profile menu"
                         className="flex items-center gap-2 rounded-full p-1 hover:bg-white/10 transition-colors"
                     >
-                        <Avatar size="sm" src={avatarSrc} className="size-8" />
+                        {activeProfile ? (
+                            <span
+                                className="size-8 rounded-md flex items-center justify-center text-lg shadow-md"
+                                style={{ backgroundColor: activeProfile.color }}
+                                aria-hidden
+                            >
+                                {activeProfile.avatar}
+                            </span>
+                        ) : (
+                            <Avatar size="sm" src={avatarSrc} className="size-8" />
+                        )}
                     </button>
                 }
             >
                 {!!displayName && (
-                    <div className="px-2 py-1.5 text-xs text-[--muted] truncate max-w-[14rem]">{displayName}</div>
+                    <div className="px-2 py-1.5 text-xs text-[--muted] truncate max-w-[14rem]">
+                        {activeProfile ? `${activeProfile.avatar}  ${activeProfile.name}` : displayName}
+                    </div>
                 )}
 
                 <div className="px-2 py-1.5 flex items-center justify-between gap-3">
                     <span className="text-xs text-[--muted]">{t("common.language")}</span>
                     <LanguageSwitcher />
                 </div>
+
+                <DropdownMenuSeparator />
+
+                {profiles.length > 0 && activeProfile && (
+                    <DropdownMenuItem onClick={onSwitchProfile}>
+                        <LuUsers /> {t("profiles.switch")}
+                    </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={onManageProfiles}>
+                    <BiUser /> {profiles.length === 0 ? t("profiles.enable") : t("profiles.manage")}
+                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
