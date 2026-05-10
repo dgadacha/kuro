@@ -286,6 +286,12 @@ DELETE /api/v1/kuro-profiles/:uid/history            Wipe complet de l'historiqu
 DELETE /api/v1/kuro-profiles/:uid/history/:mediaId   Drop tous les épisodes d'une série
 DELETE /api/v1/kuro-profiles/:uid/history/:mediaId/episode/:episodeNumber
                                                      Drop une seule ligne d'épisode
+
+GET    /api/v1/kuro-profiles/:uid/list               Liste les entrées de "Mes listes" du profil
+PUT    /api/v1/kuro-profiles/:uid/list                Upsert (mediaId, status) — appelé en
+                                                     dual-write avec AniList par le frontend
+DELETE /api/v1/kuro-profiles/:uid/list/:mediaId      Retire l'anime de la vue du profil
+                                                     (n'efface PAS l'entrée AniList globale)
 ```
 
 Forme de la réponse (toujours wrappée dans `{ "data": ... }`) :
@@ -347,14 +353,25 @@ L'UI à la Netflix vit presque entièrement dans `seanime-web/src/app/(main)/_fe
 
 ## Profils (façon Netflix)
 
-Un user peut enregistrer jusqu'à 6 profils. Chaque profil a son propre historique de visionnage (par `(profile_uid, mediaId, episodeNumber)`) ; le compte AniList, les réglages serveur et les extensions sont partagés entre profils, par design.
+Un user peut enregistrer jusqu'à 6 profils. Chaque profil a :
+- son propre **historique de visionnage** (par `(profile_uid, mediaId, episodeNumber)`)
+- sa propre **vue "Mes listes"** (par `(profile_uid, mediaId)`, avec son propre status)
 
-- Persistance : SQLite, sur le même datadir / PVC que le reste de l'app.
-- Tables : `kuro_profiles`, `kuro_profile_watch_histories`.
-- API : `GET|POST /api/v1/kuro-profiles`, `PATCH|DELETE /api/v1/kuro-profiles/:uid`, `GET|PUT /api/v1/kuro-profiles/:uid/history`, `DELETE /api/v1/kuro-profiles/:uid/history/:mediaId`.
+Ce qui reste **partagé** entre profils par design :
+- Le compte AniList (un seul token au niveau serveur — la progression sync va sur ce compte)
+- Les extensions installées
+- Les réglages serveur
+
+> Quand profil A ajoute Naruto à "En cours" et profil B le mette à "À regarder",
+> chacun voit son propre statut sur sa page Mes listes — alors qu'en interne
+> AniList a Naruto une seule fois (le dernier write gagne au niveau du
+> compte global, mais l'UI affiche la valeur kuro per-profil).
+
+Persistance : SQLite, sur le même datadir / PVC que le reste de l'app.
+- Tables : `kuro_profiles`, `kuro_profile_watch_histories`, `kuro_profile_list_entries`.
 - Sélection du profil actif (quel profil est "courant" dans cet onglet du navigateur) vit dans `localStorage["kuro-active-profile"]` — le seul truc qui n'est pas en BDD, parce que c'est une préférence UI, pas un état partagé.
 
-Quand aucun profil n'est actif l'app dégrade en mode mono-utilisateur et lit l'endpoint legacy `/api/v1/continuity/history`, donc les anciens users ne voient aucune coupure.
+Quand aucun profil n'est actif l'app dégrade en mode mono-utilisateur, lit l'endpoint legacy `/api/v1/continuity/history` pour la reprise de lecture, et `/api/v1/anilist/anime-collection` pour Mes listes — comme avant l'arrivée des profils. Donc les anciens users ne voient aucune coupure.
 
 ## Crédits & licence
 

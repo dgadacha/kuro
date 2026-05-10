@@ -605,6 +605,20 @@ type KuroProfile struct {
 	Color  string `gorm:"column:color;size:16" json:"color"`
 }
 
+// Per-profile MEMBERSHIP in the user's lists. The AniList account stays
+// shared (one token, one global progress) but each profile keeps its own
+// view of "which animes I care about + at which status". Composite UNIQUE
+// on (profile_uid, media_id) so there's exactly one row per (profile, anime).
+type KuroProfileListEntry struct {
+	BaseModel
+	ProfileUID string `gorm:"column:profile_uid;size:64;not null;uniqueIndex:idx_kuro_profile_list,priority:1" json:"profileUid"`
+	MediaID    int    `gorm:"column:media_id;not null;uniqueIndex:idx_kuro_profile_list,priority:2" json:"mediaId"`
+	// One of: CURRENT, PLANNING, COMPLETED, PAUSED, DROPPED, REPEATING.
+	// Stored as a plain string so adding a new AL_MediaListStatus value
+	// later doesn't require a schema migration.
+	Status string `gorm:"column:status;size:16;not null" json:"status"`
+}
+
 type KuroProfileWatchHistory struct {
 	BaseModel
 	// Composite uniqueness on (profile, media, episode) so each watched

@@ -415,6 +415,11 @@ func InitRoutes(app *core.App, e *echo.Echo) {
 	v1KuroProfiles.DELETE("/:uid/history", h.HandleClearKuroProfileHistory)
 	v1KuroProfiles.DELETE("/:uid/history/:mediaId", h.HandleDeleteKuroProfileHistoryItem)
 	v1KuroProfiles.DELETE("/:uid/history/:mediaId/episode/:episodeNumber", h.HandleDeleteKuroProfileHistoryEpisode)
+	// Per-profile list (each profile sees its own "Mes listes" view, on top
+	// of the shared AniList account that still tracks progress globally)
+	v1KuroProfiles.GET("/:uid/list", h.HandleListKuroProfileList)
+	v1KuroProfiles.PUT("/:uid/list", h.HandleUpsertKuroProfileListEntry)
+	v1KuroProfiles.DELETE("/:uid/list/:mediaId", h.HandleDeleteKuroProfileListEntry)
 
 	//
 	// Sync

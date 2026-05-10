@@ -7,6 +7,7 @@
  */
 import { AL_MediaListStatus } from "@/api/generated/types"
 import { useDeleteAnilistListEntry, useEditAnilistListEntry } from "@/api/hooks/anilist.hooks"
+import { useActiveProfileId, useProfileListActions, ProfileListEntry } from "@/lib/profiles/profiles"
 import { cn } from "@/components/ui/core/styling"
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import * as React from "react"
@@ -37,6 +38,9 @@ export function NetflixListCardMenu({ mediaId, currentStatus, alwaysVisible, cla
     const { mutate: edit, isPending: editing } = useEditAnilistListEntry(mediaId, "anime")
     const { mutate: remove, isPending: removing } = useDeleteAnilistListEntry(mediaId, "anime", () => { /* refetched via cache invalidation */ })
 
+    const activeProfileId = useActiveProfileId()
+    const { upsert: profileUpsert, remove: profileRemove } = useProfileListActions()
+
     const stop = (e: React.SyntheticEvent) => {
         e.preventDefault()
         e.stopPropagation()
@@ -44,11 +48,19 @@ export function NetflixListCardMenu({ mediaId, currentStatus, alwaysVisible, cla
 
     const moveTo = (status: AL_MediaListStatus) => {
         edit({ mediaId, status, type: "anime" })
+        if (activeProfileId) {
+            void profileUpsert(mediaId, status as ProfileListEntry["status"])
+        }
     }
 
     const onDelete = () => {
         if (!confirm(t("lists.actions.delete_confirm"))) return
-        remove({ mediaId, type: "anime" })
+        if (activeProfileId) {
+            // Profile-only delete — see comment in NetflixListPickerButton.
+            void profileRemove(mediaId)
+        } else {
+            remove({ mediaId, type: "anime" })
+        }
     }
 
     const busy = editing || removing

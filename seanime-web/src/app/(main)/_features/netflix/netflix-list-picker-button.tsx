@@ -11,6 +11,7 @@
  */
 import { AL_MediaListStatus } from "@/api/generated/types"
 import { useDeleteAnilistListEntry, useEditAnilistListEntry } from "@/api/hooks/anilist.hooks"
+import { useActiveProfileId, useProfileListActions, ProfileListEntry } from "@/lib/profiles/profiles"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
@@ -40,16 +41,34 @@ export function NetflixListPickerButton({ mediaId, currentStatus, className }: P
     const { mutate: edit, isPending: editing } = useEditAnilistListEntry(mediaId, "anime")
     const { mutate: remove, isPending: removing } = useDeleteAnilistListEntry(mediaId, "anime", () => { /* invalidated by hook */ })
 
+    // When a profile is active, EVERY status change is dual-written:
+    //  - AniList (so progress sync keeps working at the account level)
+    //  - kuro_profile_list_entries for THIS profile (so the per-profile
+    //    "Mes listes" view stays isolated). The shared AniList account is
+    //    intentionally still the global source of truth for progress.
+    const activeProfileId = useActiveProfileId()
+    const { upsert: profileUpsert, remove: profileRemove } = useProfileListActions()
+
     const inAList = !!currentStatus
     const busy = editing || removing
 
     const moveTo = (status: AL_MediaListStatus) => {
         edit({ mediaId, status, type: "anime" })
+        if (activeProfileId) {
+            void profileUpsert(mediaId, status as ProfileListEntry["status"])
+        }
     }
 
     const onDelete = () => {
         if (!confirm(t("lists.actions.delete_confirm"))) return
-        remove({ mediaId, type: "anime" })
+        if (activeProfileId) {
+            // Profile-only delete by default — AniList stays untouched so
+            // progress history of OTHER profiles isn't nuked. The user can
+            // wipe AniList separately from anilist.co if they want.
+            void profileRemove(mediaId)
+        } else {
+            remove({ mediaId, type: "anime" })
+        }
     }
 
     // The trigger looks different depending on whether the anime is already

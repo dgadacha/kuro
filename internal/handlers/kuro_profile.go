@@ -196,3 +196,66 @@ func (h *Handler) HandleClearKuroProfileHistory(c echo.Context) error {
 func (h *Handler) HandleUpsertKuroProfileHistoryItemPOST(c echo.Context) error {
 	return h.HandleUpsertKuroProfileHistoryItem(c)
 }
+
+// -----------------------------------------------------------------------------
+// Per-profile list (the "Mes listes" view, isolated per profile)
+// -----------------------------------------------------------------------------
+
+// HandleListKuroProfileList
+//
+//	@summary returns the profile's list entries (one row per (profile, media)).
+//	@route /api/v1/kuro-profiles/{uid}/list [GET]
+//	@returns []models.KuroProfileListEntry
+func (h *Handler) HandleListKuroProfileList(c echo.Context) error {
+	uid := c.Param("uid")
+	entries, err := h.App.Database.ListKuroProfileListEntries(uid)
+	if err != nil {
+		return h.RespondWithError(c, err)
+	}
+	if entries == nil {
+		entries = []*models.KuroProfileListEntry{}
+	}
+	return h.RespondWithData(c, entries)
+}
+
+// HandleUpsertKuroProfileListEntry
+//
+//	@summary inserts or updates the (profile, media) list row.
+//	@route /api/v1/kuro-profiles/{uid}/list [PUT]
+//	@returns models.KuroProfileListEntry
+func (h *Handler) HandleUpsertKuroProfileListEntry(c echo.Context) error {
+	uid := c.Param("uid")
+	var body struct {
+		MediaID int    `json:"mediaId"`
+		Status  string `json:"status"`
+	}
+	if err := c.Bind(&body); err != nil {
+		return h.RespondWithError(c, err)
+	}
+	saved, err := h.App.Database.UpsertKuroProfileListEntry(&models.KuroProfileListEntry{
+		ProfileUID: uid,
+		MediaID:    body.MediaID,
+		Status:     body.Status,
+	})
+	if err != nil {
+		return h.RespondWithError(c, err)
+	}
+	return h.RespondWithData(c, saved)
+}
+
+// HandleDeleteKuroProfileListEntry
+//
+//	@summary removes one media from this profile's list (does not touch AniList).
+//	@route /api/v1/kuro-profiles/{uid}/list/{mediaId} [DELETE]
+//	@returns bool
+func (h *Handler) HandleDeleteKuroProfileListEntry(c echo.Context) error {
+	uid := c.Param("uid")
+	mediaID, err := strconv.Atoi(c.Param("mediaId"))
+	if err != nil {
+		return h.RespondWithError(c, err)
+	}
+	if err := h.App.Database.DeleteKuroProfileListEntry(uid, mediaID); err != nil {
+		return h.RespondWithError(c, err)
+	}
+	return h.RespondWithData(c, true)
+}

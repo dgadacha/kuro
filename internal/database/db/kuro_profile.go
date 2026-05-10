@@ -182,3 +182,67 @@ func (db *Database) ClearKuroProfileWatchHistory(profileUID string) error {
 		Where("profile_uid = ?", profileUID).
 		Delete(&models.KuroProfileWatchHistory{}).Error
 }
+
+// -----------------------------------------------------------------------------
+// Per-profile list membership
+// -----------------------------------------------------------------------------
+
+func (db *Database) ListKuroProfileListEntries(profileUID string) ([]*models.KuroProfileListEntry, error) {
+	if profileUID == "" {
+		return nil, errors.New("profile uid required")
+	}
+	var res []*models.KuroProfileListEntry
+	err := db.gormdb.
+		Where("profile_uid = ?", profileUID).
+		Order("updated_at DESC").
+		Find(&res).Error
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// UpsertKuroProfileListEntry inserts or updates the (profile, media) row.
+// Used both for "add to list" and "move between lists".
+func (db *Database) UpsertKuroProfileListEntry(item *models.KuroProfileListEntry) (*models.KuroProfileListEntry, error) {
+	if item == nil {
+		return nil, errors.New("item required")
+	}
+	if item.ProfileUID == "" {
+		return nil, errors.New("profile uid required")
+	}
+	if item.MediaID == 0 {
+		return nil, errors.New("media id required")
+	}
+	if item.Status == "" {
+		return nil, errors.New("status required")
+	}
+	err := db.gormdb.
+		Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "profile_uid"},
+				{Name: "media_id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"status",
+				"updated_at",
+			}),
+		}).
+		Create(item).Error
+	if err != nil {
+		return nil, err
+	}
+	var refreshed models.KuroProfileListEntry
+	if err := db.gormdb.
+		Where("profile_uid = ? AND media_id = ?", item.ProfileUID, item.MediaID).
+		First(&refreshed).Error; err != nil {
+		return nil, err
+	}
+	return &refreshed, nil
+}
+
+func (db *Database) DeleteKuroProfileListEntry(profileUID string, mediaID int) error {
+	return db.gormdb.
+		Where("profile_uid = ? AND media_id = ?", profileUID, mediaID).
+		Delete(&models.KuroProfileListEntry{}).Error
+}

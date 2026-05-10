@@ -40,6 +40,17 @@ export type ProfileWatchEntry = {
     updatedAt: string
 }
 
+/** Per-profile membership in the user's lists. Status mirrors AniList's
+ *  AL_MediaListStatus values. */
+export type ProfileListEntry = {
+    id: number
+    profileUid: string
+    mediaId: number
+    status: "CURRENT" | "PLANNING" | "COMPLETED" | "PAUSED" | "DROPPED" | "REPEATING"
+    createdAt: string
+    updatedAt: string
+}
+
 export const PROFILE_AVATARS = [
     "🐱", "🐶", "🦊", "🐰", "🐼", "🐯",
     "🐸", "🐙", "🦁", "🐺", "🦄", "🌸",
@@ -61,9 +72,11 @@ const EP_CREATE = "/api/v1/kuro-profiles"
 const EP_PATCH = (uid: string) => `/api/v1/kuro-profiles/${encodeURIComponent(uid)}`
 const EP_DELETE = (uid: string) => `/api/v1/kuro-profiles/${encodeURIComponent(uid)}`
 const EP_HISTORY = (uid: string) => `/api/v1/kuro-profiles/${encodeURIComponent(uid)}/history`
+const EP_PROFILE_LIST = (uid: string) => `/api/v1/kuro-profiles/${encodeURIComponent(uid)}/list`
 
 const QK_PROFILES = ["kuro-profiles"] as const
 const QK_HISTORY = (uid: string) => ["kuro-profiles", uid, "history"] as const
+const QK_PROFILE_LIST = (uid: string) => ["kuro-profiles", uid, "list"] as const
 
 // -----------------------------------------------------------------------------
 // Active-profile selection (purely client-side — which profile is "current")
@@ -269,6 +282,67 @@ export function useProfileHistoryUpsert() {
  * All scoped to the active profile and invalidate the cached list so the
  * History page + Continue Watching row update without a manual refresh.
  */
+// -----------------------------------------------------------------------------
+// Per-profile list (the "Mes listes" view, isolated per profile)
+// -----------------------------------------------------------------------------
+
+/** Live view of the active profile's list. [] when no profile is active. */
+export function useActiveProfileList(): ProfileListEntry[] {
+    const uid = useActiveProfileId()
+    const q = useServerQuery<ProfileListEntry[]>({
+        endpoint: uid ? EP_PROFILE_LIST(uid) : "",
+        method: "GET",
+        queryKey: uid ? [...QK_PROFILE_LIST(uid)] : ["kuro-profiles", "list", "noop"],
+        enabled: !!uid,
+    })
+    return q.data ?? []
+}
+
+/** Map mediaId → status for the active profile. O(1) lookup from the modal /
+ *  cards without re-iterating the array on every render. */
+export function useActiveProfileListStatusMap(): Map<number, ProfileListEntry["status"]> {
+    const list = useActiveProfileList()
+    return React.useMemo(() => {
+        const m = new Map<number, ProfileListEntry["status"]>()
+        for (const e of list) m.set(e.mediaId, e.status)
+        return m
+    }, [list])
+}
+
+export function useProfileListActions() {
+    const uid = useActiveProfileId()
+    const queryClient = useQueryClient()
+
+    const invalidate = React.useCallback(() => {
+        if (!uid) return
+        queryClient.invalidateQueries({ queryKey: [...QK_PROFILE_LIST(uid)] })
+    }, [uid, queryClient])
+
+    const upsert = React.useCallback(
+        async (mediaId: number, status: ProfileListEntry["status"]): Promise<void> => {
+            if (!uid) return
+            await fetch(EP_PROFILE_LIST(uid), {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mediaId, status }),
+            })
+            invalidate()
+        },
+        [uid, invalidate],
+    )
+
+    const remove = React.useCallback(
+        async (mediaId: number): Promise<void> => {
+            if (!uid) return
+            await fetch(`${EP_PROFILE_LIST(uid)}/${mediaId}`, { method: "DELETE" })
+            invalidate()
+        },
+        [uid, invalidate],
+    )
+
+    return { upsert, remove }
+}
+
 export function useProfileHistoryActions() {
     const uid = useActiveProfileId()
     const queryClient = useQueryClient()

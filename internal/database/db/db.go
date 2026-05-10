@@ -118,9 +118,10 @@ func migrateTables(db *gorm.DB) error {
 		&models.CustomSourceCollection{},
 		&models.CustomSourceIdentifier{},
 		&models.MediaMetadataParent{},
-		// Kuro: Netflix-style profiles + per-profile watch history
+		// Kuro: Netflix-style profiles + per-profile watch history + per-profile list view
 		&models.KuroProfile{},
 		&models.KuroProfileWatchHistory{},
+		&models.KuroProfileListEntry{},
 		//&models.MangaChapterContainer{},
 	)
 	if err != nil {

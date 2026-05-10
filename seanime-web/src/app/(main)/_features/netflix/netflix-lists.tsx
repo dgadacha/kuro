@@ -3,6 +3,7 @@ import { useGetAnimeCollection } from "@/api/hooks/anilist.hooks"
 import { NetflixCard } from "@/app/(main)/_features/netflix/netflix-card"
 import { NetflixHistoryGrid } from "@/app/(main)/_features/netflix/netflix-history-grid"
 import { NetflixListCardMenu } from "@/app/(main)/_features/netflix/netflix-list-card-menu"
+import { useActiveProfileId, useActiveProfileList } from "@/lib/profiles/profiles"
 import { cn } from "@/components/ui/core/styling"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TextInput } from "@/components/ui/text-input"
@@ -31,13 +32,46 @@ export function NetflixLists() {
     const [searchInput, setSearchInput] = React.useState("")
     const search = useDebounce(searchInput.trim().toLowerCase(), 250)
 
-    /** Flat list of entries with their AniList list status preserved. */
+    // When a profile is active, "Mes listes" reflects ONLY what that profile
+    // has added (kuro_profile_list_entries). When no profile is active, fall
+    // back to the global AniList collection — legacy single-user mode.
+    const activeProfileId = useActiveProfileId()
+    const profileList = useActiveProfileList()
+
+    // Index the AniList collection by mediaId so we can resolve each profile
+    // entry's media payload (cover, title, etc.) without re-walking the lists.
+    const mediaById = React.useMemo(() => {
+        const m = new Map<number, AL_BaseAnime>()
+        for (const list of data?.MediaListCollection?.lists ?? []) {
+            for (const entry of list?.entries ?? []) {
+                if (entry?.media?.id != null) m.set(entry.media.id, entry.media as AL_BaseAnime)
+            }
+        }
+        return m
+    }, [data])
+
+    /** Flat list of entries — profile-scoped if a profile is active, global otherwise. */
     const allEntries = React.useMemo<Entry[]>(() => {
-        const lists = data?.MediaListCollection?.lists ?? []
         const wanted = active === "all" || active === "history"
             ? null
             : STATUS_BY_KEY[active]
 
+        if (activeProfileId) {
+            // Profile mode — entries from the kuro list, status from kuro,
+            // media payload from the AniList cache (already loaded for the
+            // shared account).
+            const out: Entry[] = []
+            for (const e of profileList) {
+                if (wanted && e.status !== wanted) continue
+                const media = mediaById.get(e.mediaId)
+                if (!media) continue  // not yet in the AniList cache; skip silently
+                out.push({ media, status: e.status as AL_MediaListStatus })
+            }
+            return out
+        }
+
+        // Single-user mode — same as before.
+        const lists = data?.MediaListCollection?.lists ?? []
         const out: Entry[] = []
         for (const list of lists) {
             if (!list) continue
@@ -51,7 +85,7 @@ export function NetflixLists() {
             }
         }
         return out
-    }, [data, active])
+    }, [data, active, activeProfileId, profileList, mediaById])
 
     const filtered = React.useMemo<Entry[]>(() => {
         if (!search) return allEntries

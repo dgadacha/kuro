@@ -1,9 +1,10 @@
-import { Anime_Entry } from "@/api/generated/types"
+import { Anime_Entry, AL_MediaListStatus } from "@/api/generated/types"
 import { useGetAnilistAnimeDetails } from "@/api/hooks/anilist.hooks"
 import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
 import { NetflixEpisodeList } from "@/app/(main)/_features/netflix/netflix-episode-list"
 import { NetflixListPickerButton } from "@/app/(main)/_features/netflix/netflix-list-picker-button"
 import { NetflixMoreLikeThis } from "@/app/(main)/_features/netflix/netflix-more-like-this"
+import { useActiveProfileId, useActiveProfileListStatusMap } from "@/lib/profiles/profiles"
 import { SeaImage } from "@/components/shared/sea-image"
 import { IconButton } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
@@ -80,6 +81,16 @@ function Body({ mediaId }: { mediaId: number }) {
     const rawDescription = entry?.media?.description?.replace(/(<([^>]+)>)/gi, "") ?? ""
     const { text: description, isTranslating } = useTranslatedText(rawDescription)
 
+    // When a profile is active, the displayed list status is the per-profile
+    // value (kuro_profile_list_entries) — NOT the global AniList one. That's
+    // what makes "deedoo's Currently Watching" show different content from
+    // "aym's Currently Watching" even though one AniList account is shared.
+    const activeProfileId = useActiveProfileId()
+    const profileStatusMap = useActiveProfileListStatusMap()
+    const currentStatus: AL_MediaListStatus | null = activeProfileId
+        ? (profileStatusMap.get(mediaId) as AL_MediaListStatus | undefined) ?? null
+        : (entry?.listData?.status ?? null)
+
     if (entryLoading || !entry) return <BodySkeleton />
 
     const banner = entry.media?.bannerImage || entry.media?.coverImage?.extraLarge
@@ -105,7 +116,7 @@ function Body({ mediaId }: { mediaId: number }) {
                     <div className="flex items-center gap-3 flex-wrap">
                         <NetflixListPickerButton
                             mediaId={mediaId}
-                            currentStatus={entry.listData?.status ?? null}
+                            currentStatus={currentStatus}
                         />
                     </div>
                 </div>
