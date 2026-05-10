@@ -7,10 +7,11 @@ testdata/
 */.DS_Store
 .todo/
 
-Dockerfile
+# Kuro tracks its own Dockerfile + .dockerignore (multi-stage build for the
+# k8s deploy on registry.gitlab.com/kidnar/kuro). Upstream seanime ignored
+# these — we re-add them here.
 Dockerfile.dev
 dev.dockerfile
-.dockerignore
 
 go.work
 
