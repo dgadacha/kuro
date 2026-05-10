@@ -260,6 +260,18 @@ A series of waves, all already pushed to `kuro/main`:
   the init container (root) writes config.toml it stays root:root mode 600 →
   CrashLoopBackOff with "permission denied". The init script chowns to
   999:999 and chmod 0644 — keep it that way.
+- **Silent `git pull` failure on the salon node** — `git pull --ff-only` in
+  `/appli/kuro/` aborts (without setting a non-zero exit code that's obvious
+  in the chained shell) if there are UNTRACKED files in the working tree
+  that would be overwritten by the incoming commits. This bit us hard when
+  `Dockerfile`, `.dockerignore` and `k8s/*.yaml` (which lived only on the
+  server for ages) got tracked in commit `5f17b95b`: every subsequent pull
+  silently aborted with "Les fichiers suivants non suivis seraient effacés"
+  and HEAD stayed at `e5cb83a8` — the deployed pod kept compiling old
+  source while we shipped 4+ "fix" commits. **Always check `git status`
+  before assuming a pull worked**, or use `git pull --ff-only && git rev-parse HEAD`
+  and compare to the local. If conflicts exist with untracked-becoming-tracked
+  files, `rm -rf <path>` then pull (the tracked version is what we want).
 
 ## Next things the user is likely to ask
 
@@ -301,10 +313,20 @@ git log --oneline -20
 # Force-rewrite config port (if user changes Makefile PORT default)
 sed -i '' -E "s/^port = [0-9]+/port = 43211/" ~/.seanime-data/config.toml
 
-# Deploy a fresh image
+# Deploy a fresh image — IMPORTANT: verify HEAD actually moved before
+# trusting the build. `git pull --ff-only` can silently abort if untracked
+# files conflict (see the silent-pull gotcha above).
+cd /appli/kuro
+git status --short                         # MUST be clean (or only stuff you'd expect)
+git pull --ff-only && git log --oneline -1 # confirm HEAD is what you expect
 docker build -t registry.gitlab.com/kidnar/kuro:latest .
 docker push registry.gitlab.com/kidnar/kuro:latest
 kubectl -n kuro rollout restart deployment/kuro
+
+# Quickly verify the served bundle actually contains a known new string
+# (the chunk hash in /static/js/index.<hash>.js will change between deploys
+# only if the source actually changed)
+curl -s https://kuro.nc-maiz.org/ | grep -oE '/static/js/index\.[a-z0-9]+\.js' | head -1
 
 # Tail kuro logs in cluster (run from the salon node via SSH)
 kubectl logs -n kuro -l app=kuro -c kuro --tail=200 -f
