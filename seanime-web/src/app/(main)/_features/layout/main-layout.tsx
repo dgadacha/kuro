@@ -153,7 +153,8 @@ function useProfileGate() {
 
         if (profiles.length === 0) return  // user hasn't opted into profiles yet
 
-        const valid = !!activeId && profiles.some(p => p.id === activeId)
+        // `activeId` is the client-generated UID (string), NOT the SQL auto-id.
+        const valid = !!activeId && profiles.some(p => p.uid === activeId)
         if (!valid) router.push("/profiles")
     }, [pathname, profiles, activeId])
 }
