@@ -15,6 +15,10 @@
   &nbsp;
   <a href="https://gitlab.com/kidnar/kuro"><img alt="GitLab" src="https://img.shields.io/badge/GitLab-kidnar%2Fkuro-FC6D26?logo=gitlab"/></a>
   &nbsp;
+  <a href="https://gitlab.com/kidnar/kuro/-/releases"><img alt="Release" src="https://img.shields.io/gitlab/v/release/kidnar%2Fkuro?logo=gitlab&label=release&color=E50914"/></a>
+  &nbsp;
+  <a href="https://gitlab.com/kidnar/kuro/-/pipelines"><img alt="Pipeline" src="https://img.shields.io/gitlab/pipeline-status/kidnar%2Fkuro?branch=main&logo=gitlab&label=CI"/></a>
+  &nbsp;
   <a href="https://kuro.nc-maiz.org"><img alt="Démo" src="https://img.shields.io/badge/d%C3%A9mo-kuro.nc--maiz.org-E50914"/></a>
 </p>
 
@@ -247,6 +251,47 @@ kubectl -n kuro rollout status   deployment/kuro
 
 # inspection rapide sans entrer dans le pod
 kubectl -n kuro exec deploy/kuro -- /app/seanime --version
+```
+
+### Déploiement continu (CI/CD)
+
+Push sur `main` → déploiement auto, sans SSH. La pipeline GitLab fait
+deux jobs :
+
+```
+git push  →  build:image (~3-4 min)  →  deploy:k8s (~1 min)  →  pod rolled
+```
+
+Briques en place :
+
+- **Self-hosted runner** sur le nœud salon (docker executor, tag `salon`),
+  enregistré comme runner projet — pas de quota, pas de coût, build dans
+  le LAN du cluster.
+- **GitLab Agent for Kubernetes** (KAS) installé dans le namespace `kuro`
+  (2 replicas, leader-election par lease). Service account et Role scopés
+  au namespace `kuro` — même un job CI compromis ne peut rien toucher
+  ailleurs dans le cluster.
+- `.gitlab-ci.yml` à la racine, deux stages :
+  - `build:image` → DinD, push vers `registry.gitlab.com/kidnar/kuro` taggé
+    `:SHA`, `:branch`, `:latest` sur main, `:kuro-vX.Y.Z` sur les tags.
+  - `deploy:k8s` → `kubectl apply` des manifests namespace-scoped puis
+    `set image deployment/kuro kuro=:SHA` et `rollout status` (timeout 3 min).
+- `.gitlab/agents/kuro/config.yaml` déclare l'agent + son default_namespace.
+- `.gitlab/agents/kuro/kuro-agent-rbac.yaml` = ServiceAccount + Role +
+  RoleBinding qui limitent ce que l'agent peut faire.
+
+État des pipelines : <https://gitlab.com/kidnar/kuro/-/pipelines>
+
+### Releases
+
+Releases publiées sur **GitLab uniquement** : <https://gitlab.com/kidnar/kuro/-/releases>
+
+Convention de tag : `kuro-vMAJOR.MINOR.PATCH` (ex: `kuro-v1.0.0`).
+Pousser un tag matching `^kuro-v` déclenche automatiquement le
+pipeline qui publie l'image conteneur taggée pareil :
+
+```
+registry.gitlab.com/kidnar/kuro:kuro-vX.Y.Z
 ```
 
 ### Autres targets Make
