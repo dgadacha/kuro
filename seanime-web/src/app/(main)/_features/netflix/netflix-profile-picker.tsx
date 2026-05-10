@@ -32,7 +32,12 @@ export function NetflixProfilePicker() {
 
     const onPick = (uid: string) => {
         select(uid)
-        router.push("/")
+        // Use a hard navigation instead of router.push: TanStack Router's
+        // soft-nav races with jotai's atom-update commit and the layout-level
+        // useProfileGate sometimes bounces us straight back to /profiles.
+        // A full reload guarantees the next page boots with the active uid
+        // already persisted in localStorage, and the gate sees it on first run.
+        window.location.assign("/")
     }
 
     const openCreate = () => {

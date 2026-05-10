@@ -93,6 +93,20 @@ export function useProfiles() {
     return q.data ?? []
 }
 
+/**
+ * Same as useProfiles but also exposes the loading flag — used by the gate
+ * so it doesn't redirect to /profiles before the list has finished loading
+ * (otherwise activeId might be valid but profiles=[] triggers a wrong bounce).
+ */
+export function useProfilesQuery() {
+    const q = useServerQuery<Profile[]>({
+        endpoint: EP_LIST,
+        method: "GET",
+        queryKey: [...QK_PROFILES],
+    })
+    return { profiles: q.data ?? [], isLoading: q.isLoading, isFetched: q.isFetched }
+}
+
 export function useActiveProfile(): Profile | null {
     const profiles = useProfiles()
     const uid = useActiveProfileId()

@@ -27,7 +27,7 @@ import { useTorrentStreamListener } from "@/app/(main)/entry/_containers/torrent
 import { TorrentStreamOverlay } from "@/app/(main)/entry/_containers/torrent-stream/torrent-stream-overlay"
 import { LoadingOverlayWithLogo } from "@/components/shared/loading-overlay-with-logo"
 import { AppLayout, AppLayoutContent, AppSidebarProvider } from "@/components/ui/app-layout"
-import { activeProfileIdAtom, useProfiles } from "@/lib/profiles/profiles"
+import { activeProfileIdAtom, useProfilesQuery } from "@/lib/profiles/profiles"
 import { usePathname, useRouter } from "@/lib/navigation"
 import { __isElectronDesktop__ } from "@/types/constants"
 import { useAtomValue } from "jotai"
@@ -140,7 +140,7 @@ function Loader() {
  * exempt to avoid a redirect loop.
  */
 function useProfileGate() {
-    const profiles = useProfiles()
+    const { profiles, isFetched } = useProfilesQuery()
     const activeId = useAtomValue(activeProfileIdAtom)
     const router = useRouter()
     const pathname = usePathname()
@@ -151,10 +151,14 @@ function useProfileGate() {
         if (pathname.startsWith("/auth")) return
         if (pathname.startsWith("/offline")) return
 
+        // Wait for the profiles query to have a verdict — without this guard,
+        // the gate fires once with profiles=[] (loading) → carve-out → ok,
+        // then again with profiles=[N] but a stale activeId snapshot → bounce.
+        if (!isFetched) return
         if (profiles.length === 0) return  // user hasn't opted into profiles yet
 
         // `activeId` is the client-generated UID (string), NOT the SQL auto-id.
         const valid = !!activeId && profiles.some(p => p.uid === activeId)
         if (!valid) router.push("/profiles")
-    }, [pathname, profiles, activeId])
+    }, [pathname, profiles, activeId, isFetched])
 }
