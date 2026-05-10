@@ -2,6 +2,7 @@ import { Anime_Entry } from "@/api/generated/types"
 import { useGetAnilistAnimeDetails } from "@/api/hooks/anilist.hooks"
 import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
 import { NetflixEpisodeList } from "@/app/(main)/_features/netflix/netflix-episode-list"
+import { NetflixListPickerButton } from "@/app/(main)/_features/netflix/netflix-list-picker-button"
 import { NetflixMoreLikeThis } from "@/app/(main)/_features/netflix/netflix-more-like-this"
 import { SeaImage } from "@/components/shared/sea-image"
 import { IconButton } from "@/components/ui/button"
@@ -84,10 +85,16 @@ function Body({ mediaId }: { mediaId: number }) {
                     <SeaImage src={banner} alt="" fill priority className="object-cover object-center" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-10">
+                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-10 space-y-4">
                     <h1 className="text-3xl lg:text-5xl font-extrabold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] max-w-2xl">
                         {title}
                     </h1>
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <NetflixListPickerButton
+                            mediaId={mediaId}
+                            currentStatus={entry.listData?.status ?? null}
+                        />
+                    </div>
                 </div>
             </div>
 

@@ -95,6 +95,8 @@
     "actions": {
       "menu": "Actions",
       "move_to": "Move to",
+      "add_to_list": "Add to my lists",
+      "add_to": "Add to",
       "delete": "Remove from my lists",
       "delete_confirm": "Remove this anime from your AniList lists?"
     }
