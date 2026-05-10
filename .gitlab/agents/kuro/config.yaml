@@ -13,12 +13,6 @@ ci_access:
     - id: kidnar/kuro
       default_namespace: kuro
 
-container_scanning:
-  resource_requirements:
-    requests:
-      cpu: "100m"
-      memory: "128Mi"
-
 # Observability — the agent surfaces basic cluster events into the GitLab
 # Operate → Kubernetes view so you can see deploy state from the web UI.
 observability:
