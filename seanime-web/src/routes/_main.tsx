@@ -38,9 +38,10 @@ function Layout() {
         <ServerDataWrapper host={host}>
             <MainLayout>
                 <div data-main-layout-container className="h-auto">
-                    {/* push content under the fixed Netflix top bar.
-                        Hero pages opt out via -mt-16 lg:-mt-[68px]. */}
-                    <div data-main-layout-content className="pt-16 lg:pt-[68px]">
+                    {/* Push content under the fixed top bar (top-side) AND clear
+                        the mobile bottom tab (~3.5rem + iOS home indicator).
+                        Hero pages opt out of the top offset via -mt-16. */}
+                    <div data-main-layout-content className="pt-16 lg:pt-[68px] pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0">
                         <ErrorBoundary FallbackComponent={AppErrorBoundary}>
                             <Outlet />
                         </ErrorBoundary>

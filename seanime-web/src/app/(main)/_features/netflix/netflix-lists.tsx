@@ -87,18 +87,48 @@ export function NetflixLists() {
         return out
     }, [data, active, activeProfileId, profileList, mediaById])
 
+    // Genre filter — single-select chip row above the grid. "Tous" = no filter.
+    // The available chips are derived from what's actually in this tab's
+    // entries, so we never show a chip that would render zero results.
+    const [activeGenre, setActiveGenre] = React.useState<string | null>(null)
+    const availableGenres = React.useMemo<string[]>(() => {
+        const counts = new Map<string, number>()
+        for (const { media } of allEntries) {
+            for (const g of media.genres ?? []) {
+                if (!g) continue
+                counts.set(g, (counts.get(g) ?? 0) + 1)
+            }
+        }
+        // Sort by frequency desc so the most-represented genres come first.
+        return [...counts.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .map(([g]) => g)
+    }, [allEntries])
+
+    // Reset the genre filter when switching tabs — otherwise sticking on
+    // "Shōnen" on the Completed tab leaks across into Currently watching.
+    React.useEffect(() => {
+        setActiveGenre(null)
+    }, [active])
+
     const filtered = React.useMemo<Entry[]>(() => {
-        if (!search) return allEntries
-        return allEntries.filter(({ media }) => {
-            const titles = [
-                media.title?.userPreferred,
-                media.title?.romaji,
-                media.title?.english,
-                media.title?.native,
-            ].filter(Boolean) as string[]
-            return titles.some(t => t.toLowerCase().includes(search))
-        })
-    }, [allEntries, search])
+        let out = allEntries
+        if (activeGenre) {
+            out = out.filter(({ media }) => (media.genres ?? []).includes(activeGenre))
+        }
+        if (search) {
+            out = out.filter(({ media }) => {
+                const titles = [
+                    media.title?.userPreferred,
+                    media.title?.romaji,
+                    media.title?.english,
+                    media.title?.native,
+                ].filter(Boolean) as string[]
+                return titles.some(t => t.toLowerCase().includes(search))
+            })
+        }
+        return out
+    }, [allEntries, search, activeGenre])
 
     const tabs: { key: ListKey; label: string }[] = [
         { key: "current", label: t("lists.tabs.current") },
@@ -153,6 +183,40 @@ export function NetflixLists() {
                     )
                 })}
             </div>
+
+            {/* Genre chip row — hidden on History (history has its own filter
+                surface) and on tabs that have no entries (nothing to filter). */}
+            {active !== "history" && availableGenres.length > 0 && (
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-4 sm:-mx-6 lg:-mx-16 px-4 sm:px-6 lg:px-16 pb-1">
+                    <button
+                        type="button"
+                        onClick={() => setActiveGenre(null)}
+                        className={cn(
+                            "shrink-0 px-3 py-1 text-xs font-semibold rounded-full transition-colors whitespace-nowrap",
+                            activeGenre === null
+                                ? "bg-white text-black"
+                                : "bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white",
+                        )}
+                    >
+                        {t("lists.tabs.all")}
+                    </button>
+                    {availableGenres.map(genre => (
+                        <button
+                            key={genre}
+                            type="button"
+                            onClick={() => setActiveGenre(genre === activeGenre ? null : genre)}
+                            className={cn(
+                                "shrink-0 px-3 py-1 text-xs font-semibold rounded-full transition-colors whitespace-nowrap",
+                                activeGenre === genre
+                                    ? "bg-white text-black"
+                                    : "bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white",
+                            )}
+                        >
+                            {genre}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* History tab has its own renderer (per-anime grouping + episode rows). */}
             {active === "history" ? (

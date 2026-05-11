@@ -1,4 +1,5 @@
 import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
+import { NetflixPipOnBlur } from "@/app/(main)/_features/netflix/netflix-pip-on-blur"
 import { NetflixProfileHistorySaver } from "@/app/(main)/_features/netflix/netflix-profile-history-saver"
 import { OnlinestreamPage } from "@/app/(main)/onlinestream/_containers/onlinestream-page"
 import {
@@ -78,6 +79,8 @@ export default function WatchPage() {
             <div data-watch-page className="min-h-screen bg-black -mt-16 lg:-mt-[68px]">
                 {/* Per-profile watch history mirror — see netflix-profile-history-saver. */}
                 <NetflixProfileHistorySaver />
+                {/* Pop the video into Picture-in-Picture when the user switches tabs. */}
+                <NetflixPipOnBlur />
                 <OnlinestreamPage
                     animeEntry={animeEntry}
                     animeEntryLoading={isLoading}

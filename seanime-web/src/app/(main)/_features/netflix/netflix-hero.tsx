@@ -1,8 +1,11 @@
 import { AL_BaseAnime } from "@/api/generated/types"
+import { useGetAnimeCollection } from "@/api/hooks/anilist.hooks"
+import { useGetAnimeEntry } from "@/api/hooks/anime_entries.hooks"
 import { useNetflixDetailModal } from "@/app/(main)/_features/netflix/netflix-detail-modal"
 import { HERO } from "@/app/(main)/_features/netflix/netflix.constants"
 import { useSlideshow } from "@/app/(main)/_features/netflix/use-slideshow"
 import { useDiscoverTrendingAnime } from "@/app/(main)/discover/_lib/handle-discover-queries"
+import { useActiveProfileHistory, useActiveProfileId } from "@/lib/profiles/profiles"
 import { SeaImage } from "@/components/shared/sea-image"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/components/ui/core/styling"
@@ -11,6 +14,10 @@ import { useTranslatedText } from "@/lib/translate/use-translated-text"
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { BiInfoCircle, BiPlay } from "react-icons/bi"
+
+// Ignore entries within FINISHED_THRESHOLD seconds of the end for the resume
+// hero — those are "I finished watching" not "I left in the middle".
+const RESUME_FINISHED_THRESHOLD = 60
 
 export function NetflixHero() {
     const { t } = useTranslation()
@@ -28,14 +35,50 @@ export function NetflixHero() {
     const [hovering, setHovering] = React.useState(false)
     const [index, setIndex] = useSlideshow(pool.length, HERO.rotateMs, { paused: hovering })
 
+    // Resume detection — when the active profile has an in-progress episode,
+    // the hero swaps from trending-slideshow to a single-card "Reprendre"
+    // pinned to that anime. More useful than a random highlight.
+    const profileId = useActiveProfileId()
+    const profileHistory = useActiveProfileHistory()
+    const resume = React.useMemo(() => {
+        if (!profileId) return null
+        const inProgress = profileHistory
+            .filter(h => h.duration > 0 && h.currentTime > 0 && h.currentTime < h.duration - RESUME_FINISHED_THRESHOLD)
+            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+        return inProgress[0] ?? null
+    }, [profileId, profileHistory])
+
+    // Resolve the resume anime's full media payload — try the AniList cache
+    // first (cheap), fall back to the per-entry endpoint when missing.
+    const { data: collection } = useGetAnimeCollection()
+    const resumeMediaFromCollection = React.useMemo(() => {
+        if (!resume || !collection) return null
+        for (const list of collection.MediaListCollection?.lists ?? []) {
+            for (const entry of list?.entries ?? []) {
+                if (entry?.media?.id === resume.mediaId) return entry.media as AL_BaseAnime
+            }
+        }
+        return null
+    }, [resume, collection])
+    const { data: resumeEntry } = useGetAnimeEntry(resume && !resumeMediaFromCollection ? resume.mediaId : null)
+    const resumeMedia = resumeMediaFromCollection ?? (resumeEntry?.media as AL_BaseAnime | undefined) ?? null
+
+    // Either resume mode or slideshow mode — never both. featured is always
+    // a single media object so the rest of the JSX stays unchanged.
+    const inResumeMode = !!(resume && resumeMedia?.bannerImage)
+    const featured = inResumeMode ? resumeMedia! : (pool[index] ?? pool[0])
+
     // Hooks must run unconditionally — keep them above the loading early-return.
-    const featured = pool[index] ?? pool[0]
     const rawDescription = featured?.description?.replace(/(<([^>]+)>)/gi, "") || ""
     const { text: description } = useTranslatedText(rawDescription)
 
-    if (isLoading || pool.length === 0) {
+    if (isLoading || (!inResumeMode && pool.length === 0)) {
         return <Skeleton className={cn("w-full rounded-none", HERO.heightClass)} />
     }
+
+    const resumeHref = resume
+        ? `/watch?id=${resume.mediaId}&episode=${resume.episodeNumber}&t=${Math.floor(resume.currentTime)}`
+        : null
 
     return (
         <section
@@ -47,7 +90,20 @@ export function NetflixHero() {
             onMouseEnter={() => setHovering(true)}
             onMouseLeave={() => setHovering(false)}
         >
-            <HeroBackdrops pool={pool} activeIndex={index} />
+            {inResumeMode ? (
+                // Single-card resume mode: a static backdrop, no slideshow churn.
+                <div className="absolute inset-0">
+                    <SeaImage
+                        src={resumeMedia.bannerImage || resumeMedia.coverImage?.extraLarge || ""}
+                        alt={resumeMedia.title?.userPreferred || ""}
+                        fill
+                        priority
+                        className="object-cover object-center"
+                    />
+                </div>
+            ) : (
+                <HeroBackdrops pool={pool} activeIndex={index} />
+            )}
             <HeroGradients />
 
             <div className="relative z-[2] h-full flex items-end pb-16 sm:pb-20 lg:pb-24 px-4 sm:px-6 lg:px-16">
@@ -74,14 +130,26 @@ export function NetflixHero() {
                     )}
 
                     <div className="flex items-center gap-2 sm:gap-3 pt-2">
-                        <Button
-                            size="md"
-                            className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-4 sm:px-6 lg:px-8 lg:!h-12 lg:!text-base"
-                            leftIcon={<BiPlay className="text-xl sm:text-2xl" />}
-                            onClick={() => openDetail(featured.id)}
-                        >
-                            {t("home.hero.play")}
-                        </Button>
+                        {inResumeMode && resumeHref ? (
+                            <a href={resumeHref} target="_blank" rel="noopener noreferrer" className="inline-flex">
+                                <Button
+                                    size="md"
+                                    className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-4 sm:px-6 lg:px-8 lg:!h-12 lg:!text-base"
+                                    leftIcon={<BiPlay className="text-xl sm:text-2xl" />}
+                                >
+                                    {t("home.hero.resume")} {t("entry.episode_short")} {resume!.episodeNumber}
+                                </Button>
+                            </a>
+                        ) : (
+                            <Button
+                                size="md"
+                                className="bg-white !text-black hover:!bg-white/90 font-bold rounded-md px-4 sm:px-6 lg:px-8 lg:!h-12 lg:!text-base"
+                                leftIcon={<BiPlay className="text-xl sm:text-2xl" />}
+                                onClick={() => openDetail(featured.id)}
+                            >
+                                {t("home.hero.play")}
+                            </Button>
+                        )}
 
                         <Button
                             size="md"
@@ -96,7 +164,7 @@ export function NetflixHero() {
                 </div>
             </div>
 
-            {pool.length > 1 && (
+            {!inResumeMode && pool.length > 1 && (
                 <div
                     role="tablist"
                     aria-label="Sélection à la une"

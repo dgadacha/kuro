@@ -3,6 +3,7 @@ import { ScannerModal } from "@/app/(main)/_features/anime-library/_containers/s
 import { ErrorExplainer } from "@/app/(main)/_features/error-explainer/error-explainer"
 import { IssueReport } from "@/app/(main)/_features/issue-report/issue-report"
 import { MediaPreviewModal } from "@/app/(main)/_features/media/_containers/media-preview-modal"
+import { NetflixBottomTab } from "@/app/(main)/_features/netflix/netflix-bottom-tab"
 import { NetflixDetailModal } from "@/app/(main)/_features/netflix/netflix-detail-modal"
 import { NetflixTopBar } from "@/app/(main)/_features/netflix/netflix-top-bar"
 import { GlobalPlaylistManager } from "@/app/(main)/_features/playlists/_containers/global-playlist-manager"
@@ -80,6 +81,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         {children}
                     </AppLayoutContent>
                 </AppLayout>
+                <NetflixBottomTab />
             </AppSidebarProvider>
         </>
     )

@@ -28,6 +28,36 @@ type Group = {
     episodes: ProfileWatchEntry[]  // sorted by episodeNumber asc
 }
 
+type DateBucket = "today" | "yesterday" | "thisWeek" | "thisMonth" | "older"
+
+/** Bucket label used by the section headers in the History tab. */
+function bucketOf(updatedAtIso: string): DateBucket {
+    const updated = new Date(updatedAtIso)
+    const now = new Date()
+    const dayMs = 24 * 60 * 60 * 1000
+
+    // Compare by calendar day, not by elapsed ms — "watched at 23h yesterday"
+    // shouldn't be lumped with "watched 22h ago" if those straddle midnight.
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+    const updatedDay = new Date(updated.getFullYear(), updated.getMonth(), updated.getDate()).getTime()
+    const diffDays = Math.round((startOfToday - updatedDay) / dayMs)
+
+    if (diffDays <= 0) return "today"
+    if (diffDays === 1) return "yesterday"
+    if (diffDays <= 7) return "thisWeek"
+    if (diffDays <= 30) return "thisMonth"
+    return "older"
+}
+
+const BUCKET_ORDER: DateBucket[] = ["today", "yesterday", "thisWeek", "thisMonth", "older"]
+const BUCKET_I18N: Record<DateBucket, string> = {
+    today: "history.bucket.today",
+    yesterday: "history.bucket.yesterday",
+    thisWeek: "history.bucket.this_week",
+    thisMonth: "history.bucket.this_month",
+    older: "history.bucket.older",
+}
+
 export function NetflixHistoryGrid() {
     const { t } = useTranslation()
     const profileId = useActiveProfileId()
@@ -54,6 +84,17 @@ export function NetflixHistoryGrid() {
             new Date(b.latest.updatedAt).getTime() - new Date(a.latest.updatedAt).getTime(),
         )
     }, [history])
+
+    // Second pass: bucket each group by when it was last touched.
+    const buckets = React.useMemo<Record<DateBucket, Group[]>>(() => {
+        const out: Record<DateBucket, Group[]> = {
+            today: [], yesterday: [], thisWeek: [], thisMonth: [], older: [],
+        }
+        for (const g of groups) {
+            out[bucketOf(g.latest.updatedAt)].push(g)
+        }
+        return out
+    }, [groups])
 
     if (!profileId) {
         return (
@@ -87,8 +128,24 @@ export function NetflixHistoryGrid() {
                 </Button>
             </div>
 
-            <div className="rounded-lg border border-white/10 divide-y divide-white/10 overflow-hidden bg-white/[0.02]">
-                {groups.map(g => <HistoryRow key={g.mediaId} group={g} />)}
+            {/* Sections grouped by recency — "Aujourd'hui", "Hier", "Cette
+                semaine", "Ce mois-ci", "Plus ancien". Empty buckets are
+                silently skipped. */}
+            <div className="space-y-6">
+                {BUCKET_ORDER.map(bucket => {
+                    const items = buckets[bucket]
+                    if (items.length === 0) return null
+                    return (
+                        <section key={bucket} className="space-y-2">
+                            <h3 className="text-sm font-semibold uppercase tracking-wider text-[--muted]">
+                                {t(BUCKET_I18N[bucket])}
+                            </h3>
+                            <div className="rounded-lg border border-white/10 divide-y divide-white/10 overflow-hidden bg-white/[0.02]">
+                                {items.map(g => <HistoryRow key={g.mediaId} group={g} />)}
+                            </div>
+                        </section>
+                    )
+                })}
             </div>
         </div>
     )

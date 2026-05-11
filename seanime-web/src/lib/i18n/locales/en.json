@@ -31,7 +31,8 @@
     "refresh_anilist": "Refresh AniList",
     "sign_in": "Sign in",
     "sign_out": "Sign out",
-    "more": "More"
+    "more": "More",
+    "profile": "Profile"
   },
   "home": {
     "rows": {
@@ -45,6 +46,7 @@
     },
     "hero": {
       "play": "Play",
+      "resume": "Resume",
       "more_info": "More info",
       "slide_label": "Slide {{n}}: {{title}}",
       "slideshow_aria": "Featured selection"
@@ -102,6 +104,13 @@
     }
   },
   "history": {
+    "bucket": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "this_week": "This week",
+      "this_month": "This month",
+      "older": "Older"
+    },
     "no_profile": "Activate a profile to see your watch history.",
     "empty": "No episodes watched yet.",
     "episodes_count": "episodes watched",

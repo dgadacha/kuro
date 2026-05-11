@@ -55,6 +55,8 @@ export function NetflixTopBar() {
             className={cn(
                 "fixed top-0 inset-x-0 z-[60] transition-colors duration-300",
                 scrolled ? "bg-black/95 backdrop-blur-sm" : "bg-gradient-to-b from-black/70 via-black/40 to-transparent",
+                // iPhone notch / Dynamic Island clearance.
+                "pt-[max(env(safe-area-inset-top),0px)]",
             )}
             style={{ WebkitAppRegion: "drag" } as any}
         >
@@ -67,9 +69,8 @@ export function NetflixTopBar() {
                     <span className="hidden sm:inline text-lg lg:text-xl font-extrabold text-white tracking-tight">KURO</span>
                 </SeaLink>
 
-                {/* min-w-0 lets the nav shrink rather than push other items out;
-                    whitespace-nowrap on each link prevents wrapping inside a pill. */}
-                <nav className="flex items-center gap-0.5 sm:gap-1 lg:gap-2 min-w-0">
+                {/* Nav links hidden < sm — the bottom tab bar takes over. */}
+                <nav className="hidden sm:flex items-center gap-0.5 sm:gap-1 lg:gap-2 min-w-0">
                     {navItems.map(item => (
                         <SeaLink
                             key={item.href}
@@ -88,11 +89,12 @@ export function NetflixTopBar() {
 
                 <div className="flex-1" />
 
+                {/* Search icon also hidden < sm — search lives in the bottom tab. */}
                 <SeaLink
                     href="/search"
                     aria-label={t("common.search")}
                     className={cn(
-                        "p-2 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors shrink-0",
+                        "hidden sm:inline-flex p-2 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors shrink-0",
                         pathname.startsWith("/search") && "text-white bg-white/10",
                     )}
                 >

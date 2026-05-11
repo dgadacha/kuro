@@ -69,7 +69,12 @@ export function NetflixListCardMenu({ mediaId, currentStatus, alwaysVisible, cla
         <div
             className={cn(
                 "absolute top-2 right-2 z-[3]",
-                alwaysVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                alwaysVisible
+                    ? "opacity-100"
+                    // On touch devices (no real hover), the hover-only opacity-100
+                    // never triggers and the menu becomes unreachable. Force it
+                    // visible whenever the platform reports no hover capability.
+                    : "opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100",
                 "transition-opacity duration-150",
                 className,
             )}

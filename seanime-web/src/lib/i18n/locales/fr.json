@@ -31,7 +31,8 @@
     "refresh_anilist": "Rafraîchir AniList",
     "sign_in": "Se connecter",
     "sign_out": "Se déconnecter",
-    "more": "Plus"
+    "more": "Plus",
+    "profile": "Profil"
   },
   "home": {
     "rows": {
@@ -45,6 +46,7 @@
     },
     "hero": {
       "play": "Lecture",
+      "resume": "Reprendre",
       "more_info": "Plus d'infos",
       "slide_label": "Slide {{n}} : {{title}}",
       "slideshow_aria": "Sélection à la une"
@@ -102,6 +104,13 @@
     }
   },
   "history": {
+    "bucket": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "this_week": "Cette semaine",
+      "this_month": "Ce mois-ci",
+      "older": "Plus ancien"
+    },
     "no_profile": "Active un profil pour voir l'historique de visionnage.",
     "empty": "Aucun épisode regardé pour le moment.",
     "episodes_count": "épisodes vus",
