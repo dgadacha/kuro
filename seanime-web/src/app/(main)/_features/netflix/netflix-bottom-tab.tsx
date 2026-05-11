@@ -18,7 +18,8 @@ import * as React from "react"
 import { useTranslation } from "react-i18next"
 import { BiUser } from "react-icons/bi"
 import { FiSearch } from "react-icons/fi"
-import { LuHome, LuListVideo, LuCompass } from "react-icons/lu"
+// `LuHome` was renamed to `LuHouse` in lucide v0.453+ (react-icons/lu mirror).
+import { LuHouse, LuListVideo, LuCompass } from "react-icons/lu"
 
 export function NetflixBottomTab() {
     const { t } = useTranslation()
@@ -32,7 +33,7 @@ export function NetflixBottomTab() {
     if (pathname.startsWith("/offline")) return null
 
     const items = [
-        { href: "/",          label: t("nav.home"),     icon: LuHome,      active: pathname === "/" },
+        { href: "/",          label: t("nav.home"),     icon: LuHouse,     active: pathname === "/" },
         { href: "/search",    label: t("nav.search"),   icon: FiSearch,    active: pathname.startsWith("/search") },
         { href: "/lists",     label: t("nav.lists"),    icon: LuListVideo, active: pathname.startsWith("/lists") },
         { href: "/discover",  label: t("nav.discover"), icon: LuCompass,   active: pathname.startsWith("/discover") },
